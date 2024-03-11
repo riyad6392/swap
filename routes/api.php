@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\RegistrationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\ForgetPasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,7 +20,8 @@ use App\Http\Controllers\Auth\LoginController;
 
 Route::post('register', [RegistrationController::class, 'register'])->name('register');
 Route::post('login', [LoginController::class, 'login'])->name('login');
-
+Route::post('forget-password', [ForgetPasswordController::class, 'forgetPassword'])->name('forgot-password');
+Route::post('reset-password', [ForgetPasswordController::class, 'resetPassword'])->name('reset-password');
 //Route::post('refresh-token', [ForgotPasswordController::class, 'getTokenAndRefreshTokenByRefreshToken']);
 
 
