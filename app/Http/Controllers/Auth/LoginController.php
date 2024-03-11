@@ -137,4 +137,33 @@ class LoginController extends Controller
 //        return $response;
 
     }
+
+    public function logout(Request $request)
+    {
+        auth()->user()->token()->revoke();
+        return response()->json(['success' => true, 'message' => 'User logged out successfully'], 200);
+    }
+
+    public function refreshToken(Request $request)
+    {
+        $validateData = Validator::make($request->all(), [
+            'refresh_token' => 'required'
+        ]);
+
+        if ($validateData->fails()) {
+            return response()->json(['success' => false, 'errors' => $validateData->errors()], 422);
+        }
+
+        $oClient = OClient::where('password_client', 1)->first();
+
+        $response = Http::asForm()->post(config('app.url') . '/oauth/token', [
+            'grant_type' => 'refresh_token',
+            'refresh_token' => $request->refresh_token,
+            'client_id' => $oClient->id,
+            'client_secret' => $oClient->secret,
+            'scope' => 'user'
+        ]);
+
+        return response()->json($response->json());
+    }
 }

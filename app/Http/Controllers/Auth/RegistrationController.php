@@ -76,14 +76,11 @@ class RegistrationController extends Controller
 
         if ($validateData->fails()) {
             return response()->json(['success' => false, 'errors' => $validateData->errors()], 422);
+        }else{
+            $request->password = bcrypt($request->password);
+            User::create($request->only('name', 'email', 'password'));
+
+            return response()->json(['success' => true, 'message' => 'Your registration successfully done'], 200);
         }
-
-//        return response()->json($validateData);
-        $request->password = bcrypt($request->password);
-        User::create($request->only('name', 'email', 'password'));
-
-//        $token = $user->createToken('API Token')->accessToken;
-        return response()->json(['success' => true, 'message' => 'Your registration successfully done'], 200);
-
     }
 }
