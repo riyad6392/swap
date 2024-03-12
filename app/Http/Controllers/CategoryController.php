@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+
 
 class CategoryController extends Controller
 {
     /**
-     * Product List.
+     * Category List.
      *
      * @OA\Get(
      *     path="/api/category",
@@ -71,7 +74,54 @@ class CategoryController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Create a new Category.
+     *
+     *
+     * @OA\Post (path="/api/category",
+     *     tags={"Category"},
+     *     security={{ "apiAuth": {} }},
+     *
+     *
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="name",
+     *         required=true,
+     *
+     *         @OA\Schema(type="string"),
+     *         example="Doel Rana",
+     *     ),
+     *
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="description",
+     *         required=true,
+     *
+     *         @OA\Schema(type="string"),
+     *         example="This is just description",
+     *     ),
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="success",
+     *
+     *          @OA\JsonContent(
+     *
+     *              @OA\Property(property="success", type="boolean", example="true"),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Category created successfully."}}),
+     *          ),
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=422,
+     *          description="Invalid data",
+     *
+     *          @OA\JsonContent(
+     *
+     *              @OA\Property(property="success", type="boolean", example="false"),
+     *              @OA\Property(property="errors", type="json", example={"message": {"The given data was invalid."}}),
+     *          )
+     *      )
+     * )
      */
     public function store(Request $request)
     {
@@ -89,11 +139,40 @@ class CategoryController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Category Show.
+     *
+     * @OA\Get(
+     *     path="/api/category/{id}/show",
+     *     tags={"Category"},
+     *     security={{ "apiAuth": {} }},
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="success",
+     *
+     *          @OA\JsonContent(
+     *
+     *              @OA\Property(property="data", type="json", example={"id": 1,"name": "Category 1","description": "Description", "created_at": "2022-11-02T12:25:16.000000Z","updated_at": "2022-11-02T12:25:16.000000Z"},),
+     *          )
+     *      ),
+     *
+     *       @OA\Response(
+     *           response=401,
+     *           description="Invalid user",
+     *
+     *           @OA\JsonContent(
+     *
+     *               @OA\Property(property="success", type="boolean", example="false"),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Unauthenticated"}}),
+     *           )
+     *       )
+     * )
      */
+
     public function show(string $id)
     {
-        //
+        $category = Category::findOrFail($id);
+        return response()->json(['success' => true, 'data' => $category]);
     }
 
     /**
@@ -106,17 +185,104 @@ class CategoryController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
+     * @OA\Put (
+     *     path="/api/category/{id}",
+     *     tags={"Category"},
+     *     security={{ "apiAuth": {} }},
+     *
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="name",
+     *         required=true,
+     *
+     *         @OA\Schema(type="string"),
+     *         example="Doel Rana",
+     *     ),
+     *
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="description",
+     *         required=true,
+     *
+     *         @OA\Schema(type="string"),
+     *         example="This is just description",
+     *     ),
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="success",
+     *
+     *          @OA\JsonContent(
+     *
+     *              @OA\Property(property="success", type="boolean", example="true"),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Category updated successfully."}}),
+     *          ),
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=422,
+     *          description="Invalid data",
+     *
+     *          @OA\JsonContent(
+     *
+     *              @OA\Property(property="success", type="boolean", example="false"),
+     *              @OA\Property(property="errors", type="json", example={"message": {"The given data was invalid."}}),
+     *          )
+     *      )
+     * )
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validateData = Validator::make($request->all(), [
+            'name' => 'required|max:255',
+            'description' => 'required'
+        ]);
+
+        if ($validateData->fails()) {
+            return response()->json(['success' => false, 'errors' => $validateData->errors()], 422);
+        }else{
+            $category = Category::findOrFail($id);
+            $category->update($request->only('name', 'description'));
+            return response()->json(['success' => true, 'message' => 'Category updated successfully.']);
+        }
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified Category from storage.
+     *
+     * @OA\Delete (
+     *     path="/api/category/{id}",
+     *     tags={"Category"},
+     *     security={{ "apiAuth": {} }},
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="success",
+     *
+     *          @OA\JsonContent(
+     *
+     *              @OA\Property(property="success", type="boolean", example="true"),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Category deleted successfully."}}),
+     *          ),
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=422,
+     *          description="Invalid data",
+     *
+     *          @OA\JsonContent(
+     *
+     *              @OA\Property(property="success", type="boolean", example="false"),
+     *              @OA\Property(property="errors", type="json", example={"message": {"The given data was invalid."}}),
+     *          )
+     *      )
+     * )
      */
     public function destroy(string $id)
     {
-        //
+        $category = Category::findOrFail($id);
+        $category->delete();
+        return response()->json(['success' => true, 'message' => 'Category deleted successfully.']);
     }
 }
