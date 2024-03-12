@@ -20,7 +20,7 @@ class ForgetPasswordController extends Controller
      * Forget Password.
      *
      * @OA\Post (
-     *     path="/api/v1/forget-password",
+     *     path="/api/forget-password",
      *     tags={"Authentication"},
      *
      *     @OA\Parameter(
@@ -97,7 +97,7 @@ class ForgetPasswordController extends Controller
      * Reset Password.
      *
      * @OA\Post (
-     *     path="/api/v1/reset-password",
+     *     path="/api/reset-password",
      *     tags={"Authentication"},
      *
      *     @OA\Parameter(

@@ -9,7 +9,7 @@
 </head>
 <body>
 <div>
-    hello data
+    Please click on the link to reset your password
     <a href="{{env('FRONT_APP_URL').'/reset-password?'.$token}}">Reset Password</a>
     {{$token}}
 </div>

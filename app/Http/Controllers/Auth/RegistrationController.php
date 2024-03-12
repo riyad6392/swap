@@ -14,7 +14,7 @@ class RegistrationController extends Controller
      * Register a new User.
      *
      * @OA\Post (
-     *     path="/api/v1/register",
+     *     path="/api/register",
      *     tags={"Authentication"},
      *
      *     @OA\Parameter(

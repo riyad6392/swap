@@ -27,7 +27,7 @@ class LoginController extends Controller
      *      version="latest",
      *  )
      * @OA\Post (
-     *     path="/api/v1/login",
+     *     path="/api/login",
      *     tags={"Authentication"},
      *
      *     @OA\Parameter(
