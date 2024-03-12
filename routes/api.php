@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ForgetPasswordController;
+use App\Http\Controllers\ForgotPasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,7 +23,7 @@ Route::post('register', [RegistrationController::class, 'register'])->name('regi
 Route::post('login', [LoginController::class, 'login'])->name('login');
 Route::post('forget-password', [ForgetPasswordController::class, 'forgetPassword'])->name('forgot-password');
 Route::post('reset-password', [ForgetPasswordController::class, 'resetPassword'])->name('reset-password');
-//Route::post('refresh-token', [ForgotPasswordController::class, 'getTokenAndRefreshTokenByRefreshToken']);
+Route::post('refresh-token', [ForgotPasswordController::class, 'getTokenAndRefreshTokenByRefreshToken']);
 
 
 Route::group(['middleware' => 'auth:api'], function () {
