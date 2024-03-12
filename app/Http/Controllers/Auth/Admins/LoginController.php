@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use App\Support\Auth\Facade\PassportService;
+use Laravel\Passport\Passport;
+
 
 class LoginController extends Controller
 {
@@ -90,20 +93,21 @@ class LoginController extends Controller
         }
 
         if (auth()->guard('admins')->attempt($request->only('email', 'password'), (bool)$request->remember)) {
-            config(['auth.guards.api.provider' => 'doctor']);
+            config(['auth.guards.api.provider' => 'admins']);
 
-            return response()->json(['success' => true, 'message' => 'rEQUST'], 200);
+//            return response()->json(['success' => true, 'message' => 'rEQUST'], 200);
 
-            $user = auth()->user();
-            $strToken = $user->createToken('API Token')->accessToken;;
-            $expiration = Carbon::parse(Carbon::now()->addDays($this->expiresInDays))->diffInSeconds(Carbon::now()) ;
+            $user = auth()->guard('admins')->user();
+            $strToken = $user->createToken('API Token',['user'])->accessToken;;
+            $token = Passport::
+//            $expiration = Carbon::parse(Carbon::now()->addDays($this->expiresInDays))->diffInSeconds(Carbon::now()) ;
 
 //            $refresh_token = $this->getTokenAndRefreshToken( $request->email, $request->password, 'user');
             return response()->json([
                 'success' => true,
                 'user' => $user,
                 'token_type' => 'Bearer',
-                'expires_in' => $expiration,
+//                'expires_in' => $expiration,
                 'access_token' => $strToken,
                 //                'refresh_token' => $refresh_token,
             ], 200);
