@@ -10,17 +10,16 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use App\Support\Auth\Facade\PassportService;
 use Laravel\Passport\Passport;
+use Laravel\Passport\Client as OClient;
 
 
 class LoginController extends Controller
 {
+    public int $expiresInDays = 7;
+
     /**
      * Login Admin
      *
-     * @OA\Info(
-     *      title="SWAP API Documantation",
-     *      version="latest",
-     *  )
      * @OA\Post (
      *     path="/api/admin/login",
      *     tags={"Authentication"},
@@ -95,24 +94,74 @@ class LoginController extends Controller
         if (auth()->guard('admins')->attempt($request->only('email', 'password'), (bool)$request->remember)) {
             config(['auth.guards.api.provider' => 'admins']);
 
-//            return response()->json(['success' => true, 'message' => 'rEQUST'], 200);
+        //    return response()->json(['success' => true, 'message' => 'rEQUST'], 200);
 
             $user = auth()->guard('admins')->user();
-            $strToken = $user->createToken('API Token',['user'])->accessToken;;
-            $token = Passport::
-//            $expiration = Carbon::parse(Carbon::now()->addDays($this->expiresInDays))->diffInSeconds(Carbon::now()) ;
+            $strToken = $user->createToken('Admins', ['admin'])->accessToken;;
+            // $token = Passport::
+           $expiration = Carbon::parse(Carbon::now()->addDays($this->expiresInDays))->diffInSeconds(Carbon::now()) ;
 
-//            $refresh_token = $this->getTokenAndRefreshToken( $request->email, $request->password, 'user');
+           $refresh_token = $this->getTokenAndRefreshToken( $request->email, $request->password, 'admin');
             return response()->json([
                 'success' => true,
                 'user' => $user,
                 'token_type' => 'Bearer',
-//                'expires_in' => $expiration,
+                'expires_in' => $expiration,
                 'access_token' => $strToken,
-                //                'refresh_token' => $refresh_token,
+                'refresh_token' => $refresh_token,
             ], 200);
         }
         return response()->json(['success' => false, 'errors' => ['message' => 'Authentication failed']], 422);
 //        https://www.webappfix.com/post/laravel-9-multi-authentication-guard-passport-api-example.html
+    }
+
+    public function getTokenAndRefreshToken($email, $password, $scope = 'user')
+    {
+        $oClient = OClient::where('password_client', 1)->first();
+
+        $response = request()->create('/oauth/token', 'post', [
+            'grant_type' => 'password',
+            'client_id' => $oClient->id,
+            'client_secret' => $oClient->secret,
+            'response_type' => 'token',
+            'username' => $email,
+            'password' => $password,
+            'scope' => $scope,
+        ]);
+
+        $result = app()->handle($response);
+
+        return json_decode((string) $result->getContent(), true);
+
+    }
+
+    /**
+     * Admin logout.
+     * @OA\Post (
+     *     path="/api/admin/logout",
+     *     tags={"Portal Authentication"},
+     *     security={{ "apiAuth": {} }},
+     *      @OA\Response(
+     *          response=200,
+     *          description="success",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example="true"),
+     *              @OA\Property(property="message", type="string", example="User successfully logout!"),
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Invalid user",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example="false"),
+     *              @OA\Property(property="errors", type="json", example={"message": {"Unauthenticated"}}),
+     *          )
+     *      )
+     * )
+     */
+    public function logout(Request $request)
+    {
+        $request->user()->token()->revoke();
+        return response()->json(['success' => true, 'message' => 'User successfully logout!'], 200);
     }
 }
