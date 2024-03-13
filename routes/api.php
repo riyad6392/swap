@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\RegistrationController;
+use App\Http\Controllers\InventoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
@@ -32,5 +33,9 @@ Route::group(['middleware' => 'auth:api'], function () {
     })->name('data');
 
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
+
+    Route::resource('product', \App\Http\Controllers\ProductController::class);
+
 });
 
+require __DIR__.'/admin/admin_api.php';

@@ -1,33 +1,28 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers\Auth\Admins;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use Laravel\Passport\Client as OClient;
+use App\Support\Auth\Facade\PassportService;
 use Laravel\Passport\Passport;
-use Illuminate\Support\Facades\Http;
-
 
 
 class LoginController extends Controller
 {
-    public int $expiresInDays = 7;
-
     /**
-     * Login User
+     * Login Admin
      *
      * @OA\Info(
      *      title="SWAP API Documantation",
      *      version="latest",
      *  )
      * @OA\Post (
-     *     path="/api/login",
+     *     path="/api/admin/login",
      *     tags={"Authentication"},
      *
      *     @OA\Parameter(
@@ -97,103 +92,27 @@ class LoginController extends Controller
             return response()->json(['success' => false, 'errors' => $validateData->errors()], 422);
         }
 
-        if (auth()->attempt($request->only('email', 'password'), (bool)$request->remember)) {
-            $user = auth()->user();
-            $strToken = $user->createToken('API Token')->accessToken;;
-            $expiration = Carbon::parse(Carbon::now()->addDays($this->expiresInDays))->diffInSeconds(Carbon::now()) ;
+        if (auth()->guard('admins')->attempt($request->only('email', 'password'), (bool)$request->remember)) {
+            config(['auth.guards.api.provider' => 'admins']);
 
-            $refresh_token = $this->getTokenAndRefreshToken( $request->email, $request->password, 'user');
-           return $refresh_token;
+//            return response()->json(['success' => true, 'message' => 'rEQUST'], 200);
+
+            $user = auth()->guard('admins')->user();
+            $strToken = $user->createToken('API Token',['user'])->accessToken;;
+            $token = Passport::
+//            $expiration = Carbon::parse(Carbon::now()->addDays($this->expiresInDays))->diffInSeconds(Carbon::now()) ;
+
+//            $refresh_token = $this->getTokenAndRefreshToken( $request->email, $request->password, 'user');
             return response()->json([
                 'success' => true,
                 'user' => $user,
                 'token_type' => 'Bearer',
-                'expires_in' => $expiration,
+//                'expires_in' => $expiration,
                 'access_token' => $strToken,
-               'refresh_token' => $refresh_token,
+                //                'refresh_token' => $refresh_token,
             ], 200);
         }
         return response()->json(['success' => false, 'errors' => ['message' => 'Authentication failed']], 422);
-    }
-
-    public function getTokenAndRefreshToken($email, $password, $scope = 'user')
-    {
-        $oClient = OClient::where('password_client', 1)->first();
-
-        $response = request()->create('/oauth/token', 'post', [
-            'grant_type' => 'password',
-            'client_id' => $oClient->id,
-            'client_secret' => $oClient->secret,
-            'response_type' => 'token',
-            'username' => $email,
-            'password' => $password,
-            'scope' => $scope,
-        ]);
-
-        $result = app()->handle($response);
-
-        return json_decode((string) $result->getContent(), true);
-
-    }
-
-    /**
-     * User logout.
-     *
-     * @OA\Post (
-     *     path="/api/v1/logout",
-     *     tags={"Authentication"},
-     *     security={{ "apiAuth": {} }},
-     *
-     *      @OA\Response(
-     *          response=200,
-     *          description="success",
-     *
-     *          @OA\JsonContent(
-     *
-     *              @OA\Property(property="success", type="boolean", example="true"),
-     *              @OA\Property(property="message", type="string", example="User successfully logout!"),
-     *          )
-     *      ),
-     *
-     *      @OA\Response(
-     *          response=401,
-     *          description="Invalid user",
-     *
-     *          @OA\JsonContent(
-     *
-     *              @OA\Property(property="success", type="boolean", example="false"),
-     *              @OA\Property(property="errors", type="json", example={"message": {"Unauthenticated"}}),
-     *          )
-     *      )
-     * )
-     */
-
-    public function logout(Request $request)
-    {
-        auth()->user()->token()->revoke();
-        return response()->json(['success' => true, 'message' => 'User logged out successfully'], 200);
-    }
-
-    public function refreshToken(Request $request)
-    {
-        $validateData = Validator::make($request->all(), [
-            'refresh_token' => 'required'
-        ]);
-
-        if ($validateData->fails()) {
-            return response()->json(['success' => false, 'errors' => $validateData->errors()], 422);
-        }
-
-        $oClient = OClient::where('password_client', 1)->first();
-
-        $response = Http::asForm()->post(config('app.url') . '/oauth/token', [
-            'grant_type' => 'refresh_token',
-            'refresh_token' => $request->refresh_token,
-            'client_id' => $oClient->id,
-            'client_secret' => $oClient->secret,
-            'scope' => 'user'
-        ]);
-
-        return response()->json($response->json());
+//        https://www.webappfix.com/post/laravel-9-multi-authentication-guard-passport-api-example.html
     }
 }

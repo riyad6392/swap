@@ -5,13 +5,13 @@
         "version": "latest"
     },
     "paths": {
-        "/api/v1/forget-password": {
+        "/api/forget-password": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
-                "summary": "Register a new User.",
-                "operationId": "fea41c3bf329146d1a1d24523209be10",
+                "summary": "Forget Password.",
+                "operationId": "48669e1f3eb9830c74ece9f77056c1a9",
                 "parameters": [
                     {
                         "name": "email",
@@ -75,13 +75,13 @@
                 }
             }
         },
-        "/api/v1/reset-password": {
+        "/api/reset-password": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
-                "summary": "Register a new User.",
-                "operationId": "c3b768913813f9792fe42a163fa2be25",
+                "summary": "Reset Password.",
+                "operationId": "a6df91a137b56d9b58535ff5e0261eea",
                 "parameters": [
                     {
                         "name": "email",
@@ -172,13 +172,13 @@
                 }
             }
         },
-        "/api/v1/login": {
+        "/api/login": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "Login User",
-                "operationId": "b981681c9afe6154f748787bffba4554",
+                "operationId": "3673edffcdc18c06ac5aef5e2219d774",
                 "parameters": [
                     {
                         "name": "email",
@@ -275,13 +275,13 @@
                 }
             }
         },
-        "/api/v1/register": {
+        "/api/register": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "Register a new User.",
-                "operationId": "c8e0ae67896a14b91be5d3e8fd4d50f4",
+                "operationId": "c89cf690a73d96f46d01fe8798530651",
                 "parameters": [
                     {
                         "name": "name",
@@ -351,6 +351,559 @@
                                             "example": {
                                                 "message": [
                                                     "The given data was invalid."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/category": {
+            "get": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Category List.",
+                "operationId": "327644f4d836240fa297b2822ab6ca92",
+                "parameters": [
+                    {
+                        "name": "pagination",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number"
+                        },
+                        "example": "10"
+                    },
+                    {
+                        "name": "get_all",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "json",
+                                            "example": []
+                                        },
+                                        "links": {
+                                            "type": "json",
+                                            "example": []
+                                        },
+                                        "meta": {
+                                            "type": "json",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Unauthenticated"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Create a new Category.",
+                "operationId": "de40ad04180a48262a05cf249f785ab3",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Doel Rana"
+                    },
+                    {
+                        "name": "description",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "This is just description"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Category created successfully."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "The given data was invalid."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/category/{id}/show": {
+            "get": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Category Show.",
+                "operationId": "dfcc50772cbba6f26fd52d329a1c398e",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "json",
+                                            "example": {
+                                                "id": 1,
+                                                "name": "Category 1",
+                                                "description": "Description",
+                                                "created_at": "2022-11-02T12:25:16.000000Z",
+                                                "updated_at": "2022-11-02T12:25:16.000000Z"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Unauthenticated"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/category/{id}": {
+            "put": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Update the specified resource in storage.",
+                "operationId": "9be67b4880d28356ade2ebc0b425415e",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Doel Rana"
+                    },
+                    {
+                        "name": "description",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "This is just description"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Category updated successfully."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "The given data was invalid."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Remove the specified Category from storage.",
+                "operationId": "534a636fb456263f752f0983f8097fb5",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Category deleted successfully."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "The given data was invalid."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/inventory": {
+            "get": {
+                "tags": [
+                    "Inventory"
+                ],
+                "summary": "Product List.",
+                "operationId": "02191ace01f4f2e4a399a85886836a49",
+                "parameters": [
+                    {
+                        "name": "pagination",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number"
+                        },
+                        "example": "10"
+                    },
+                    {
+                        "name": "get_all",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "json",
+                                            "example": []
+                                        },
+                                        "links": {
+                                            "type": "json",
+                                            "example": []
+                                        },
+                                        "meta": {
+                                            "type": "json",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Unauthenticated"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/product": {
+            "post": {
+                "tags": [
+                    "Inventory"
+                ],
+                "summary": "Product Created.",
+                "operationId": "1d0b0d8724685b7b8f9d87f403bfc4df",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Doel Rana"
+                    },
+                    {
+                        "name": "category_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "1"
+                    },
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "1"
+                    },
+                    {
+                        "name": "description",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "This is just an address"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Product Created successfully."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Some this is wrong"
                                                 ]
                                             }
                                         }
