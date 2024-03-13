@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\Admins\ForgetPasswordController;
 use App\Http\Controllers\Auth\Admins\LoginController;
 use App\Http\Controllers\Auth\Admins\RegistrationController;
 use Illuminate\Support\Facades\Route;
@@ -8,6 +9,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('admin/register', [RegistrationController::class, 'register'])->name('admin.register');
 Route::post('admin/login', [LoginController::class, 'login'])->name('admin.login');
+Route::post('admin/forget-password', [ForgetPasswordController::class, 'forgetPassword'])->name('admin.forgot-password');
+Route::post('admin/reset-password', [ForgetPasswordController::class, 'resetPassword'])->name('admin.reset-password');
 
 Route::group(['middleware' => 'auth:admins-api'], function () {
     Route::get('/admin-test' , function(){
