@@ -120,7 +120,7 @@ class LoginController extends Controller
     {
         $oClient = OClient::where('password_client', 1)->first();
 
-        $response = app()->handle(request()->create('/oauth/token', 'post', [
+        $response = request()->create('/oauth/token', 'post', [
             'grant_type' => 'password',
             'client_id' => $oClient->id,
             'client_secret' => $oClient->secret,
@@ -128,12 +128,45 @@ class LoginController extends Controller
             'username' => $email,
             'password' => $password,
             'scope' => $scope,
-        ]));
+        ]);
 
-        $result = json_decode($response->getContent());
-        return response()->json($result);
+        $result = app()->handle($response);
+
+        return json_decode((string) $result->getContent(), true);
 
     }
+
+    /**
+     * User logout.
+     *
+     * @OA\Post (
+     *     path="/api/v1/logout",
+     *     tags={"Authentication"},
+     *     security={{ "apiAuth": {} }},
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="success",
+     *
+     *          @OA\JsonContent(
+     *
+     *              @OA\Property(property="success", type="boolean", example="true"),
+     *              @OA\Property(property="message", type="string", example="User successfully logout!"),
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=401,
+     *          description="Invalid user",
+     *
+     *          @OA\JsonContent(
+     *
+     *              @OA\Property(property="success", type="boolean", example="false"),
+     *              @OA\Property(property="errors", type="json", example={"message": {"Unauthenticated"}}),
+     *          )
+     *      )
+     * )
+     */
 
     public function logout(Request $request)
     {
