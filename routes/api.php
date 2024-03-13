@@ -36,6 +36,14 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     Route::resource('product', \App\Http\Controllers\ProductController::class);
 
+    Route::resource('plan', \App\Http\Controllers\PlanController::class);
+
+    Route::group(['middleware' => 'check.subscription'], function () {
+        Route::post('subscribe-check', function () {
+            return response()->json(['success' => true, 'message' => 'You are subscribed to a plan.'], 200);
+        })->name('subscribe-check');
+    });
+
 });
 
 require __DIR__.'/admin/admin_api.php';

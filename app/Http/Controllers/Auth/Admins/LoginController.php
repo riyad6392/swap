@@ -22,7 +22,7 @@ class LoginController extends Controller
      *
      * @OA\Post (
      *     path="/api/admin/login",
-     *     tags={"Authentication"},
+     *     tags={"Admin Authentication"},
      *
      *     @OA\Parameter(
      *         in="query",
@@ -139,7 +139,7 @@ class LoginController extends Controller
      * Admin logout.
      * @OA\Post (
      *     path="/api/admin/logout",
-     *     tags={"Portal Authentication"},
+     *     tags={"Admin Authentication"},
      *     security={{ "apiAuth": {} }},
      *      @OA\Response(
      *          response=200,

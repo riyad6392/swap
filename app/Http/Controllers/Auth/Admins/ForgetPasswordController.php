@@ -18,7 +18,7 @@ class ForgetPasswordController extends Controller
      *
      * @OA\Post (
      *     path="/api/admin/forget-password",
-     *     tags={"Authentication"},
+     *     tags={"Admin Authentication"},
      *
      *     @OA\Parameter(
      *         in="query",
@@ -53,25 +53,25 @@ class ForgetPasswordController extends Controller
 
      public function forgetPassword(Request $request)
      {
- 
+
          $validateData = Validator::make($request->all(), [
              'email' => 'required|email|exists:admins,email'
          ]);
- 
+
          if ($validateData->fails()) {
              return response()->json(['success' => false, 'errors' => $validateData->errors()], 422);
          } else {
              DB::beginTransaction();
              try {
- 
+
                  $token = Str::random(64);
- 
+
                  DB::table('password_reset_tokens')
                      ->updateOrInsert(
                          ['email' => $request->email],
                          ['token' => $token, 'created_at' => now()]
                      );
- 
+
                  DB::commit();
                  return response()->json([
                      'success' => true,
@@ -83,14 +83,14 @@ class ForgetPasswordController extends Controller
              }
          }
      }
- 
- 
+
+
      /**
       * Reset Password.
       *
       * @OA\Post (
       *     path="/api/admin/reset-password",
-      *     tags={"Authentication"},
+      *     tags={"Admin Authentication"},
       *
       *     @OA\Parameter(
       *         in="query",
@@ -149,34 +149,34 @@ class ForgetPasswordController extends Controller
       * )
       */
      public function resetPassword(Request $request){
- 
- 
+
+
          $validateData = Validator::make($request->all(), [
              'email' => 'required|email|exists:admins,email',
              'password' => 'required|string|min:6|confirmed',
              'password_confirmation' => 'required|same:password',
              'token' => 'required'
          ]);
- 
+
          if ($validateData->fails()) {
              return response()->json(['success' => false, 'errors' => $validateData->errors()], 422);
          } else {
              DB::beginTransaction();
- 
+
              try{
- 
+
                  $updatePassword = DB::table('password_reset_tokens')
                      ->where('email', $request->email)
                      ->where('token', $request->token)
                      ->first();
- 
+
                  if(!$updatePassword){
                      return response()->json(['status' => false, 'message' => 'Invalid token!']);
                  }
- 
+
                  Admin::where('email', $request->email)
                      ->update(['password' => Hash::make($request->password)]);
- 
+
                  DB::table('password_reset_tokens')->where(['email'=> $request->email])->delete();
                  DB::commit();
                  return response()->json([
