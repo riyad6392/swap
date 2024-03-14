@@ -15,11 +15,11 @@ class checkSubscription
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->user()->subscription_is_active == true) {
-            return $next($request);
-        }else{
-            return response()->json(['success' => false, 'message' => 'You are not subscribed to any plan.'], 403);
-        }
-//        return $next($request);
+        // if (auth()->user()?->subscription_is_active == true) {
+        //     return $next($request);
+        // }else{
+        //     return response()->json(['success' => false, 'message' => 'You are not subscribed to any plan.'], 403);
+        // }
+       return $next($request);
     }
 }
