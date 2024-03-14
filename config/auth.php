@@ -45,11 +45,11 @@ return [
             'provider' => 'users',
         ],
 
-        'admins' => [
+        'admin' => [
             'driver' => 'session',
             'provider' => 'admins',
         ],
-        'admins-api' => [
+        'admin-api' => [
             'driver' => 'passport',
             'provider' => 'admins',
         ],
