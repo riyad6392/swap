@@ -91,34 +91,26 @@ class LoginController extends Controller
             return response()->json(['success' => false, 'errors' => $validateData->errors()], 422);
         }
 
-        if (auth()->guard('admins')->attempt($request->only('email', 'password'), (bool)$request->remember)) {
-            config(['auth.guards.api.provider' => 'admins']);
+        if (auth()->guard('admin')->attempt($request->only('email', 'password'), (bool)$request->remember)) {
+            $user = auth()->guard('admin')->user();
+            config(['auth.guards.api.provider' => 'admin']);
+             $refresh_token = $this->getTokenAndRefreshToken( $request->email, $request->password, 'admin');
 
-        //    return response()->json(['success' => true, 'message' => 'rEQUST'], 200);
-
-            $user = auth()->guard('admins')->user();
-            $strToken = $user->createToken('Admins', ['admin'])->accessToken;;
-            // $token = Passport::
-           $expiration = Carbon::parse(Carbon::now()->addDays($this->expiresInDays))->diffInSeconds(Carbon::now()) ;
-
-           $refresh_token = $this->getTokenAndRefreshToken( $request->email, $request->password, 'admin');
             return response()->json([
                 'success' => true,
                 'user' => $user,
-                'token_type' => 'Bearer',
-                'expires_in' => $expiration,
-                'access_token' => $strToken,
-                'refresh_token' => $refresh_token,
+                'token'=> $refresh_token
             ], 200);
         }
         return response()->json(['success' => false, 'errors' => ['message' => 'Authentication failed']], 422);
+        
 //        https://www.webappfix.com/post/laravel-9-multi-authentication-guard-passport-api-example.html
     }
 
-    public function getTokenAndRefreshToken($email, $password, $scope = 'user')
+    public function getTokenAndRefreshToken($email, $password, $scope)
     {
-        $oClient = OClient::where('password_client', 1)->first();
-
+        $oClient = OClient::where('password_client', 1)->where('provider', 'admins')->first();
+       
         $response = request()->create('/oauth/token', 'post', [
             'grant_type' => 'password',
             'client_id' => $oClient->id,
