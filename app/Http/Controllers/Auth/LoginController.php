@@ -99,18 +99,12 @@ class LoginController extends Controller
 
         if (auth()->attempt($request->only('email', 'password'), (bool)$request->remember)) {
             $user = auth()->user();
-            $strToken = $user->createToken('API Token')->accessToken;;
-            $expiration = Carbon::parse(Carbon::now()->addDays($this->expiresInDays))->diffInSeconds(Carbon::now()) ;
+            $token = $this->getTokenAndRefreshToken( $request->email, $request->password, 'user');
 
-            $refresh_token = $this->getTokenAndRefreshToken( $request->email, $request->password, 'user');
-           return $refresh_token;
             return response()->json([
                 'success' => true,
                 'user' => $user,
-                'token_type' => 'Bearer',
-                'expires_in' => $expiration,
-                'access_token' => $strToken,
-               'refresh_token' => $refresh_token,
+                'token' => $token,
             ], 200);
         }
         return response()->json(['success' => false, 'errors' => ['message' => 'Authentication failed']], 422);
@@ -118,7 +112,7 @@ class LoginController extends Controller
 
     public function getTokenAndRefreshToken($email, $password, $scope = 'user')
     {
-        $oClient = OClient::where('password_client', 1)->first();
+        $oClient = OClient::where('password_client', 1)->where('provider', 'users')->first();;
 
         $response = request()->create('/oauth/token', 'post', [
             'grant_type' => 'password',
