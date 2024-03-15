@@ -29,7 +29,7 @@ class PlanController extends Controller
      * Create a new Plan.
      *
      *
-     * @OA\Post (path="/api/category",
+     * @OA\Post (path="/api/plan",
      *     tags={"Category"},
      *     security={{ "apiAuth": {} }},
      *
