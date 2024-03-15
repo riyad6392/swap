@@ -59,9 +59,24 @@ class CategoryController extends Controller
      *       )
      * )
      */
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Category::paginate(10);
+        $validateData = Validator::make($request->all(), [
+            'pagination' => 'nullable|numeric',
+            'get_all' => 'nullable|boolean'
+        ]);
+
+        if ($validateData->fails()) {
+            return response()->json(['success' => false, 'errors' => $validateData->errors()], 422);
+        }
+
+        $categories = Category::query();
+        if ($request->get('get_all') == 'true') {
+
+            return response()->json(['success' => true, 'data' => $categories->get() , 'message' => $request->get('get_all')]);
+        }
+
+        $categories = $categories->paginate(10);
         return response()->json(['success' => true, 'data' => $categories]);
     }
 
@@ -127,7 +142,6 @@ class CategoryController extends Controller
     {
         $validateData = Validator::make($request->all(), [
             'name' => 'required|max:255',
-            'description' => 'required'
         ]);
 
         if ($validateData->fails()) {

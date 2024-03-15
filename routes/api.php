@@ -39,9 +39,10 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::resource('plan', \App\Http\Controllers\PlanController::class);
 
     Route::group(['middleware' => 'check.subscription'], function () {
-        Route::post('subscribe-check', function () {
+        Route::get('subscribe-check', function () {
             return response()->json(['success' => true, 'message' => 'You are subscribed to a plan.'], 200);
         })->name('subscribe-check');
+        Route::resource('category', \App\Http\Controllers\CategoryController::class);
     });
 
 });
