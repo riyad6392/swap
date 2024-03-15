@@ -8,6 +8,8 @@ use App\Models\ProductVariation;
 use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
@@ -188,10 +190,9 @@ class ProductController extends Controller
         if (in_array($requestType, self::UPDATE_REQUEST_TYPE)) {
             $product->images()->delete();
         }
-
-
         foreach ($request->images as $imageData) {
-            $path = $imageData->store('images'); // chage to storage
+            $filename = time() . '-' . uniqid() . '.' . $imageData->getClientOriginalExtension();
+            $path = Storage::disk('public')->putFileAs('images', $imageData, $filename);
             $product->images()->create([
                 'path' => $path
             ]);
