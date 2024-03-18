@@ -1300,54 +1300,66 @@
         "/api/plan": {
             "post": {
                 "tags": [
-                    "Plan"
+                    "Category"
                 ],
-                "summary": "Store a newly created resource in storage.",
+                "summary": "Create a new Plan.",
                 "operationId": "3c0ee287f14bb7c839b9d4793dc1f323",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "name": {
-                                        "type": "string",
-                                        "example": "Basic"
-                                    },
-                                    "description": {
-                                        "type": "string",
-                                        "example": "Basic Plan"
-                                    },
-                                    "price": {
-                                        "type": "number",
-                                        "example": "100"
-                                    },
-                                    "currency": {
-                                        "type": "string",
-                                        "example": "USD"
-                                    },
-                                    "interval": {
-                                        "type": "string",
-                                        "example": "month"
-                                    },
-                                    "interval_duration": {
-                                        "type": "number",
-                                        "example": "1"
-                                    },
-                                    "feature": {
-                                        "type": "string",
-                                        "example": "feature1"
-                                    },
-                                    "value": {
-                                        "type": "string",
-                                        "example": "value1"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Doel Rana"
+                    },
+                    {
+                        "name": "description",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "This is just description"
+                    },
+                    {
+                        "name": "price",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "100"
+                    },
+                    {
+                        "name": "currency",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "USD"
+                    },
+                    {
+                        "name": "interval",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "month"
+                    },
+                    {
+                        "name": "interval_duration",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "1"
                     }
-                },
+                ],
                 "responses": {
                     "200": {
                         "description": "success",
@@ -1359,9 +1371,13 @@
                                             "type": "boolean",
                                             "example": "true"
                                         },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Plan created successfully!"
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Category created successfully."
+                                                ]
+                                            }
                                         }
                                     },
                                     "type": "object"
@@ -1382,32 +1398,8 @@
                                         "errors": {
                                             "type": "json",
                                             "example": {
-                                                "name": [
-                                                    "The name field is required."
-                                                ]
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Invalid user",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": "false"
-                                        },
-                                        "errors": {
-                                            "type": "json",
-                                            "example": {
                                                 "message": [
-                                                    "Unauthenticated"
+                                                    "The given data was invalid."
                                                 ]
                                             }
                                         }
@@ -1515,44 +1507,141 @@
                 ],
                 "summary": "Product Created.",
                 "operationId": "1d0b0d8724685b7b8f9d87f403bfc4df",
-                "parameters": [
-                    {
-                        "name": "name",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "example": "Doel Rana"
-                    },
-                    {
-                        "name": "category_id",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "example": "1"
-                    },
-                    {
-                        "name": "user_id",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "example": "1"
-                    },
-                    {
-                        "name": "description",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "example": "This is just an address"
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "category_id",
+                                    "user_id",
+                                    "images",
+                                    "variations"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Product Name"
+                                    },
+                                    "category_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "user_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Product Description"
+                                    },
+                                    "images": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "path"
+                                            ],
+                                            "properties": {
+                                                "path": {
+                                                    "type": "string",
+                                                    "example": "image1.jpg"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "example": [
+                                            {
+                                                "path": "image1.jpg"
+                                            },
+                                            {
+                                                "path": "image2.jpg"
+                                            }
+                                        ]
+                                    },
+                                    "variations": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "price",
+                                                "stock",
+                                                "quantity"
+                                            ],
+                                            "properties": {
+                                                "size": {
+                                                    "type": "string",
+                                                    "example": "XL"
+                                                },
+                                                "color": {
+                                                    "type": "string",
+                                                    "example": "Red"
+                                                },
+                                                "price": {
+                                                    "type": "number",
+                                                    "format": "decimal",
+                                                    "example": 19.99
+                                                },
+                                                "stock": {
+                                                    "type": "integer",
+                                                    "example": 100
+                                                },
+                                                "discount": {
+                                                    "type": "number",
+                                                    "format": "double",
+                                                    "example": 10.5
+                                                },
+                                                "quantity": {
+                                                    "type": "integer",
+                                                    "example": 50
+                                                },
+                                                "discount_type": {
+                                                    "type": "string",
+                                                    "example": "percentage"
+                                                },
+                                                "discount_start_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2024-03-15"
+                                                },
+                                                "discount_end_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2024-03-20"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "example": [
+                                            {
+                                                "size": "XL",
+                                                "color": "Red",
+                                                "price": 19.99,
+                                                "stock": 100,
+                                                "discount": 10.5,
+                                                "quantity": 50,
+                                                "discount_type": "percentage",
+                                                "discount_start_date": "2024-03-15",
+                                                "discount_end_date": "2024-03-20"
+                                            },
+                                            {
+                                                "size": "L",
+                                                "color": "Blue",
+                                                "price": 24.99,
+                                                "stock": 80,
+                                                "discount": null,
+                                                "quantity": 30,
+                                                "discount_type": null,
+                                                "discount_start_date": null,
+                                                "discount_end_date": null
+                                            }
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
                     }
-                ],
+                },
                 "responses": {
                     "200": {
                         "description": "success",
@@ -1595,6 +1684,275 @@
                                                     "Some this is wrong"
                                                 ]
                                             }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/product/{id}": {
+            "put": {
+                "tags": [
+                    "Inventory"
+                ],
+                "summary": "Update the product.",
+                "operationId": "d3467c795490afbb49680821c9bd6b0d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the product to be updated",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "category_id",
+                                    "user_id",
+                                    "images",
+                                    "variations"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Updated Product Name"
+                                    },
+                                    "category_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "user_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Updated Product Description"
+                                    },
+                                    "images": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "path"
+                                            ],
+                                            "properties": {
+                                                "path": {
+                                                    "type": "string",
+                                                    "example": "image3.jpg"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "example": [
+                                            {
+                                                "path": "image3.jpg"
+                                            },
+                                            {
+                                                "path": "image4.jpg"
+                                            }
+                                        ]
+                                    },
+                                    "variations": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "price",
+                                                "stock",
+                                                "quantity"
+                                            ],
+                                            "properties": {
+                                                "size": {
+                                                    "type": "string",
+                                                    "example": "M"
+                                                },
+                                                "color": {
+                                                    "type": "string",
+                                                    "example": "Green"
+                                                },
+                                                "price": {
+                                                    "type": "number",
+                                                    "format": "decimal",
+                                                    "example": 29.99
+                                                },
+                                                "stock": {
+                                                    "type": "integer",
+                                                    "example": 150
+                                                },
+                                                "discount": {
+                                                    "type": "number",
+                                                    "format": "double",
+                                                    "example": 15.75
+                                                },
+                                                "quantity": {
+                                                    "type": "integer",
+                                                    "example": 80
+                                                },
+                                                "discount_type": {
+                                                    "type": "string",
+                                                    "example": "fixed"
+                                                },
+                                                "discount_start_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2024-03-18"
+                                                },
+                                                "discount_end_date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2024-03-25"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "example": [
+                                            {
+                                                "size": "M",
+                                                "color": "Green",
+                                                "price": 29.99,
+                                                "stock": 150,
+                                                "discount": 15.75,
+                                                "quantity": 80,
+                                                "discount_type": "fixed",
+                                                "discount_start_date": "2024-03-18",
+                                                "discount_end_date": "2024-03-25"
+                                            },
+                                            {
+                                                "size": "S",
+                                                "color": "Yellow",
+                                                "price": 34.99,
+                                                "stock": 120,
+                                                "discount": null,
+                                                "quantity": 60,
+                                                "discount_type": null,
+                                                "discount_start_date": null,
+                                                "discount_end_date": null
+                                            }
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "data": {
+                                            "type": "json",
+                                            "example": {
+                                                "id": 1,
+                                                "name": "Updated Product Name",
+                                                "category_id": 1,
+                                                "user_id": 1,
+                                                "description": "Updated Product Description"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Some this is wrong"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Inventory"
+                ],
+                "summary": "Remove the specified resource from storage.",
+                "operationId": "c830155516bad1f72b0081160edeb2ac",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the product to be deleted",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Product and related data deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Product not found"
                                         }
                                     },
                                     "type": "object"
