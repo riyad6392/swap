@@ -30,7 +30,7 @@ class PlanController extends Controller
      *
      *
      * @OA\Post (path="/api/plan",
-     *     tags={"Plan"},
+     *     tags={"Category"},
      *     security={{ "apiAuth": {} }},
      *
      *
@@ -176,87 +176,8 @@ class PlanController extends Controller
     }
 
     /**
-     * Update a new Plan.
-     *
-     *
-     * @OA\Post (path="/api/plan/{id}",
-     *     tags={"Plan"},
-     *     security={{ "apiAuth": {} }},
-     *
-     *
-     *     @OA\Parameter(
-     *         in="query",
-     *         name="name",
-     *         required=true,
-     *
-     *         @OA\Schema(type="string"),
-     *         example="Doel Rana",
-     *     ),
-     *
-     *     @OA\Parameter(
-     *         in="query",
-     *         name="description",
-     *         required=true,
-     *
-     *         @OA\Schema(type="string"),
-     *         example="This is just description",
-     *     ),
-     *     @OA\Parameter(
-     *     in="query",
-     *     name="price",
-     *     required=true,
-     *     @OA\Schema(type="string"),
-     *     example="100",
-     *     ),
-     *
-     *     @OA\Parameter(
-     *     in="query",
-     *     name="currency",
-     *     required=true,
-     *     @OA\Schema(type="string"),
-     *     example="USD",
-     *     ),
-     *
-     *     @OA\Parameter(
-     *     in="query",
-     *     name="interval",
-     *     required=true,
-     *     @OA\Schema(type="string"),
-     *     example="month",
-     *     ),
-     *
-     *     @OA\Parameter(
-     *     in="query",
-     *     name="interval_duration",
-     *     required=true,
-     *     @OA\Schema(type="string"),
-     *     example="1",
-     *     ),
-     *
-     *      @OA\Response(
-     *          response=200,
-     *          description="success",
-     *
-     *          @OA\JsonContent(
-     *
-     *              @OA\Property(property="success", type="boolean", example="true"),
-     *               @OA\Property(property="errors", type="json", example={"message": {"Category created successfully."}}),
-     *          ),
-     *      ),
-     *
-     *      @OA\Response(
-     *          response=422,
-     *          description="Invalid data",
-     *
-     *          @OA\JsonContent(
-     *
-     *              @OA\Property(property="success", type="boolean", example="false"),
-     *              @OA\Property(property="errors", type="json", example={"message": {"The given data was invalid."}}),
-     *          )
-     *      )
-     * )
+     * Update the specified resource in storage.
      */
-
     public function update(Request $request, string $id)
     {
         $validateData = Validator::make($request->all(), [

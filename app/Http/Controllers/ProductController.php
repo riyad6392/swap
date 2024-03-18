@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Image;
 use App\Http\Requests\Product\StoreProductRequest;
 use App\Models\Product;
 use App\Models\ProductVariation;
-use http\Env\Response;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
+    const UPDATE_REQUEST_TYPE = ['put', 'patch'];
     /**
      * Product List.
      *
@@ -63,7 +67,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $inventories = Product::with('productVariations')->paginate(10);
+        $inventories = Product::with('productVariations', 'images')->paginate(10);
         return response()->json(['success' => true, 'data' => $inventories]);
     }
 
@@ -82,120 +86,294 @@ class ProductController extends Controller
      *     path="/api/product",
      *     tags={"Inventory"},
      *
-     *     @OA\Parameter(
-     *         in="query",
-     *         name="name",
+     *     @OA\RequestBody(
      *         required=true,
-     *
-     *         @OA\Schema(type="string"),
-     *         example="Doel Rana",
+     *         @OA\JsonContent(
+     *             required={"name", "category_id", "user_id", "images", "variations"},
+     *             @OA\Property(property="name", type="string", example="Product Name"),
+     *             @OA\Property(property="category_id", type="integer", example=1),
+     *             @OA\Property(property="user_id", type="integer", example=1),
+     *             @OA\Property(property="description", type="string", example="Product Description"),
+     *             @OA\Property(
+     *                 property="images",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     required={"path"},
+     *                     @OA\Property(property="path", type="string", example="image1.jpg")
+     *                 ),
+     *                 example={{"path": "image1.jpg"}, {"path": "image2.jpg"}}
+     *             ),
+     *             @OA\Property(
+     *                 property="variations",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     required={"price", "stock", "quantity"},
+     *                     @OA\Property(property="size", type="string", example="XL"),
+     *                     @OA\Property(property="color", type="string", example="Red"),
+     *                     @OA\Property(property="price", type="number", format="decimal", example=19.99),
+     *                     @OA\Property(property="stock", type="integer", example=100),
+     *                     @OA\Property(property="discount", type="number", format="double", example=10.5),
+     *                     @OA\Property(property="quantity", type="integer", example=50),
+     *                     @OA\Property(property="discount_type", type="string", example="percentage"),
+     *                     @OA\Property(property="discount_start_date", type="string", format="date", example="2024-03-15"),
+     *                     @OA\Property(property="discount_end_date", type="string", format="date", example="2024-03-20")
+     *                 ),
+     *                 example={
+     *                     {"size": "XL", "color": "Red", "price": 19.99, "stock": 100, "discount": 10.5, "quantity": 50, "discount_type": "percentage", "discount_start_date": "2024-03-15", "discount_end_date": "2024-03-20"},
+     *                     {"size": "L", "color": "Blue", "price": 24.99, "stock": 80, "discount": null, "quantity": 30, "discount_type": null, "discount_start_date": null, "discount_end_date": null}
+     *                 }
+     *             )
+     *         )
      *     ),
      *
-     *     @OA\Parameter(
-     *         in="query",
-     *         name="category_id",
-     *         required=true,
-     *
-     *         @OA\Schema(type="string"),
-     *         example="1",
+     *     @OA\Response(
+     *         response=200,
+     *         description="success",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example="true"),
+     *             @OA\Property(property="errors", type="json", example={"message": {"Product Created successfully."}}),
+     *         ),
      *     ),
-     *     @OA\Parameter(
-     *         in="query",
-     *         name="user_id",
-     *         required=true,
      *
-     *         @OA\Schema(type="string"),
-     *         example="1",
-     *     ),
-     *     @OA\Parameter(
-     *          in="query",
-     *          name="description",
-     *          required=true,
-     *
-     *          @OA\Schema(type="string"),
-     *          example="This is just an address",
-     *      ),
-     *
-     *      @OA\Response(
-     *          response=200,
-     *          description="success",
-     *
-     *          @OA\JsonContent(
-     *
-     *              @OA\Property(property="success", type="boolean", example="true"),
-     *               @OA\Property(property="errors", type="json", example={"message": {"Product Created successfully."}}),
-     *          ),
-     *      ),
-     *
-     *      @OA\Response(
-     *          response=422,
-     *          description="Invalid user",
-     *
-     *          @OA\JsonContent(
-     *
-     *              @OA\Property(property="success", type="boolean", example="false"),
-     *              @OA\Property(property="errors", type="json", example={"message": {"Some this is wrong"}}),
-     *          )
-     *      )
+     *     @OA\Response(
+     *         response=422,
+     *         description="Invalid user",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example="false"),
+     *             @OA\Property(property="errors", type="json", example={"message": {"Some this is wrong"}}),
+     *         )
+     *     )
      * )
      */
     public function store(StoreProductRequest $request)
     {
-        return response()->json($request);
-
-        $validateData = Validator::make($request->all(), [
-            'name' => 'required|max:255',
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string',
             'category_id' => 'required|integer',
-            'user_id' => 'required|integer'
+            'user_id' => 'required|integer',
+            'description' => 'nullable|string',
+            'images' => 'required|array',
+            'images.*.path' => 'required|string',
+            'variations' => 'required|array',
+            'variations.*.size' => 'nullable|string',
+            'variations.*.color' => 'nullable|string',
+            'variations.*.price' => 'required|numeric',
+            'variations.*.stock' => 'required|integer',
+            'variations.*.discount' => 'nullable|numeric',
+            'variations.*.quantity' => 'required|integer',
+            'variations.*.discount_type' => 'nullable|string',
+            'variations.*.discount_start_date' => 'nullable|date',
+            'variations.*.discount_end_date' => 'nullable|date',
         ]);
 
-        if ($validateData->fails()) {
-            return response()->json(['success' => false, 'errors' => $validateData->errors()], 422);
-        }else {
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+        try {
+            DB::beginTransaction();
+            $product = Product::create($request->only(['name', 'category_id', 'user_id', 'description']));
 
-//            return response()->json($request);
-            if($request->has('files')){
-                Product::create([
-                    'name' => $request->name,
-                    'category_id' => $request->category_id,
-                    'user_id' => $request->user_id,
-                    'description' => $request->description ?? '',
-                ]);
+            if ($request->has('images')) {
+                $this->uploadImages($request, $product);
             }
-//            ProductVariation::
-            return response()->json(['success' => true, 'message' => 'Product created successfully']);
+            $this->storeVariations($request, $product);
+            DB::commit();
+
+            return response()->json(['success' => true, 'data' => $product], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Failed to create product'], 500);
+        }
+    }
+    public function uploadImages(Request $request, Product $product, string $requestType = 'post'): void
+    {
+        if (in_array($requestType, self::UPDATE_REQUEST_TYPE)) {
+            $product->images()->delete();
+        }
+        foreach ($request->images as $imageData) {
+            $filename = time() . '-' . uniqid() . '.' . $imageData->getClientOriginalExtension();
+            $path = Storage::disk('public')->putFileAs('images', $imageData, $filename);
+            $product->images()->create([
+                'path' => $path
+            ]);
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
+    public function storeVariations(Request $request, Product $product, string $requestType = 'post'): void
+    {
+        if (in_array($requestType, self::UPDATE_REQUEST_TYPE)) {
+            $product->productVariations()->delete();
+        }
+
+        foreach ($request->variations as $variationData) {
+            $product->productVariations()->create($variationData);
+        }
+    }
+
     public function show(string $id)
     {
-        //
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Product $product)
     {
-        //
+        $product->load('images', 'productVariations');
+
+        return response()->json(['success' => true, 'data' => $product], 200);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the product.
+     *
+     * @OA\Put (
+     *     path="/api/product/{id}",
+     *     tags={"Inventory"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the product to be updated",
+     *         @OA\Schema(type="integer", format="int64")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name", "category_id", "user_id", "images", "variations"},
+     *             @OA\Property(property="name", type="string", example="Updated Product Name"),
+     *             @OA\Property(property="category_id", type="integer", example=1),
+     *             @OA\Property(property="user_id", type="integer", example=1),
+     *             @OA\Property(property="description", type="string", example="Updated Product Description"),
+     *             @OA\Property(
+     *                 property="images",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     required={"path"},
+     *                     @OA\Property(property="path", type="string", example="image3.jpg")
+     *                 ),
+     *                 example={{"path": "image3.jpg"}, {"path": "image4.jpg"}}
+     *             ),
+     *             @OA\Property(
+     *                 property="variations",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     required={"price", "stock", "quantity"},
+     *                     @OA\Property(property="size", type="string", example="M"),
+     *                     @OA\Property(property="color", type="string", example="Green"),
+     *                     @OA\Property(property="price", type="number", format="decimal", example=29.99),
+     *                     @OA\Property(property="stock", type="integer", example=150),
+     *                     @OA\Property(property="discount", type="number", format="double", example=15.75),
+     *                     @OA\Property(property="quantity", type="integer", example=80),
+     *                     @OA\Property(property="discount_type", type="string", example="fixed"),
+     *                     @OA\Property(property="discount_start_date", type="string", format="date", example="2024-03-18"),
+     *                     @OA\Property(property="discount_end_date", type="string", format="date", example="2024-03-25")
+     *                 ),
+     *                 example={
+     *                     {"size": "M", "color": "Green", "price": 29.99, "stock": 150, "discount": 15.75, "quantity": 80, "discount_type": "fixed", "discount_start_date": "2024-03-18", "discount_end_date": "2024-03-25"},
+     *                     {"size": "S", "color": "Yellow", "price": 34.99, "stock": 120, "discount": null, "quantity": 60, "discount_type": null, "discount_start_date": null, "discount_end_date": null}
+     *                 }
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="success",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example="true"),
+     *             @OA\Property(property="data", type="json", example={"id": 1, "name": "Updated Product Name", "category_id": 1, "user_id": 1, "description": "Updated Product Description"}),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Invalid user",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example="false"),
+     *             @OA\Property(property="errors", type="json", example={"message": {"Some this is wrong"}}),
+     *         )
+     *     )
+     * )
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Product $product)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'name' => 'string',
+            'category_id' => 'integer',
+            'user_id' => 'integer',
+            'description' => 'nullable|string',
+            'images' => 'array',
+            'images.*.path' => 'string',
+            'variations' => 'array',
+            'variations.*.size' => 'nullable|string',
+            'variations.*.color' => 'nullable|string',
+            'variations.*.price' => 'numeric',
+            'variations.*.stock' => 'integer',
+            'variations.*.discount' => 'nullable|numeric',
+            'variations.*.quantity' => 'integer',
+            'variations.*.discount_type' => 'nullable|string',
+            'variations.*.discount_start_date' => 'nullable|date',
+            'variations.*.discount_end_date' => 'nullable|date',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+        try {
+            DB::beginTransaction();
+
+            $product->update($request->only(['name', 'category_id', 'user_id', 'description']));
+
+            if ($request->has('images')) {
+                $this->uploadImages($request, $product, 'put');
+            }
+
+            $this->storeVariations($request, $product, 'put');
+            DB::commit();
+
+            return response()->json(['success' => true, 'data' => $product], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Failed to update product'], 500);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
+     *
+     * @OA\Delete (
+     *     path="/api/product/{id}",
+     *     tags={"Inventory"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the product to be deleted",
+     *         @OA\Schema(type="integer", format="int64")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="success",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example="true"),
+     *             @OA\Property(property="message", type="string", example="Product and related data deleted successfully")
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example="false"),
+     *             @OA\Property(property="message", type="string", example="Product not found")
+     *         ),
+     *     )
+     * )
      */
-    public function destroy(string $id)
+    public function destroy(Product $product)
     {
-        //
+        $product->images()->delete();
+        $product->productVariations()->delete();
+        $product->delete();
+
+        return response()->json(['success' => true, 'message' => 'Product and related data deleted successfully'], 200);
     }
 }

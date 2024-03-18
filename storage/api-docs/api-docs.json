@@ -1302,184 +1302,52 @@
                 "tags": [
                     "Plan"
                 ],
-                "summary": "Create a new Plan.",
+                "summary": "Store a newly created resource in storage.",
                 "operationId": "3c0ee287f14bb7c839b9d4793dc1f323",
-                "parameters": [
-                    {
-                        "name": "name",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "example": "Doel Rana"
-                    },
-                    {
-                        "name": "description",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "example": "This is just description"
-                    },
-                    {
-                        "name": "price",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "example": "100"
-                    },
-                    {
-                        "name": "currency",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "example": "USD"
-                    },
-                    {
-                        "name": "interval",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "example": "month"
-                    },
-                    {
-                        "name": "interval_duration",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "example": "1"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": "true"
-                                        },
-                                        "errors": {
-                                            "type": "json",
-                                            "example": {
-                                                "message": [
-                                                    "Category created successfully."
-                                                ]
-                                            }
-                                        }
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Basic"
                                     },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Invalid data",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": "false"
-                                        },
-                                        "errors": {
-                                            "type": "json",
-                                            "example": {
-                                                "message": [
-                                                    "The given data was invalid."
-                                                ]
-                                            }
-                                        }
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Basic Plan"
                                     },
-                                    "type": "object"
-                                }
+                                    "price": {
+                                        "type": "number",
+                                        "example": "100"
+                                    },
+                                    "currency": {
+                                        "type": "string",
+                                        "example": "USD"
+                                    },
+                                    "interval": {
+                                        "type": "string",
+                                        "example": "month"
+                                    },
+                                    "interval_duration": {
+                                        "type": "number",
+                                        "example": "1"
+                                    },
+                                    "feature": {
+                                        "type": "string",
+                                        "example": "feature1"
+                                    },
+                                    "value": {
+                                        "type": "string",
+                                        "example": "value1"
+                                    }
+                                },
+                                "type": "object"
                             }
                         }
                     }
                 },
-                "security": [
-                    {
-                        "apiAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/plan/{id}": {
-            "post": {
-                "tags": [
-                    "Plan"
-                ],
-                "summary": "Update a new Plan.",
-                "operationId": "6603194848979a9c2563867097783704",
-                "parameters": [
-                    {
-                        "name": "name",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "example": "Doel Rana"
-                    },
-                    {
-                        "name": "description",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "example": "This is just description"
-                    },
-                    {
-                        "name": "price",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "example": "100"
-                    },
-                    {
-                        "name": "currency",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "example": "USD"
-                    },
-                    {
-                        "name": "interval",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "example": "month"
-                    },
-                    {
-                        "name": "interval_duration",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "example": "1"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "success",
@@ -1491,13 +1359,9 @@
                                             "type": "boolean",
                                             "example": "true"
                                         },
-                                        "errors": {
-                                            "type": "json",
-                                            "example": {
-                                                "message": [
-                                                    "Category created successfully."
-                                                ]
-                                            }
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Plan created successfully!"
                                         }
                                     },
                                     "type": "object"
@@ -1518,8 +1382,32 @@
                                         "errors": {
                                             "type": "json",
                                             "example": {
+                                                "name": [
+                                                    "The name field is required."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
                                                 "message": [
-                                                    "The given data was invalid."
+                                                    "Unauthenticated"
                                                 ]
                                             }
                                         }
