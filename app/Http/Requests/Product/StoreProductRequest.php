@@ -59,11 +59,4 @@ class StoreProductRequest extends FormRequest
         ];
     }
 
-    protected function prepareForValidation(): void
-    {
-        $this->merge([
-            'created_by' => auth()->id(),
-            'updated_by' => auth()->id()
-        ]);
-    }
 }

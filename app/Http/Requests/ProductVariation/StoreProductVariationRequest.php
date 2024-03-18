@@ -23,7 +23,6 @@ class StoreProductVariationRequest extends FormRequest
      */
     public function rules(): array
     {
-        dd($this->variations);
 
         return [
             'variations' => 'required|array',
@@ -71,34 +70,34 @@ class StoreProductVariationRequest extends FormRequest
 
     }
 
-    protected function prepareForValidation(): void
-    {
-        $variations = $this->variations;
-        foreach ($variations as $key => $variation)
-        {
-            $variations[$key]['created_by'] = auth()->id();
-            $variations[$key]['updated_by'] = auth()->id();
-//
-//            array_merge($variation, [
-//                'created_by' => auth()->id(),
-//                'updated_by' => auth()->id()
-//            ]);
-//            array_merge($variation, [
-//                'created_by' => auth()->id(),
-//                'updated_by' => auth()->id()
-//            ]);
-//            dump($variation);
-////            $variation['created_by'] = auth()->id();
-////            $this->merge([
-////                'variations' => array_merge($variation, [
-////                    'created_by' => auth()->id(),
-////                    'updated_by' => auth()->id()
-////                ])
+//    protected function prepareForValidation(): void
+//    {
+//        $variations = $this->variations;
+//        foreach ($variations as $key => $variation)
+//        {
+//            $variations[$key]['created_by'] = auth()->id();
+//            $variations[$key]['updated_by'] = auth()->id();
+////
+////            array_merge($variation, [
+////                'created_by' => auth()->id(),
+////                'updated_by' => auth()->id()
 ////            ]);
-//            dump($variation);
-
-        }
-        $this->merge(['variations'=> $variations]);
-
-    }
+////            array_merge($variation, [
+////                'created_by' => auth()->id(),
+////                'updated_by' => auth()->id()
+////            ]);
+////            dump($variation);
+//////            $variation['created_by'] = auth()->id();
+//////            $this->merge([
+//////                'variations' => array_merge($variation, [
+//////                    'created_by' => auth()->id(),
+//////                    'updated_by' => auth()->id()
+//////                ])
+//////            ]);
+////            dump($variation);
+//
+//        }
+//        $this->merge(['variations'=> $variations]);
+//
+//    }
 }

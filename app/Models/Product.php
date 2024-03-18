@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\CreatedUpdatedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory,CreatedUpdatedBy;
 
     protected $fillable = [
         'name',
@@ -33,5 +34,11 @@ class Product extends Model
         return $this->hasMany(ProductVariation::class);
     }
 
+    protected static function boot()
+    {
+        parent::boot();
+        self::bootCreatedUpdatedBy();
+
+    }
 
 }
