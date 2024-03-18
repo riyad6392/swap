@@ -17,6 +17,8 @@ return new class extends Migration
             $table->integer('category_id');
             $table->integer('user_id');
             $table->longText('description')->nullable();
+            $table->integer('created_by');
+            $table->integer('updated_by');
             $table->timestamps();
         });
     }

@@ -18,7 +18,9 @@ class ProductVariation extends Model
         'quantity',
         'discount_type',
         'discount_start_date',
-        'discount_end_date'
+        'discount_end_date',
+        'created_by',
+        'updated_by'
     ];
 
     public function images()

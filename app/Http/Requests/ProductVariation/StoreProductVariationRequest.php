@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\ProductVariation;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreProductVariationRequest extends FormRequest
 {
@@ -21,6 +23,8 @@ class StoreProductVariationRequest extends FormRequest
      */
     public function rules(): array
     {
+        dd($this->variations);
+
         return [
             'variations' => 'required|array',
             'variations.*.size' => 'nullable|string',
@@ -34,5 +38,67 @@ class StoreProductVariationRequest extends FormRequest
             'variations.*.discount_end_date' => 'nullable|date',
             'variations.*.variant_images.*' => 'nullable|array',
         ];
+    }
+
+    public function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(response()->json([
+            'success'   => false,
+            'message'   => 'Validation errors',
+            'errors'      => $validator->errors()
+        ], 422));
+    }
+
+    public function messages(): array
+    {
+        return [
+            'variations.required' => 'Variations are required',
+            'variations.array' => 'Variations must be an array',
+            'variations.*.size.string' => 'Size must be a string',
+            'variations.*.color.string' => 'Color must be a string',
+            'variations.*.price.required' => 'Price is required',
+            'variations.*.price.numeric' => 'Price must be a number',
+            'variations.*.stock.required' => 'Stock is required',
+            'variations.*.stock.integer' => 'Stock must be an integer',
+            'variations.*.discount.numeric' => 'Discount must be a number',
+            'variations.*.quantity.required' => 'Quantity is required',
+            'variations.*.quantity.integer' => 'Quantity must be an integer',
+            'variations.*.discount_type.string' => 'Discount type must be a string',
+            'variations.*.discount_start_date.date' => 'Discount start date must be a date',
+            'variations.*.discount_end_date.date' => 'Discount end date must be a date',
+            'variations.*.variant_images.array' => 'Variant images must be an array',
+        ];
+
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $variations = $this->variations;
+        foreach ($variations as $key => $variation)
+        {
+            $variations[$key]['created_by'] = auth()->id();
+            $variations[$key]['updated_by'] = auth()->id();
+//
+//            array_merge($variation, [
+//                'created_by' => auth()->id(),
+//                'updated_by' => auth()->id()
+//            ]);
+//            array_merge($variation, [
+//                'created_by' => auth()->id(),
+//                'updated_by' => auth()->id()
+//            ]);
+//            dump($variation);
+////            $variation['created_by'] = auth()->id();
+////            $this->merge([
+////                'variations' => array_merge($variation, [
+////                    'created_by' => auth()->id(),
+////                    'updated_by' => auth()->id()
+////                ])
+////            ]);
+//            dump($variation);
+
+        }
+        $this->merge(['variations'=> $variations]);
+
     }
 }

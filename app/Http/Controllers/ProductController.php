@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProductVariation\StoreProductVariationRequest;
 use App\Models\Image;
 use App\Http\Requests\Product\StoreProductRequest;
 use App\Models\Product;
@@ -158,41 +159,26 @@ class ProductController extends Controller
      *     )
      * )
      */
-    public function store(StoreProductRequest $request)
+    public function store(StoreProductRequest $productRequest , StoreProductVariationRequest $productVariantRequest)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string',
-            'category_id' => 'required|integer',
-            'user_id' => 'required|integer',
-            'description' => 'nullable|string',
-            'images' => 'required|array',
-            'deleted_image_ids' => 'nullable',
-            'images.*.path' => 'required|string',
-            'variations' => 'required|array',
-            'variations.*.size' => 'nullable|string',
-            'variations.*.color' => 'nullable|string',
-            'variations.*.price' => 'required|numeric',
-            'variations.*.stock' => 'required|integer',
-            'variations.*.discount' => 'nullable|numeric',
-            'variations.*.quantity' => 'required|integer',
-            'variations.*.discount_type' => 'nullable|string',
-            'variations.*.discount_start_date' => 'nullable|date',
-            'variations.*.discount_end_date' => 'nullable|date',
-            'variations.*.varient_images' => 'nullable|array',
-        ]);
 
-        if ($validator->fails()) {
-            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
-        }
-        $this->deleted_image_ids = $request->has('deleted_image_ids') ? json_decode($request->deleted_image_ids) : [];
+        $this->deleted_image_ids = $productRequest->has('deleted_image_ids') ? json_decode($productRequest->deleted_image_ids) : [];
         try {
             DB::beginTransaction();
-            $product = Product::create($request->only(['name', 'category_id', 'user_id', 'description']));
 
-            if ($request->has('images')) {
-                FileUploadService::uploadFile($request->images, $product, $this->deleted_image_ids);
+            $product = Product::create($productRequest->only([
+                'name',
+                'category_id',
+                'user_id',
+                'description',
+                'created_by',
+                'updated_by'
+            ]));
+
+            if ($productRequest->has('images')) {
+                FileUploadService::uploadFile($productRequest->images, $product, $this->deleted_image_ids);
             }
-            $this->storeVariations($request, $product);
+            $this->storeVariations($productVariantRequest, $product);
             DB::commit();
 
             return response()->json(['success' => true, 'data' => $product], 201);
@@ -202,11 +188,19 @@ class ProductController extends Controller
         }
     }
 
-    public function storeVariations($request, Product $product): void
+    public function storeVariations($request, Product $product)
     {
+        dd($request->all());
+
+        return response()->json($request->all());
         foreach ($request->variations as $variationData) {
             $variation = $product->productVariations()
-                ->updateOrCreate(['product_id' => $product->id], $variationData);
+                ->updateOrCreate(
+                    ['product_id' => $product->id],
+                    array_merge($variationData,
+                        ['created_by' => auth()->id() , 'updated_by' => auth()->id()
+                        ])
+                );
             if (isset($variationData['varient_images']) && count($variationData['varient_images'])) {
                 FileUploadService::uploadFile($variationData['varient_images'], $variation, $this->deleted_image_ids);
             }
