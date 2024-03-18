@@ -6,6 +6,8 @@ use App\Models\Image;
 use App\Http\Requests\Product\StoreProductRequest;
 use App\Models\Product;
 use App\Models\ProductVariation;
+use App\Services\FileUploadService;
+use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -15,6 +17,7 @@ use Illuminate\Support\Facades\Validator;
 class ProductController extends Controller
 {
     const UPDATE_REQUEST_TYPE = ['put', 'patch'];
+    private $deleted_image_ids = [];
     /**
      * Product List.
      *
@@ -67,7 +70,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $inventories = Product::with('productVariations', 'images')->paginate(10);
+        $inventories = Product::with('productVariations.images', 'images')->paginate(10);
         return response()->json(['success' => true, 'data' => $inventories]);
     }
 
@@ -94,6 +97,7 @@ class ProductController extends Controller
      *             @OA\Property(property="category_id", type="integer", example=1),
      *             @OA\Property(property="user_id", type="integer", example=1),
      *             @OA\Property(property="description", type="string", example="Product Description"),
+     *             @OA\Property(property="deleted_image_ids", type="array", example={"1", "2", "3"}, @OA\Items(type="integer")),
      *             @OA\Property(
      *                 property="images",
      *                 type="array",
@@ -116,11 +120,20 @@ class ProductController extends Controller
      *                     @OA\Property(property="quantity", type="integer", example=50),
      *                     @OA\Property(property="discount_type", type="string", example="percentage"),
      *                     @OA\Property(property="discount_start_date", type="string", format="date", example="2024-03-15"),
-     *                     @OA\Property(property="discount_end_date", type="string", format="date", example="2024-03-20")
+     *                     @OA\Property(property="discount_end_date", type="string", format="date", example="2024-03-20"),
+     *                     @OA\Property(
+     *                         property="varient_images",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             required={"path"},
+     *                             @OA\Property(property="path", type="string", example="image1.jpg")
+     *                         ),
+     *                         example={{"path": "image1.jpg"}, {"path": "image2.jpg"}}
+     *                     )
      *                 ),
      *                 example={
-     *                     {"size": "XL", "color": "Red", "price": 19.99, "stock": 100, "discount": 10.5, "quantity": 50, "discount_type": "percentage", "discount_start_date": "2024-03-15", "discount_end_date": "2024-03-20"},
-     *                     {"size": "L", "color": "Blue", "price": 24.99, "stock": 80, "discount": null, "quantity": 30, "discount_type": null, "discount_start_date": null, "discount_end_date": null}
+     *                     {"size": "XL", "color": "Red", "price": 19.99, "stock": 100, "discount": 10.5, "quantity": 50, "discount_type": "percentage", "discount_start_date": "2024-03-15", "discount_end_date": "2024-03-20", "varient_images": {{"path": "image1.jpg"}, {"path": "image2.jpg"}}},
+     *                     {"size": "L", "color": "Blue", "price": 24.99, "stock": 80, "discount": null, "quantity": 30, "discount_type": null, "discount_start_date": null, "discount_end_date": null, "varient_images": {{"path": "image3.jpg"}, {"path": "image4.jpg"}}}
      *                 }
      *             )
      *         )
@@ -153,6 +166,7 @@ class ProductController extends Controller
             'user_id' => 'required|integer',
             'description' => 'nullable|string',
             'images' => 'required|array',
+            'deleted_image_ids' => 'nullable',
             'images.*.path' => 'required|string',
             'variations' => 'required|array',
             'variations.*.size' => 'nullable|string',
@@ -164,17 +178,19 @@ class ProductController extends Controller
             'variations.*.discount_type' => 'nullable|string',
             'variations.*.discount_start_date' => 'nullable|date',
             'variations.*.discount_end_date' => 'nullable|date',
+            'variations.*.varient_images' => 'nullable|array',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
+        $this->deleted_image_ids = $request->has('deleted_image_ids') ? json_decode($request->deleted_image_ids) : [];
         try {
             DB::beginTransaction();
             $product = Product::create($request->only(['name', 'category_id', 'user_id', 'description']));
 
             if ($request->has('images')) {
-                $this->uploadImages($request, $product);
+                FileUploadService::uploadFile($request->images, $product, $this->deleted_image_ids);
             }
             $this->storeVariations($request, $product);
             DB::commit();
@@ -182,31 +198,18 @@ class ProductController extends Controller
             return response()->json(['success' => true, 'data' => $product], 201);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'Failed to create product'], 500);
-        }
-    }
-    public function uploadImages(Request $request, Product $product, string $requestType = 'post'): void
-    {
-        if (in_array($requestType, self::UPDATE_REQUEST_TYPE)) {
-            $product->images()->delete();
-        }
-        foreach ($request->images as $imageData) {
-            $filename = time() . '-' . uniqid() . '.' . $imageData->getClientOriginalExtension();
-            $path = Storage::disk('public')->putFileAs('images', $imageData, $filename);
-            $product->images()->create([
-                'path' => $path
-            ]);
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 
-    public function storeVariations(Request $request, Product $product, string $requestType = 'post'): void
+    public function storeVariations($request, Product $product): void
     {
-        if (in_array($requestType, self::UPDATE_REQUEST_TYPE)) {
-            $product->productVariations()->delete();
-        }
-
         foreach ($request->variations as $variationData) {
-            $product->productVariations()->create($variationData);
+            $variation = $product->productVariations()
+                ->updateOrCreate(['product_id' => $product->id], $variationData);
+            if (isset($variationData['varient_images']) && count($variationData['varient_images'])) {
+                FileUploadService::uploadFile($variationData['varient_images'], $variation, $this->deleted_image_ids);
+            }
         }
     }
 
@@ -245,6 +248,7 @@ class ProductController extends Controller
      *             @OA\Property(property="category_id", type="integer", example=1),
      *             @OA\Property(property="user_id", type="integer", example=1),
      *             @OA\Property(property="description", type="string", example="Updated Product Description"),
+     *             @OA\Property(property="deleted_image_ids", type="array", example={"1", "2", "3"}, @OA\Items(type="integer")),
      *             @OA\Property(
      *                 property="images",
      *                 type="array",
@@ -267,11 +271,12 @@ class ProductController extends Controller
      *                     @OA\Property(property="quantity", type="integer", example=80),
      *                     @OA\Property(property="discount_type", type="string", example="fixed"),
      *                     @OA\Property(property="discount_start_date", type="string", format="date", example="2024-03-18"),
-     *                     @OA\Property(property="discount_end_date", type="string", format="date", example="2024-03-25")
+     *                     @OA\Property(property="discount_end_date", type="string", format="date", example="2024-03-25"),
+     *                     @OA\Property(property="varient_images", type="array", @OA\Items(type="string", example="image1.jpg"), nullable=true),
      *                 ),
      *                 example={
-     *                     {"size": "M", "color": "Green", "price": 29.99, "stock": 150, "discount": 15.75, "quantity": 80, "discount_type": "fixed", "discount_start_date": "2024-03-18", "discount_end_date": "2024-03-25"},
-     *                     {"size": "S", "color": "Yellow", "price": 34.99, "stock": 120, "discount": null, "quantity": 60, "discount_type": null, "discount_start_date": null, "discount_end_date": null}
+     *                     {"size": "M", "color": "Green", "price": 29.99, "stock": 150, "discount": 15.75, "quantity": 80, "discount_type": "fixed", "discount_start_date": "2024-03-18", "discount_end_date": "2024-03-25", "varient_images": {"image1.jpg", "image2.jpg"}},
+     *                     {"size": "S", "color": "Yellow", "price": 34.99, "stock": 120, "discount": null, "quantity": 60, "discount_type": null, "discount_start_date": null, "discount_end_date": null, "varient_images": null}
      *                 }
      *             )
      *         )
@@ -303,6 +308,7 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'images' => 'array',
             'images.*.path' => 'string',
+            'deleted_image_ids' => 'nullable',
             'variations' => 'array',
             'variations.*.size' => 'nullable|string',
             'variations.*.color' => 'nullable|string',
@@ -313,21 +319,25 @@ class ProductController extends Controller
             'variations.*.discount_type' => 'nullable|string',
             'variations.*.discount_start_date' => 'nullable|date',
             'variations.*.discount_end_date' => 'nullable|date',
+            'variations.*.varient_images' => 'nullable|array',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
+
+        $this->deleted_image_ids = $request->has('deleted_image_ids') ? json_decode($request->deleted_image_ids) : [];
+
         try {
             DB::beginTransaction();
 
             $product->update($request->only(['name', 'category_id', 'user_id', 'description']));
 
             if ($request->has('images')) {
-                $this->uploadImages($request, $product, 'put');
+                FileUploadService::uploadFile($request->images, $product, $this->deleted_image_ids);
             }
 
-            $this->storeVariations($request, $product, 'put');
+            $this->storeVariations($request, $product);
             DB::commit();
 
             return response()->json(['success' => true, 'data' => $product], 201);
