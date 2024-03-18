@@ -155,7 +155,7 @@ class ProductController extends Controller
             'user_id' => 'required|integer',
             'description' => 'nullable|string',
             'images' => 'required|array',
-            'deleted_image_ids' => 'nullable|required',
+            'deleted_image_ids' => 'nullable',
             'images.*.path' => 'required|string',
             'variations' => 'required|array',
             'variations.*.size' => 'nullable|string',
@@ -167,6 +167,7 @@ class ProductController extends Controller
             'variations.*.discount_type' => 'nullable|string',
             'variations.*.discount_start_date' => 'nullable|date',
             'variations.*.discount_end_date' => 'nullable|date',
+            'variations.*.varient_images' => 'nullable|array',
         ]);
 
         if ($validator->fails()) {
@@ -190,13 +191,11 @@ class ProductController extends Controller
         }
     }
 
-    public function storeVariations($request, Product $product, string $requestType = 'post'): void
+    public function storeVariations($request, Product $product): void
     {
-        if (in_array($requestType, self::UPDATE_REQUEST_TYPE)) {
-            $product->productVariations()->delete();
-        }
         foreach ($request->variations as $variationData) {
-            $variation = $product->productVariations()->create($variationData);
+            $variation = $product->productVariations()
+                ->updateOrCreate(['product_id' => $product->id], $variationData);
             if (isset($variationData['varient_images']) && count($variationData['varient_images'])) {
                 FileUploadService::uploadFile($variationData['varient_images'], $variation, $this->deleted_image_ids);
             }
@@ -296,6 +295,7 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'images' => 'array',
             'images.*.path' => 'string',
+            'deleted_image_ids' => 'nullable',
             'variations' => 'array',
             'variations.*.size' => 'nullable|string',
             'variations.*.color' => 'nullable|string',
@@ -306,21 +306,25 @@ class ProductController extends Controller
             'variations.*.discount_type' => 'nullable|string',
             'variations.*.discount_start_date' => 'nullable|date',
             'variations.*.discount_end_date' => 'nullable|date',
+            'variations.*.varient_images' => 'nullable|array',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
+
+        $this->deleted_image_ids = $request->has('deleted_image_ids') ? json_decode($request->deleted_image_ids) : [];
+
         try {
             DB::beginTransaction();
 
             $product->update($request->only(['name', 'category_id', 'user_id', 'description']));
 
             if ($request->has('images')) {
-                $this->uploadImages($request, $product, 'put');
+                FileUploadService::uploadFile($request->images, $product, $this->deleted_image_ids);
             }
 
-            $this->storeVariations($request, $product, 'put');
+            $this->storeVariations($request, $product);
             DB::commit();
 
             return response()->json(['success' => true, 'data' => $product], 201);
