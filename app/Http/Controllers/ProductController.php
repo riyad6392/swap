@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Image;
 use App\Models\Product;
 use App\Models\ProductVariation;
+use App\Services\FileUploadService;
 use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Validator;
 class ProductController extends Controller
 {
     const UPDATE_REQUEST_TYPE = ['put', 'patch'];
+    private $deleted_image_ids = [];
     /**
      * Product List.
      *
@@ -67,7 +69,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $inventories = Product::with('productVariations', 'images')->paginate(10);
+        $inventories = Product::with('productVariations.images', 'images')->paginate(10);
         return response()->json(['success' => true, 'data' => $inventories]);
     }
 
@@ -153,6 +155,7 @@ class ProductController extends Controller
             'user_id' => 'required|integer',
             'description' => 'nullable|string',
             'images' => 'required|array',
+            'deleted_image_ids' => 'nullable|required',
             'images.*.path' => 'required|string',
             'variations' => 'required|array',
             'variations.*.size' => 'nullable|string',
@@ -169,12 +172,13 @@ class ProductController extends Controller
         if ($validator->fails()) {
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
+        $this->deleted_image_ids = $request->has('deleted_image_ids') ? json_decode($request->deleted_image_ids) : [];
         try {
             DB::beginTransaction();
             $product = Product::create($request->only(['name', 'category_id', 'user_id', 'description']));
 
             if ($request->has('images')) {
-                $this->uploadImages($request, $product);
+                FileUploadService::uploadFile($request->images, $product, $this->deleted_image_ids);
             }
             $this->storeVariations($request, $product);
             DB::commit();
@@ -182,31 +186,20 @@ class ProductController extends Controller
             return response()->json(['success' => true, 'data' => $product], 201);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'Failed to create product'], 500);
-        }
-    }
-    public function uploadImages(Request $request, Product $product, string $requestType = 'post'): void
-    {
-        if (in_array($requestType, self::UPDATE_REQUEST_TYPE)) {
-            $product->images()->delete();
-        }
-        foreach ($request->images as $imageData) {
-            $filename = time() . '-' . uniqid() . '.' . $imageData->getClientOriginalExtension();
-            $path = Storage::disk('public')->putFileAs('images', $imageData, $filename);
-            $product->images()->create([
-                'path' => $path
-            ]);
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 
-    public function storeVariations(Request $request, Product $product, string $requestType = 'post'): void
+    public function storeVariations($request, Product $product, string $requestType = 'post'): void
     {
         if (in_array($requestType, self::UPDATE_REQUEST_TYPE)) {
             $product->productVariations()->delete();
         }
-
         foreach ($request->variations as $variationData) {
-            $product->productVariations()->create($variationData);
+            $variation = $product->productVariations()->create($variationData);
+            if (isset($variationData['varient_images']) && count($variationData['varient_images'])) {
+                FileUploadService::uploadFile($variationData['varient_images'], $variation, $this->deleted_image_ids);
+            }
         }
     }
 
