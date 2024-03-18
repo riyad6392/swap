@@ -96,6 +96,7 @@ class ProductController extends Controller
      *             @OA\Property(property="category_id", type="integer", example=1),
      *             @OA\Property(property="user_id", type="integer", example=1),
      *             @OA\Property(property="description", type="string", example="Product Description"),
+     *             @OA\Property(property="deleted_image_ids", type="array", example={"1", "2", "3"}, @OA\Items(type="integer")),
      *             @OA\Property(
      *                 property="images",
      *                 type="array",
@@ -118,11 +119,20 @@ class ProductController extends Controller
      *                     @OA\Property(property="quantity", type="integer", example=50),
      *                     @OA\Property(property="discount_type", type="string", example="percentage"),
      *                     @OA\Property(property="discount_start_date", type="string", format="date", example="2024-03-15"),
-     *                     @OA\Property(property="discount_end_date", type="string", format="date", example="2024-03-20")
+     *                     @OA\Property(property="discount_end_date", type="string", format="date", example="2024-03-20"),
+     *                     @OA\Property(
+     *                         property="varient_images",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             required={"path"},
+     *                             @OA\Property(property="path", type="string", example="image1.jpg")
+     *                         ),
+     *                         example={{"path": "image1.jpg"}, {"path": "image2.jpg"}}
+     *                     )
      *                 ),
      *                 example={
-     *                     {"size": "XL", "color": "Red", "price": 19.99, "stock": 100, "discount": 10.5, "quantity": 50, "discount_type": "percentage", "discount_start_date": "2024-03-15", "discount_end_date": "2024-03-20"},
-     *                     {"size": "L", "color": "Blue", "price": 24.99, "stock": 80, "discount": null, "quantity": 30, "discount_type": null, "discount_start_date": null, "discount_end_date": null}
+     *                     {"size": "XL", "color": "Red", "price": 19.99, "stock": 100, "discount": 10.5, "quantity": 50, "discount_type": "percentage", "discount_start_date": "2024-03-15", "discount_end_date": "2024-03-20", "varient_images": {{"path": "image1.jpg"}, {"path": "image2.jpg"}}},
+     *                     {"size": "L", "color": "Blue", "price": 24.99, "stock": 80, "discount": null, "quantity": 30, "discount_type": null, "discount_start_date": null, "discount_end_date": null, "varient_images": {{"path": "image3.jpg"}, {"path": "image4.jpg"}}}
      *                 }
      *             )
      *         )
@@ -237,6 +247,7 @@ class ProductController extends Controller
      *             @OA\Property(property="category_id", type="integer", example=1),
      *             @OA\Property(property="user_id", type="integer", example=1),
      *             @OA\Property(property="description", type="string", example="Updated Product Description"),
+     *             @OA\Property(property="deleted_image_ids", type="array", example={"1", "2", "3"}, @OA\Items(type="integer")),
      *             @OA\Property(
      *                 property="images",
      *                 type="array",
@@ -259,11 +270,12 @@ class ProductController extends Controller
      *                     @OA\Property(property="quantity", type="integer", example=80),
      *                     @OA\Property(property="discount_type", type="string", example="fixed"),
      *                     @OA\Property(property="discount_start_date", type="string", format="date", example="2024-03-18"),
-     *                     @OA\Property(property="discount_end_date", type="string", format="date", example="2024-03-25")
+     *                     @OA\Property(property="discount_end_date", type="string", format="date", example="2024-03-25"),
+     *                     @OA\Property(property="varient_images", type="array", @OA\Items(type="string", example="image1.jpg"), nullable=true),
      *                 ),
      *                 example={
-     *                     {"size": "M", "color": "Green", "price": 29.99, "stock": 150, "discount": 15.75, "quantity": 80, "discount_type": "fixed", "discount_start_date": "2024-03-18", "discount_end_date": "2024-03-25"},
-     *                     {"size": "S", "color": "Yellow", "price": 34.99, "stock": 120, "discount": null, "quantity": 60, "discount_type": null, "discount_start_date": null, "discount_end_date": null}
+     *                     {"size": "M", "color": "Green", "price": 29.99, "stock": 150, "discount": 15.75, "quantity": 80, "discount_type": "fixed", "discount_start_date": "2024-03-18", "discount_end_date": "2024-03-25", "varient_images": {"image1.jpg", "image2.jpg"}},
+     *                     {"size": "S", "color": "Yellow", "price": 34.99, "stock": 120, "discount": null, "quantity": 60, "discount_type": null, "discount_start_date": null, "discount_end_date": null, "varient_images": null}
      *                 }
      *             )
      *         )
