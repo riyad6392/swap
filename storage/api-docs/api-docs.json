@@ -864,7 +864,8 @@
                         "required": false,
                         "schema": {
                             "type": "boolean"
-                        }
+                        },
+                        "example": "1"
                     }
                 ],
                 "responses": {

@@ -33,14 +33,15 @@ class CategoryController extends Controller
      *          name="get_all",
      *          required=false,
      *
-     *          @OA\Schema(type="boolean")
+     *          @OA\Schema(type="boolean"),
+     *          example="1"
+     *
      *      ),
      *     @OA\Response(
      *           response=200,
      *           description="success",
      *
      *           @OA\JsonContent(
-     *
      *               @OA\Property(property="data", type="json", example={}),
      *               @OA\Property(property="links", type="json", example={}),
      *               @OA\Property(property="meta", type="json", example={}),
@@ -52,7 +53,6 @@ class CategoryController extends Controller
      *           description="Invalid user",
      *
      *           @OA\JsonContent(
-     *
      *               @OA\Property(property="success", type="boolean", example="false"),
      *               @OA\Property(property="errors", type="json", example={"message": {"Unauthenticated"}}),
      *           )
@@ -61,17 +61,8 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $validateData = Validator::make($request->all(), [
-            'pagination' => 'nullable|numeric',
-            'get_all' => 'nullable|boolean'
-        ]);
-
-        if ($validateData->fails()) {
-            return response()->json(['success' => false, 'errors' => $validateData->errors()], 422);
-        }
-
         $categories = Category::query();
-        if ($request->get('get_all') == 'true') {
+        if ($request->get('get_all')) {
 
             return response()->json(['success' => true, 'data' => $categories->get() , 'message' => $request->get('get_all')]);
         }

@@ -11,14 +11,14 @@ class checkSubscription
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response) $next
      */
     public function handle(Request $request, Closure $next): Response
     {
-         if (auth()->guard('api')->user()->subscription_is_active) {
-             return $next($request);
-         }else{
-             return response()->json(['success' => false, 'message' => 'You are not subscribed to any plan.'], 403);
-         }
+        if (auth()->guard('api')->check() && !auth()->guard('api')->user()->subscription_is_active) {
+            return response()->json(['success' => false, 'message' => 'You are not subscribed to any plan.'], 403);
+        } else {
+            return $next($request);
+        }
     }
 }
