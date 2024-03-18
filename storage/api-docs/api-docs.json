@@ -1536,6 +1536,17 @@
                                         "type": "string",
                                         "example": "Product Description"
                                     },
+                                    "deleted_image_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
                                     "images": {
                                         "type": "array",
                                         "items": {
@@ -1607,6 +1618,29 @@
                                                     "type": "string",
                                                     "format": "date",
                                                     "example": "2024-03-20"
+                                                },
+                                                "varient_images": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "required": [
+                                                            "path"
+                                                        ],
+                                                        "properties": {
+                                                            "path": {
+                                                                "type": "string",
+                                                                "example": "image1.jpg"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "example": [
+                                                        {
+                                                            "path": "image1.jpg"
+                                                        },
+                                                        {
+                                                            "path": "image2.jpg"
+                                                        }
+                                                    ]
                                                 }
                                             },
                                             "type": "object"
@@ -1621,7 +1655,15 @@
                                                 "quantity": 50,
                                                 "discount_type": "percentage",
                                                 "discount_start_date": "2024-03-15",
-                                                "discount_end_date": "2024-03-20"
+                                                "discount_end_date": "2024-03-20",
+                                                "varient_images": [
+                                                    {
+                                                        "path": "image1.jpg"
+                                                    },
+                                                    {
+                                                        "path": "image2.jpg"
+                                                    }
+                                                ]
                                             },
                                             {
                                                 "size": "L",
@@ -1632,7 +1674,15 @@
                                                 "quantity": 30,
                                                 "discount_type": null,
                                                 "discount_start_date": null,
-                                                "discount_end_date": null
+                                                "discount_end_date": null,
+                                                "varient_images": [
+                                                    {
+                                                        "path": "image3.jpg"
+                                                    },
+                                                    {
+                                                        "path": "image4.jpg"
+                                                    }
+                                                ]
                                             }
                                         ]
                                     }
@@ -1742,6 +1792,17 @@
                                         "type": "string",
                                         "example": "Updated Product Description"
                                     },
+                                    "deleted_image_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            "1",
+                                            "2",
+                                            "3"
+                                        ]
+                                    },
                                     "images": {
                                         "type": "array",
                                         "items": {
@@ -1813,6 +1874,14 @@
                                                     "type": "string",
                                                     "format": "date",
                                                     "example": "2024-03-25"
+                                                },
+                                                "varient_images": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "image1.jpg"
+                                                    },
+                                                    "nullable": true
                                                 }
                                             },
                                             "type": "object"
@@ -1827,7 +1896,11 @@
                                                 "quantity": 80,
                                                 "discount_type": "fixed",
                                                 "discount_start_date": "2024-03-18",
-                                                "discount_end_date": "2024-03-25"
+                                                "discount_end_date": "2024-03-25",
+                                                "varient_images": [
+                                                    "image1.jpg",
+                                                    "image2.jpg"
+                                                ]
                                             },
                                             {
                                                 "size": "S",
@@ -1838,7 +1911,8 @@
                                                 "quantity": 60,
                                                 "discount_type": null,
                                                 "discount_start_date": null,
-                                                "discount_end_date": null
+                                                "discount_end_date": null,
+                                                "varient_images": null
                                             }
                                         ]
                                     }
