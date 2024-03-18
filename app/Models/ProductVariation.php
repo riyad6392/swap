@@ -21,7 +21,8 @@ class ProductVariation extends Model
         'discount_end_date'
     ];
 
-    public function image() {
-        return $this->belongsTo(Image::class);
+    public function images()
+    {
+        return $this->morphMany(Image::class, 'imageable');
     }
 }
