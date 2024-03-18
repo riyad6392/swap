@@ -12,13 +12,13 @@ Route::post('admin/login', [LoginController::class, 'login'])->name('admin.login
 Route::post('admin/forget-password', [ForgetPasswordController::class, 'forgetPassword'])->name('admin.forgot-password');
 Route::post('admin/reset-password', [ForgetPasswordController::class, 'resetPassword'])->name('admin.reset-password');
 
-Route::group(['middleware' => 'auth:admins-api'], function () {
+Route::group(['middleware' => 'auth:admin-api'], function () {
     Route::get('/admin-test' , function(){
         return response()->json(['success' => true, 'message' => 'You are authorized to access this data!'], 200);
     })->name('data');
 
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 
-    Route::resource('product', \App\Http\Controllers\ProductController::class);
+//    Route::resource('product', \App\Http\Controllers\ProductController::class);
 
 });

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Product\StoreProductRequest;
 use App\Models\Product;
 use App\Models\ProductVariation;
 use http\Env\Response;
@@ -138,8 +139,10 @@ class ProductController extends Controller
      *      )
      * )
      */
-    public function store(Request $request)
+    public function store(StoreProductRequest $request)
     {
+        return response()->json($request);
+
         $validateData = Validator::make($request->all(), [
             'name' => 'required|max:255',
             'category_id' => 'required|integer',
