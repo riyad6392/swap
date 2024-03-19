@@ -23,6 +23,7 @@ class StoreProductVariationRequest extends FormRequest
      */
     public function rules(): array
     {
+//        dd($this->all());
         return [
             'variations' => 'required|array',
             'variations.*.size' => 'nullable|string',
@@ -34,7 +35,7 @@ class StoreProductVariationRequest extends FormRequest
             'variations.*.discount_type' => 'nullable|string',
             'variations.*.discount_start_date' => 'nullable|date',
             'variations.*.discount_end_date' => 'nullable|date',
-            'variations.*.variant_images.*' => 'nullable|array',
+            'variations.*.variant_images' => 'nullable|array',
         ];
     }
 

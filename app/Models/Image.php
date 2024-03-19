@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-use App\Traits\CreatedUpdatedBy;
+use App\Traits\ModelAttributeTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
 class Image extends Model
 {
-    use HasFactory,  CreatedUpdatedBy;
+    use HasFactory, ModelAttributeTrait;
     protected $fillable = [
         'imageable_id',
         'imageable_type',
@@ -18,14 +18,14 @@ class Image extends Model
         'path'
     ];
 
-    protected $hidden = [
-        'created_at',
-        'updated_at',
-        'imageable_type',
-        'imageable_id',
-        'created_by',
-        'updated_by'
-    ];
+//    protected $hidden = [
+//        'created_at',
+//        'updated_at',
+//        'imageable_type',
+//        'imageable_id',
+//        'created_by',
+//        'updated_by'
+//    ];
     // public function getPathAttribute($value)
     // {
     //     return asset($value);

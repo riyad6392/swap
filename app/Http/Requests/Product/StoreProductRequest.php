@@ -53,8 +53,8 @@ class StoreProductRequest extends FormRequest
             'user_id.required' => 'User is required',
             'user_id.exists' => 'User does not exist',
             'user_id.integer' => 'User must be an integer',
-            'images.required' => 'Product image is required',
-            'images.array' => 'Product image must be an array'
+            'product_images.required' => 'Product image is required',
+            'product_images.array' => 'Product image must be an array'
         ];
     }
     public function all($keys = null)
