@@ -262,6 +262,8 @@ class ProductController extends Controller
                 );
             if (isset($variationData['varient_images']) && count($variationData['varient_images'])) {
                 FileUploadService::uploadFile($variationData['varient_images'], $variation, $deleted_image_ids);
+            } else {
+                FileUploadService::deleteImages($this->deleted_image_ids, $product);
             }
         }
     }
@@ -488,6 +490,8 @@ class ProductController extends Controller
 
             if ($updateProductRequest->has('product_images')) {
                 FileUploadService::uploadFile($updateProductRequest->product_images, $product, $this->deleted_image_ids);
+            } else {
+                FileUploadService::deleteImages($this->deleted_image_ids, $product);
             }
 
             $this->storeVariations($updateProductVariationRequest, $product, $this->deleted_image_ids);
