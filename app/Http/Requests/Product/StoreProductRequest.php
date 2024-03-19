@@ -5,6 +5,7 @@ namespace App\Http\Requests\Product;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\Facades\Auth;
 
 class StoreProductRequest extends FormRequest
 {
@@ -26,10 +27,8 @@ class StoreProductRequest extends FormRequest
         return [
             'name' => 'required',
             'description' => 'required',
-//            'price' => 'required|numeric',
             'category_id' => 'required|exists:categories,id',
-            'user_id' => 'required|integer|exists:users,id',
-            'images' => 'required|array'
+            'product_images' => 'required|array'
         ];
     }
 
@@ -57,6 +56,13 @@ class StoreProductRequest extends FormRequest
             'images.required' => 'Product image is required',
             'images.array' => 'Product image must be an array'
         ];
+    }
+    public function all($keys = null)
+    {
+        $data = parent::all($keys);
+        $data['user_id'] = Auth::id() ?? 1;
+
+        return $data;
     }
 
 }
