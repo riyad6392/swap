@@ -317,7 +317,7 @@ class ProductController extends Controller
      * Show the form for editing the specified resource.
      */
 
-    public function edit(Product $product)
+    public function edit(Product $product): \Illuminate\Http\JsonResponse
     {
         $product->load('images', 'productVariations');
 
@@ -482,7 +482,7 @@ class ProductController extends Controller
  * )
  */
 
-    public function update(UpdateProductRequest $updateProductRequest, UpdateProductVariationRequest $updateProductVariationRequest, Product $product)
+    public function update(UpdateProductRequest $updateProductRequest, UpdateProductVariationRequest $updateProductVariationRequest, Product $product): \Illuminate\Http\JsonResponse
     {
         try {
             DB::beginTransaction();
@@ -541,7 +541,7 @@ class ProductController extends Controller
      *     )
      * )
      */
-    public function destroy(Product $product)
+    public function destroy(Product $product): \Illuminate\Http\JsonResponse
     {
         $product->images()->delete();
         $product->productVariations()->delete();
