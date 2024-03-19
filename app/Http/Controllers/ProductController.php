@@ -185,7 +185,7 @@ class ProductController extends Controller
         }
     }
 
-    public function storeVariations($request, Product $product)
+    protected function storeVariations($request, Product $product)
     {
         foreach ($request->variations as $variationData) {
             $variation = $product->productVariations()

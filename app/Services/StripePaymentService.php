@@ -1,14 +1,41 @@
 <?php
 namespace App\Services;
 
+use Stripe\StripeClient;
+use function Laravel\Prompts\select;
+
 class StripePaymentService
 {
-    public function __construct()
+    private static StripeClient $stripe;
+
+    public static function initialize(): void
     {
-        $stripe = new \Stripe\StripeClient('sk_test_51KWED5IZ9zy7k2DvYdcVlu0k8YTlu715bhYKBHqS9FNfJN2OHLzCZJmB3neQWLFVfcFgXUSzqZiIbrWPlrWVOunR00RQf1D07h');
+        self::$stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
     }
+
     public function charge($amount, $token)
     {
         // Charge the user's card
+    }
+
+    public static function createCustomer($data): \Stripe\Customer
+    {
+        self::initialize();
+        return self::$stripe->customers->create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+        ]);
+    }
+
+    public static function getCustomer($limit = 3): \Stripe\Collection
+    {
+        self::initialize();
+        return self::$stripe->customers->all(['limit' => $limit]);
+    }
+
+    public static function deleteCustomer($data): \Stripe\Customer
+    {
+        self::initialize();
+        return self::$stripe->customers->delete($data['stripe_customer_id']);
     }
 }
