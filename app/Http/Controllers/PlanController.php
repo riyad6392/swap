@@ -134,7 +134,7 @@ class PlanController extends Controller
         $data = [
             'name'              => $request->name,
             'description'       => $request->description,
-            'amount'             => $request->price,
+            'amount'             => $request->amount,
             'currency'          => $request->currency,
             'interval'          => $request->interval,
             'interval_duration' => $request->interval_duration,
@@ -147,11 +147,10 @@ class PlanController extends Controller
             'feature'    => $request->feature,
             'value'      => $request->value,
             'plan_id'    => $plan->id,
-            'created_by' => $created_by,
-            'updated_by' => $updated_by,
         ];
         PlanDetails::create($plan_details);
-        StripePaymentService::createPrice($data);
+        $response = StripePaymentService::createPrice($data);
+        $plan->update(['stripe_price_id' => $response->id]);
         return response()->json([
             'success' => true,
             'message' => 'Plan created successfully!'

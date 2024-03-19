@@ -2,7 +2,6 @@
 namespace App\Services;
 
 use Stripe\StripeClient;
-use function Laravel\Prompts\select;
 
 class StripePaymentService
 {
@@ -42,11 +41,15 @@ class StripePaymentService
     public static function createPrice($data): \Stripe\Price
     {
         self::initialize();
+//        dd($data['amount']);
         return self::$stripe->prices->create([
-            'unit_amount' => $data['unit_amount'],
+            'unit_amount' => $data['amount'],
             'currency' => $data['currency'],
-            'recurring' => ['interval' => 'month'],
-            'product_data' => $data['name'],
+            'recurring' => [
+                'interval' => $data['interval'],
+                'interval_count' => $data['interval_duration']
+            ],
+            'product_data' => ['name' => $data['name']],
         ]);
     }
 }
