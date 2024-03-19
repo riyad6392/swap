@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-use App\Traits\CreatedUpdatedBy;
+use App\Traits\ModelAttributeTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ProductVariation extends Model
 {
-    use HasFactory,CreatedUpdatedBy;
+    use HasFactory,ModelAttributeTrait;
     protected $fillable = [
         'product_id',
         'size',

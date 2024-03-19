@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Plan\StorePlanDetailsRequest;
+use App\Http\Requests\Plan\StorePlanRequest;
 use App\Models\Plan;
 use App\Models\PlanDetails;
 use App\Services\StripePaymentService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class PlanController extends Controller
@@ -109,52 +112,40 @@ class PlanController extends Controller
      */
 
 
-    public function store(Request $request)
+    public function store(StorePlanRequest $planRequest, StorePlanDetailsRequest $planDetailsRequest)
     {
-        $validateData = Validator::make($request->all(), [
-            'name'              => 'required',
-            'description'       => 'required',
-            'currency'          => 'required',
-            'amount'          => 'required',
-            'interval'          => 'required',
-            'interval_duration' => 'required',
-            'feature' => 'required',
-            'features_count' => 'required',
-            'value' => 'required',
-        ]);
+        try {
+            DB::beginTransaction();
+            $plan = Plan::create($planRequest->only(['name',
+                                                     'description',
+                                                     'amount',
+                                                     'currency',
+                                                     'interval',
+                                                     'interval_duration',
+            ]));
 
-        if ($validateData->fails()) {
+            PlanDetails::create([
+                'plan_id' => $plan->id,
+                'feature' => $planDetailsRequest->feature,
+                'features_count' => $planDetailsRequest->features_count,
+                'value' => $planDetailsRequest->value,
+
+            ]);
+            $response = StripePaymentService::createPrice($plan);
+            $plan->update(['stripe_price_id' => $response->id]);
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Plan created successfully!'
+            ], 200);
+        }catch(\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'success' => false,
-                'errors'  => $validateData->errors()
-            ], 422);
+                'message' => $e->getMessage()
+            ], 500);
         }
-        $uid        = 'PLN-' . time() . rand(10, 99);
 
-        $data = [
-            'name'              => $request->name,
-            'description'       => $request->description,
-            'amount'             => $request->amount,
-            'currency'          => $request->currency,
-            'interval'          => $request->interval,
-            'interval_duration' => $request->interval_duration,
-            'uid'               => $uid
-        ];
-
-
-        $plan         = Plan::create($data);
-        $plan_details = [
-            'feature'    => $request->feature,
-            'value'      => $request->value,
-            'plan_id'    => $plan->id,
-        ];
-        PlanDetails::create($plan_details);
-        $response = StripePaymentService::createPrice($data);
-        $plan->update(['stripe_price_id' => $response->id]);
-        return response()->json([
-            'success' => true,
-            'message' => 'Plan created successfully!'
-        ], 200);
     }
 
     /**

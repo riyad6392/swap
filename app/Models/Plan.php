@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-use App\Traits\CreatedUpdatedBy;
+use App\Traits\ModelAttributeTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Plan extends Model
 {
-    use HasFactory, CreatedUpdatedBy;
+    use HasFactory, ModelAttributeTrait;
     protected $fillable = [
         'name',
         'uid',
@@ -25,6 +25,7 @@ class Plan extends Model
     {
         parent::boot();
         self::bootCreatedUpdatedBy();
+        self::bootUID();
 
     }
 }

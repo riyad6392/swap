@@ -2,7 +2,7 @@
 
 namespace App\Traits;
 
-trait CreatedUpdatedBy
+trait ModelAttributeTrait
 {
     public static function bootCreatedUpdatedBy()
     {
@@ -18,6 +18,15 @@ trait CreatedUpdatedBy
         static::updating(function ($model) {
             if (!$model->isDirty('updated_by')) {
                 $model->updated_by = auth()->id();
+            }
+        });
+    }
+
+    public static function bootUID()
+    {
+        static::creating(function ($model) {
+            if (!$model->isDirty('uid')) {
+                $model->uid = uniqid();
             }
         });
     }
