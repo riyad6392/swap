@@ -38,4 +38,15 @@ class StripePaymentService
         self::initialize();
         return self::$stripe->customers->delete($data['stripe_customer_id']);
     }
+
+    public static function createPrice($data): \Stripe\Price
+    {
+        self::initialize();
+        return self::$stripe->prices->create([
+            'unit_amount' => $data['unit_amount'],
+            'currency' => $data['currency'],
+            'recurring' => ['interval' => 'month'],
+            'product_data' => $data['name'],
+        ]);
+    }
 }

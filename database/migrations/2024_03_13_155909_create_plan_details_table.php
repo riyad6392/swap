@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('plan_id');
             $table->string('feature');
+            $table->string('features_count');
             $table->string('value');
             $table->string('created_by');
             $table->string('updated_by');

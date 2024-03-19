@@ -16,10 +16,11 @@ return new class extends Migration
             $table->string('name');
             $table->string('uid')->unique();
             $table->string('description');
-            $table->string('price');
+            $table->double('amount', 8, 2);
             $table->string('currency');
-            $table->string('interval');
+            $table->enum('interval', ['month', 'yearly']);
             $table->string('interval_duration');
+            $table->string('is_super_swapper')->nullable();
             $table->string('created_by');
             $table->string('updated_by');
             $table->timestamps();

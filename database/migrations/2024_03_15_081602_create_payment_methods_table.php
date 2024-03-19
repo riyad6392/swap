@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('method_name');
             $table->string('user_id');
+            $table->string('master_key');
+            $table->string('master_value');
             $table->string('status');
             $table->string('created_by');
             $table->string('updated_by');
-            $table->string('master_key');
-            $table->string('master_value');
             $table->timestamps();
         });
     }
