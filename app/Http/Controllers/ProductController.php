@@ -122,6 +122,19 @@ class ProductController extends Controller
  *     ),
  *     @OA\Parameter(
  *         in="query",
+ *         name="product_images[]",
+ *         required=true,
+ *         description="Images of the product",
+ *         @OA\Schema(
+ *             type="array",
+ *             @OA\Items(
+ *                 required={"path"},
+ *                 @OA\Property(property="path", type="string", example="updated_product_image1.jpg"),
+ *             ),
+ *         ),
+ *     ),
+ *     @OA\Parameter(
+ *         in="query",
  *         name="variations[0][size]",
  *         required=true,
  *         description="Size of the product variation at index 0",
@@ -148,12 +161,40 @@ class ProductController extends Controller
  *         description="Stock of the product variation at index 0",
  *         @OA\Schema(type="integer", example=100),
  *     ),
+ *    @OA\Parameter(
+ *         in="query",
+ *         name="variations[0][discount]",
+ *         required=true,
+ *         description="Discount of the product variation at index 0",
+ *         @OA\Schema(type="number", format="double", example=10.5),
+ *     ),
  *     @OA\Parameter(
  *         in="query",
  *         name="variations[0][quantity]",
  *         required=true,
  *         description="Quantity of the product variation at index 0",
  *         @OA\Schema(type="integer", example=50),
+ *     ),
+ *     @OA\Parameter(
+ *         in="query",
+ *         name="variations[0][discount_type]",
+ *         required=true,
+ *         description="Discount type of the product variation at index 0",
+ *         @OA\Schema(type="string", example="percentage"),
+ *     ),
+ *     @OA\Parameter(
+ *         in="query",
+ *         name="variations[0][discount_start_date]",
+ *         required=true,
+ *         description="Start date of the discount for the product variation at index 0",
+ *         @OA\Schema(type="string", format="date", example="2024-03-15"),
+ *     ),
+ *     @OA\Parameter(
+ *         in="query",
+ *         name="variations[0][discount_end_date]",
+ *         required=true,
+ *         description="End date of the discount for the product variation at index 0",
+ *         @OA\Schema(type="string", format="date", example="2024-03-20"),
  *     ),
  *     @OA\Parameter(
  *         in="query",
@@ -189,7 +230,6 @@ class ProductController extends Controller
  */
     public function store(StoreProductRequest $productRequest , StoreProductVariationRequest $productVariantRequest)
     {
-        $this->deleted_image_ids = $productRequest->has('deleted_image_ids') ? json_decode($productRequest->deleted_image_ids) : [];
         try {
             DB::beginTransaction();
 
@@ -199,9 +239,8 @@ class ProductController extends Controller
                 'user_id',
                 'description',
             ]));
-
-            if ($productRequest->has('images')) {
-                FileUploadService::uploadFile($productRequest->images, $product, $this->deleted_image_ids);
+            if ($productRequest->has('product_images')) {
+                FileUploadService::uploadFile($productRequest->product_images, $product);
             }
             $this->storeVariations($productVariantRequest, $product);
             DB::commit();
@@ -213,7 +252,7 @@ class ProductController extends Controller
         }
     }
 
-    public function storeVariations($request, Product $product)
+    public function storeVariations($request, Product $product, array $deleted_image_ids = [])
     {
         foreach ($request->variations as $variationData) {
             $variation = $product->productVariations()
@@ -222,7 +261,7 @@ class ProductController extends Controller
                     $variationData
                 );
             if (isset($variationData['varient_images']) && count($variationData['varient_images'])) {
-                FileUploadService::uploadFile($variationData['varient_images'], $variation, $this->deleted_image_ids);
+                FileUploadService::uploadFile($variationData['varient_images'], $variation, $deleted_image_ids);
             }
         }
     }
@@ -354,10 +393,51 @@ class ProductController extends Controller
  *     ),
  *     @OA\Parameter(
  *         in="query",
+ *         name="variations[0][discount]",
+ *         required=true,
+ *         description="Discount of the product variation at index 0",
+ *         @OA\Schema(type="number", format="double", example=10.5),
+ *     ),
+ *     @OA\Parameter(
+ *         in="query",
  *         name="variations[0][quantity]",
  *         required=true,
  *         description="Quantity of the product variation at index 0",
  *         @OA\Schema(type="integer", example=30),
+ *     ),
+ *     @OA\Parameter(
+ *         in="query",
+ *         name="variations[0][discount_type]",
+ *         required=true,
+ *         description="Discount type of the product variation at index 0",
+ *         @OA\Schema(type="string", example="percentage"),
+ *     ),
+ *     @OA\Parameter(
+ *         in="query",
+ *         name="variations[0][discount_start_date]",
+ *         required=true,
+ *         description="Start date of the discount for the product variation at index 0",
+ *         @OA\Schema(type="string", format="date", example="2024-03-15"),
+ *     ),
+ *     @OA\Parameter(
+ *         in="query",
+ *         name="variations[0][discount_end_date]",
+ *         required=true,
+ *         description="End date of the discount for the product variation at index 0",
+ *         @OA\Schema(type="string", format="date", example="2024-03-20"),
+ *     ),
+ *      @OA\Parameter(
+ *         in="query",
+ *         name="deleted_image_ids[]",
+ *         required=true,
+ *         description="IDs of the images to be deleted",
+ *         @OA\Schema(
+ *             type="array",
+ *             @OA\Items(
+ *                 type="integer",
+ *                 example={1, 5, 6, 7},
+ *             ),
+ *         ),
  *     ),
  *     @OA\Parameter(
  *         in="query",
@@ -401,18 +481,16 @@ class ProductController extends Controller
 
     public function update(UpdateProductRequest $updateProductRequest, UpdateProductVariationRequest $updateProductVariationRequest, Product $product)
     {
-        $this->deleted_image_ids = $updateProductRequest->has('deleted_image_ids') ? json_decode($updateProductRequest->deleted_image_ids) : [];
-
+        $this->deleted_image_ids = $updateProductRequest->has('deleted_image_ids') ? $updateProductRequest->deleted_image_ids : [];
         try {
             DB::beginTransaction();
-
             $product->update($updateProductRequest->only(['name', 'category_id', 'user_id', 'description']));
 
-            if ($updateProductRequest->has('images')) {
-                FileUploadService::uploadFile($updateProductRequest->images, $product, $this->deleted_image_ids);
+            if ($updateProductRequest->has('product_images')) {
+                FileUploadService::uploadFile($updateProductRequest->product_images, $product, $this->deleted_image_ids);
             }
 
-            $this->storeVariations($updateProductVariationRequest, $product);
+            $this->storeVariations($updateProductVariationRequest, $product, $this->deleted_image_ids);
             DB::commit();
 
             return response()->json(['success' => true, 'data' => $product], 201);
