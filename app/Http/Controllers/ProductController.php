@@ -486,7 +486,7 @@ class ProductController extends Controller
                 FileUploadService::uploadFile($updateProductRequest->product_images, $product);
             }
 
-            if($updateProductRequest->has('deleted_image_ids')){
+            if($updateProductRequest->has('deleted_image_ids')) {
                 FileUploadService::deleteImages($this->deleted_image_ids);
             }
 
@@ -535,12 +535,12 @@ class ProductController extends Controller
     {
         $productImgIds = $product->images->pluck('id')->toArray();
         $variationImgIds = $product->productVariations->pluck('images')->flatten()->pluck('id')->toArray();
-        if ($productImgIds) {
+        $imageIds = array_merge($productImgIds, $variationImgIds);
+
+        if ($imageIds) {
             FileUploadService::deleteImages($productImgIds);
         }
-        if ($variationImgIds) {
-            FileUploadService::deleteImages($variationImgIds);
-        }
+
         $product->images()->delete();
         $product->productVariations()->delete();
         $product->delete();
