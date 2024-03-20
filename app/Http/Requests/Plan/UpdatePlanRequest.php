@@ -23,7 +23,7 @@ class UpdatePlanRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'              => 'required|unique:plans,name',
+            'name'              => 'required|unique:plans,name,' . $this->plan . ',id',
             'description'       => 'required',
             'currency'          => 'required',
             'amount'            => 'required|numeric',
