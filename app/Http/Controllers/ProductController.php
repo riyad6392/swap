@@ -245,7 +245,7 @@ class ProductController extends Controller
         }
     }
 
-    public function storeVariations($request, Product $product, array $deleted_image_ids = [])
+    public function storeVariations($request, Product $product)
     {
         foreach ($request->variations as $variationData) {
             $variation = $product->productVariations()
@@ -254,7 +254,7 @@ class ProductController extends Controller
                     $variationData
                 );
             if (isset($variationData['varient_images']) && count($variationData['varient_images'])) {
-                FileUploadService::uploadFile($variationData['varient_images'], $variation, $deleted_image_ids);
+                FileUploadService::uploadFile($variationData['varient_images'], $variation);
             } else {
                 FileUploadService::deleteImages($this->deleted_image_ids);
             }
@@ -487,7 +487,7 @@ class ProductController extends Controller
                 FileUploadService::deleteImages($this->deleted_image_ids);
             }
 
-            $this->storeVariations($updateProductVariationRequest, $product, $this->deleted_image_ids);
+            $this->storeVariations($updateProductVariationRequest, $product);
             DB::commit();
 
             return response()->json(['success' => true, 'data' => $product], 201);
