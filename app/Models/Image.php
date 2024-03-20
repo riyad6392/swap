@@ -17,6 +17,9 @@ class Image extends Model
         'updated_by',
         'path'
     ];
+    protected $appends = [
+        'imagePath'
+    ];
 
 //    protected $hidden = [
 //        'created_at',
