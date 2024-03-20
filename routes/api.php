@@ -27,13 +27,14 @@ Route::post('reset-password', [ForgetPasswordController::class, 'resetPassword']
 Route::post('refresh-token', [ForgotPasswordController::class, 'getTokenAndRefreshTokenByRefreshToken']);
 
 
+
 Route::group(['middleware' => 'auth:api'], function () {
 
     Route::get('/test' , function(){
         return response()->json(['success' => true, 'message' => 'You are authorized to access this data!'], 200);
     });
 
-    Route::post('logout', [LoginController::class, 'logout'])->name('logout');
+    Route::post('logout', [LoginController::class, 'logout']);
 
     Route::group(['middleware' => 'check.subscription'], function () {
 

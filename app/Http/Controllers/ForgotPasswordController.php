@@ -13,7 +13,7 @@ class ForgotPasswordController extends Controller
     /**
      * Refresh token
      * @OA\Post (
-     *     path="/api/v1/refresh-token",
+     *     path="/api/refresh-token",
      *     tags={"Authentication"},
      *     @OA\Parameter(
      *         in="query",
@@ -46,7 +46,7 @@ class ForgotPasswordController extends Controller
      */
 
     public function getTokenAndRefreshTokenByRefreshToken(Request $request) {
-        
+
         $validateData = Validator::make($request->all(), [
             'refresh_token' => 'required'
         ]);
@@ -66,7 +66,7 @@ class ForgotPasswordController extends Controller
         ]);
 
         $result = app()->handle($response);
-        
+
         return json_decode((string) $result->getContent(), true);
     }
 }

@@ -70,12 +70,12 @@ class RegistrationController extends Controller
     {
         $validateData = Validator::make($request->all(), [
             'name' => 'required|max:255',
-            'email' => 'required|email|unique:users',
+            'email' => 'required|email|unique:admins',
             'password' => 'required'
         ]);
 
         if ($validateData->fails()) {
-            return response()->json(['success' => false, 'errors' => $validateData->errors()], 422);
+            return response()->json(['success' => false, 'message' => 'Validation errors', 'errors' => $validateData->errors()], 422);
         }else{
             $request->password = bcrypt($request->password);
             Admin::create($request->only('name', 'email', 'password'));

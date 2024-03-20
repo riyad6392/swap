@@ -162,13 +162,18 @@ class ForgetPasswordController extends Controller
         $validateData = Validator::make($request->all(), [
             'email' => 'required|email|exists:users',
             'password' => 'required|string|min:6|confirmed',
-            'password_confirmation' => 'required',
+            'password_confirmation' => 'required|same:password',
             'token' => 'required'
         ]);
 
 
         if ($validateData->fails()) {
-            return response()->json(['success' => false, 'errors' => $validateData->errors()], 422);
+            return response()->json(['success' => false,
+                'status' => 400,
+                'message' => 'Validation errors',
+                'errors' => $validateData->errors()],
+                422
+            );
         } else {
             DB::beginTransaction();
 
@@ -180,7 +185,11 @@ class ForgetPasswordController extends Controller
                     ->first();
 
                 if(!$updatePassword){
-                    return back()->withInput()->with('error', 'Invalid token!');
+                    return response()->json([
+                        'success' => false,
+                        'status' => 400,
+                        'message' => 'Invalid token!'
+                    ]);
                 }
 
                 User::where('email', $request->email)
@@ -188,13 +197,11 @@ class ForgetPasswordController extends Controller
 
                 DB::table('password_reset_tokens')->where(['email'=> $request->email])->delete();
                 DB::commit();
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Password reset successfully.'
-                ]);
+
+                return response()->json(['success' => true, 'message' => 'Password reset successfully.']);
             }catch (Exception $e){
                 DB::rollBack();
-                return response()->json(["status" => 400, "message" => $e->getMessage(), "data" => array()]);
+                return response()->json(['success' => false,"status" => 400, "message" => $e->getMessage(), "data" => array()]);
             }
         }
     }

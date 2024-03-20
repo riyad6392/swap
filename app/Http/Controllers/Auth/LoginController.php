@@ -85,7 +85,7 @@ class LoginController extends Controller
      *
      * @throws ValidationException
      */
-    public function login(Request $request)
+    public function login(Request $request): \Illuminate\Http\JsonResponse
     {
         $validateData = Validator::make($request->all(), [
             'email' => 'email|required',
@@ -94,7 +94,7 @@ class LoginController extends Controller
         ]);
 
         if ($validateData->fails()) {
-            return response()->json(['success' => false, 'errors' => $validateData->errors()], 422);
+            return response()->json(['success' => false, 'message' => 'Validation errors', 'errors' => $validateData->errors()], 422);
         }
 
         if (auth()->attempt($request->only('email', 'password'), (bool)$request->remember)) {
@@ -103,11 +103,12 @@ class LoginController extends Controller
 
             return response()->json([
                 'success' => true,
+                'message' => 'User successfully login!',
                 'user' => $user,
                 'token' => $token,
             ], 200);
         }
-        return response()->json(['success' => false, 'errors' => ['message' => 'Authentication failed']], 422);
+        return response()->json(['success' => false, 'message' => 'Authentication failed'], 422);
     }
 
     public function getTokenAndRefreshToken($email, $password, $scope = 'user')
@@ -134,7 +135,7 @@ class LoginController extends Controller
      * User logout.
      *
      * @OA\Post (
-     *     path="/api/v1/logout",
+     *     path="/api/logout",
      *     tags={"Authentication"},
      *     security={{ "apiAuth": {} }},
      *
@@ -162,13 +163,13 @@ class LoginController extends Controller
      * )
      */
 
-    public function logout(Request $request)
+    public function logout(Request $request): \Illuminate\Http\JsonResponse
     {
-        auth()->user()->token()->revoke();
+        $request->user()->token()->revoke();
         return response()->json(['success' => true, 'message' => 'User logged out successfully'], 200);
     }
 
-    public function refreshToken(Request $request)
+    public function refreshToken(Request $request): \Illuminate\Http\JsonResponse
     {
         $validateData = Validator::make($request->all(), [
             'refresh_token' => 'required'

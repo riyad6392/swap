@@ -79,7 +79,7 @@ class LoginController extends Controller
      *
      * @throws ValidationException
      */
-    public function login(Request $request)
+    public function login(Request $request): \Illuminate\Http\JsonResponse
     {
         $validateData = Validator::make($request->all(), [
             'email' => 'email|required',
@@ -88,29 +88,30 @@ class LoginController extends Controller
         ]);
 
         if ($validateData->fails()) {
-            return response()->json(['success' => false, 'errors' => $validateData->errors()], 422);
+            return response()->json(['success' => false, 'message' => 'Validation errors', 'errors' => $validateData->errors()], 422);
         }
 
         if (auth()->guard('admin')->attempt($request->only('email', 'password'), (bool)$request->remember)) {
+
             $user = auth()->guard('admin')->user();
             config(['auth.guards.api.provider' => 'admin']);
-             $refresh_token = $this->getTokenAndRefreshToken( $request->email, $request->password, 'admin');
+            $refresh_token = $this->getTokenAndRefreshToken($request->email, $request->password, 'admin');
 
             return response()->json([
                 'success' => true,
+                'message' => 'User successfully login!',
                 'user' => $user,
-                'token'=> $refresh_token
+                'token' => $refresh_token
             ], 200);
         }
         return response()->json(['success' => false, 'errors' => ['message' => 'Authentication failed']], 422);
-        
-//        https://www.webappfix.com/post/laravel-9-multi-authentication-guard-passport-api-example.html
+
     }
 
     public function getTokenAndRefreshToken($email, $password, $scope)
     {
         $oClient = OClient::where('password_client', 1)->where('provider', 'admins')->first();
-       
+
         $response = request()->create('/oauth/token', 'post', [
             'grant_type' => 'password',
             'client_id' => $oClient->id,
@@ -123,7 +124,7 @@ class LoginController extends Controller
 
         $result = app()->handle($response);
 
-        return json_decode((string) $result->getContent(), true);
+        return json_decode((string)$result->getContent(), true);
 
     }
 
@@ -151,7 +152,7 @@ class LoginController extends Controller
      *      )
      * )
      */
-    public function logout(Request $request)
+    public function logout(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->user()->token()->revoke();
         return response()->json(['success' => true, 'message' => 'User successfully logout!'], 200);

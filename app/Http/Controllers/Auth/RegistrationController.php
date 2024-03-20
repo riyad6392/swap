@@ -75,12 +75,15 @@ class RegistrationController extends Controller
         ]);
 
         if ($validateData->fails()) {
-            return response()->json(['success' => false, 'errors' => $validateData->errors()], 422);
+            return response()->json(['success' => false, 'message' => 'Validation errors', 'errors' => $validateData->errors()], 422);
         }else{
-            $request->password = bcrypt($request->password);
-            $request->subscription_is_active = 1;
 
-            User::create($request->only('name', 'email', 'password'));
+            User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => bcrypt($request->password),
+                'subscription_is_active' => 1
+            ]);
 
             return response()->json(['success' => true, 'message' => 'Your registration successfully done'], 200);
         }

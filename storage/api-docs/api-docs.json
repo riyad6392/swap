@@ -693,13 +693,13 @@
                 }
             }
         },
-        "/api/v1/logout": {
+        "/api/logout": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "User logout.",
-                "operationId": "1287c001287d7dfaa8e6c76fb8c4ca0d",
+                "operationId": "5e29d25372d83a1ff5c3165a43f3302d",
                 "responses": {
                     "200": {
                         "description": "success",
@@ -1215,13 +1215,13 @@
                 ]
             }
         },
-        "/api/v1/refresh-token": {
+        "/api/refresh-token": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "Refresh token",
-                "operationId": "b1626ef717a8de1ff65e7ad32784ed44",
+                "operationId": "8ef4237fbf057b2f6efde5ba37dad89f",
                 "parameters": [
                     {
                         "name": "refresh_token",
