@@ -21,6 +21,11 @@ class Plan extends Model
         'created_by',
         'updated_by'
     ];
+
+    public function planDetails()
+    {
+        return $this->hasMany(PlanDetails::class);
+    }
     protected static function boot()
     {
         parent::boot();
