@@ -181,7 +181,7 @@ class PlanController extends Controller
             ]);
 
             $response = StripePaymentGatewayFacade::createPrice($plan);
-            $plan->update(['stripe_price_id' => $response->id]);
+            $plan->update(['stripe_plan_id' => $response->id , 'stripe_product_id' => $response->product]);
 
             DB::commit();
 
@@ -340,12 +340,12 @@ class PlanController extends Controller
             DB::beginTransaction();
 
             $plan->update($updatePlanRequest->only(['name',
-                    'description',
-                    'amount',
-                    'currency',
-                    'interval',
-                    'interval_duration',
-                ]));
+                'description',
+                'amount',
+                'currency',
+                'interval',
+                'interval_duration',
+            ]));
 
             PlanDetails::where('plan_id', $plan->id)->update([
                 'plan_id' => $plan->id,
@@ -354,19 +354,14 @@ class PlanController extends Controller
                 'value' => $updatePlanDetailsRequest->value,
 
             ]);
-            // $response = StripePaymentService::createPrice($plan);
+            $response = StripePaymentGatewayFacade::updatePrice($plan);
             // $plan->update(['stripe_price_id' => $response->id]);
             DB::commit();
-            return response()->json([
-                'success' => true,
-                'message' => 'Plan updated successfully!'
-            ], 200);
+            return response()->json(['success' => true, 'message' => 'Plan updated successfully!'], 200);
+
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 
