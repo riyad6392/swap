@@ -134,7 +134,7 @@ class PlanController extends Controller
                 'value' => $planDetailsRequest->value,
             ]);
 
-            $response = StripePaymentService::createPrice($plan);
+            $response = StripePaymentGatewayFacade::createPrice($plan);
             $plan->update(['stripe_price_id' => $response->id]);
 
             DB::commit();

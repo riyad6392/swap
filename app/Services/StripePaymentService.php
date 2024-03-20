@@ -5,11 +5,11 @@ use Stripe\StripeClient;
 
 class StripePaymentService
 {
-    private static StripeClient $stripe;
+    private StripeClient $stripe;
 
-    public static function initialize(): void
+    public function __construct()
     {
-        self::$stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+        $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
     }
 
     public function charge($amount, $token)
@@ -17,32 +17,27 @@ class StripePaymentService
         // Charge the user's card
     }
 
-    public static function createCustomer($data): \Stripe\Customer
+    public function createCustomer($data): \Stripe\Customer
     {
-        self::initialize();
-        return self::$stripe->customers->create([
+        return $this->stripe->customers->create([
             'name' => $data['name'],
             'email' => $data['email'],
         ]);
     }
 
-    public static function getCustomer($limit = 3): \Stripe\Collection
+    public function getCustomer($limit = 3): \Stripe\Collection
     {
-        self::initialize();
-        return self::$stripe->customers->all(['limit' => $limit]);
+        return $this->stripe->customers->all(['limit' => $limit]);
     }
 
-    public static function deleteCustomer($data): \Stripe\Customer
+    public function deleteCustomer($data): \Stripe\Customer
     {
-        self::initialize();
-        return self::$stripe->customers->delete($data['stripe_customer_id']);
+        return $this->stripe->customers->delete($data['stripe_customer_id']);
     }
 
-    public static function createPrice($data): \Stripe\Price
+    public function createPrice($data): \Stripe\Price
     {
-        self::initialize();
-//        dd($data['amount']);
-        return self::$stripe->prices->create([
+        return $this->stripe->prices->create([
             'unit_amount' => $data['amount'],
             'currency' => $data['currency'],
             'recurring' => [
@@ -55,7 +50,6 @@ class StripePaymentService
 
     public function testing(): string
     {
-        dd('testing');
         return 'testing';
 
     }
