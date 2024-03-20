@@ -8,7 +8,7 @@ class StripePaymentGatewayFacade extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return 'greeting';
+        return 'StripePaymentService';
     }
 
 }

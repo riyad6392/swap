@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\StripePaymentGatewayFacade;
 use App\Http\Requests\Plan\StorePlanDetailsRequest;
 use App\Http\Requests\Plan\StorePlanRequest;
 use App\Models\Plan;
@@ -152,7 +153,7 @@ class PlanController extends Controller
      */
     public function show(string $id)
     {
-        //
+        StripePaymentGatewayFacade::testing();
     }
 
     /**

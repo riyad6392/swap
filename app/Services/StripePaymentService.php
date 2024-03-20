@@ -52,4 +52,11 @@ class StripePaymentService
             'product_data' => ['name' => $data['name']],
         ]);
     }
+
+    public function testing(): string
+    {
+        dd('testing');
+        return 'testing';
+
+    }
 }

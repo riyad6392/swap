@@ -90,7 +90,7 @@ class LoginController extends Controller
         $validateData = Validator::make($request->all(), [
             'email' => 'email|required',
             'password' => 'required',
-            'remember' => 'boolean'
+            'remember' => 'required|boolean'
         ]);
 
         if ($validateData->fails()) {
