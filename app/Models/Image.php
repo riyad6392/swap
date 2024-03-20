@@ -26,10 +26,10 @@ class Image extends Model
 //        'created_by',
 //        'updated_by'
 //    ];
-    // public function getPathAttribute($value)
-    // {
-    //     return asset($value);
-    // }
+    public function getImagePathAttribute()
+    {
+        return asset($this->path);
+    }
 
     protected static function boot()
     {

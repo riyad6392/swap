@@ -28,7 +28,7 @@ class FileUploadService
         return $imagePath;
     }
 
-    public static function deleteImages(array $deleted_image_ids, Product|ProductVariation $model = null)
+    public static function deleteImages(array $deleted_image_ids)
     {
         $images = Image::whereIn('id', $deleted_image_ids)->get();
         foreach ($images as $image) {
