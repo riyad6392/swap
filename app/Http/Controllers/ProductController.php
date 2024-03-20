@@ -232,10 +232,12 @@ class ProductController extends Controller
                 'user_id',
                 'description',
             ]));
+
             if ($productRequest->has('product_images')) {
                 FileUploadService::uploadFile($productRequest->product_images, $product);
             }
             $this->storeVariations($productVariantRequest, $product);
+
             DB::commit();
 
             return response()->json(['success' => true, 'data' => $product], 201);
@@ -247,16 +249,15 @@ class ProductController extends Controller
 
     public function storeVariations($request, Product $product)
     {
-        foreach ($request->variations as $variationData) {
+        foreach ($request->variations as $key=> $variationData) {
             $variation = $product->productVariations()
                 ->updateOrCreate(
                     ['product_id' => $product->id],
                     $variationData
                 );
-            if (isset($variationData['varient_images']) && count($variationData['varient_images'])) {
+
+            if ($request->has('variations.'.$key.'.variant_images')) {
                 FileUploadService::uploadFile($variationData['varient_images'], $variation);
-            } else {
-                FileUploadService::deleteImages($this->deleted_image_ids);
             }
         }
     }
@@ -482,8 +483,10 @@ class ProductController extends Controller
             $product->update($updateProductRequest->only(['name', 'category_id', 'user_id', 'description']));
 
             if ($updateProductRequest->has('product_images')) {
-                FileUploadService::uploadFile($updateProductRequest->product_images, $product, $this->deleted_image_ids);
-            } else {
+                FileUploadService::uploadFile($updateProductRequest->product_images, $product);
+            }
+
+            if($updateProductRequest->has('deleted_image_ids')){
                 FileUploadService::deleteImages($this->deleted_image_ids);
             }
 
@@ -531,7 +534,7 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $productImgIds = $product->images->pluck('id')->toArray();
-        $variationImgIds = $product->productVariations->pluck('images')->flatten()->pluck('id')->unique()->toArray();
+        $variationImgIds = $product->productVariations->pluck('images')->flatten()->pluck('id')->toArray();
         if ($productImgIds) {
             FileUploadService::deleteImages($productImgIds);
         }
