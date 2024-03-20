@@ -3,18 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProductVariation\StoreProductVariationRequest;
-use App\Models\Image;
 use App\Http\Requests\Product\StoreProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Http\Requests\ProductVariation\UpdateProductVariationRequest;
 use App\Models\Product;
-use App\Models\ProductVariation;
 use App\Services\FileUploadService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
@@ -238,15 +232,10 @@ class ProductController extends Controller
                 'user_id',
                 'description',
             ]));
-
             if ($productRequest->has('product_images')) {
                 FileUploadService::uploadFile($productRequest->product_images, $product);
             }
-
-            if ($productVariantRequest->has('variations')) {
-                $this->storeVariations($productVariantRequest, $product);
-            }
-
+            $this->storeVariations($productVariantRequest, $product);
             DB::commit();
 
             return response()->json(['success' => true, 'data' => $product], 201);
@@ -256,16 +245,18 @@ class ProductController extends Controller
         }
     }
 
-    protected function storeVariations($request, Product $product)
+    public function storeVariations($request, Product $product, array $deleted_image_ids = [])
     {
-        foreach ($request->variations as $key => $variationData) {
+        foreach ($request->variations as $variationData) {
             $variation = $product->productVariations()
                 ->updateOrCreate(
                     ['product_id' => $product->id],
                     $variationData
                 );
-            if ($request->has('variations.'.$key.'.variant_images')) {
-                FileUploadService::uploadFile($variationData['variant_images'], $variation);
+            if (isset($variationData['varient_images']) && count($variationData['varient_images'])) {
+                FileUploadService::uploadFile($variationData['varient_images'], $variation, $deleted_image_ids);
+            } else {
+                FileUploadService::deleteImages($this->deleted_image_ids);
             }
         }
     }
@@ -304,6 +295,7 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
+
         try {
             $product->load('images', 'productVariations');
 
@@ -317,7 +309,7 @@ class ProductController extends Controller
      * Show the form for editing the specified resource.
      */
 
-    public function edit(Product $product): \Illuminate\Http\JsonResponse
+    public function edit(Product $product)
     {
         $product->load('images', 'productVariations');
 
@@ -482,25 +474,20 @@ class ProductController extends Controller
  * )
  */
 
-    public function update(UpdateProductRequest $updateProductRequest, UpdateProductVariationRequest $updateProductVariationRequest, Product $product): \Illuminate\Http\JsonResponse
+    public function update(UpdateProductRequest $updateProductRequest, UpdateProductVariationRequest $updateProductVariationRequest, Product $product)
     {
+        $this->deleted_image_ids = $updateProductRequest->has('deleted_image_ids') ? $updateProductRequest->deleted_image_ids : [];
         try {
             DB::beginTransaction();
-
             $product->update($updateProductRequest->only(['name', 'category_id', 'user_id', 'description']));
 
             if ($updateProductRequest->has('product_images')) {
-                FileUploadService::uploadFile($updateProductRequest->product_images, $product);
+                FileUploadService::uploadFile($updateProductRequest->product_images, $product, $this->deleted_image_ids);
+            } else {
+                FileUploadService::deleteImages($this->deleted_image_ids);
             }
 
-            if ($updateProductRequest->has('deleted_image_ids')) {
-                FileUploadService::deleteImages($this->deleted_image_ids, $product);
-            }
-
-            if ($updateProductVariationRequest->has('variations')) {
-                $this->storeVariations($updateProductVariationRequest, $product);
-            }
-
+            $this->storeVariations($updateProductVariationRequest, $product, $this->deleted_image_ids);
             DB::commit();
 
             return response()->json(['success' => true, 'data' => $product], 201);
@@ -541,8 +528,16 @@ class ProductController extends Controller
      *     )
      * )
      */
-    public function destroy(Product $product): \Illuminate\Http\JsonResponse
+    public function destroy(Product $product)
     {
+        $productImgIds = $product->images->pluck('id')->toArray();
+        $variationImgIds = $product->productVariations->pluck('images')->flatten()->pluck('id')->unique()->toArray();
+        if ($productImgIds) {
+            FileUploadService::deleteImages($productImgIds);
+        }
+        if ($variationImgIds) {
+            FileUploadService::deleteImages($variationImgIds);
+        }
         $product->images()->delete();
         $product->productVariations()->delete();
         $product->delete();
