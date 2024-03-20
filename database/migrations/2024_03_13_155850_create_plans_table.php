@@ -15,8 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('uid')->unique();
-            $table->string('stripe_product_id')->nullable();
-            $table->string('stripe_plan_id')->nullable();
+            $table->string('stripe_price_id')->nullable();
             $table->string('description');
             $table->double('amount', 8, 2);
             $table->string('currency');

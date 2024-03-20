@@ -181,7 +181,7 @@ class PlanController extends Controller
             ]);
 
             $response = StripePaymentGatewayFacade::createPrice($plan);
-            $plan->update(['stripe_plan_id' => $response->id , 'stripe_product_id' => $response->product]);
+            $plan->update(['stripe_price_id' => $response->id]);
 
             DB::commit();
 

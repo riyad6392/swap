@@ -35,18 +35,16 @@ class StripePaymentService
         return $this->stripe->customers->delete($data['stripe_customer_id']);
     }
 
-    public function createPrice($data): \Stripe\Plan
+    public function createPrice($data): \Stripe\Price
     {
-        $product = $this->stripe->products->create([
-            'name' => $data['name'],
-        ]);
-
-        return $this->stripe->plans->create([
-            'amount' => $data['amount'],
+        return $this->stripe->prices->create([
+            'unit_amount' => $data['amount'],
             'currency' => $data['currency'],
-            'interval' => $data['interval'],
-            'interval_count' => $data['interval_duration'],
-            'product' => $product->id,
+            'recurring' => [
+                'interval' => $data['interval'],
+                'interval_count' => $data['interval_duration']
+            ],
+            'product_data' => ['name' => $data['name']],
         ]);
     }
 
