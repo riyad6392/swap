@@ -20,6 +20,7 @@ class ProductController extends Controller
 {
     const UPDATE_REQUEST_TYPE = ['put', 'patch'];
     private $deleted_image_ids = [];
+
     /**
      * Product List.
      *
@@ -84,150 +85,150 @@ class ProductController extends Controller
         //
     }
 
-  /**
- * Product Created.
- *
- * @OA\Post(
- *     path="/api/product",
- *     tags={"Inventory"},
- *     summary="Create a new product with variations",
- *     @OA\Parameter(
- *         in="query",
- *         name="name",
- *         required=true,
- *         description="Name of the product",
- *         @OA\Schema(type="string", example="Product Name"),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="category_id",
- *         required=true,
- *         description="ID of the category",
- *         @OA\Schema(type="integer", example=1),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="user_id",
- *         required=true,
- *         description="ID of the user",
- *         @OA\Schema(type="integer", example=1),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="description",
- *         required=true,
- *         description="Description of the product",
- *         @OA\Schema(type="string", example="Product Description"),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="product_images[]",
- *         required=true,
- *         description="Images of the product",
- *         @OA\Schema(
- *             type="array",
- *             @OA\Items(
- *                 required={"path"},
- *                 @OA\Property(property="path", type="string", example="updated_product_image1.jpg"),
- *             ),
- *         ),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="variations[0][size]",
- *         required=true,
- *         description="Size of the product variation at index 0",
- *         @OA\Schema(type="string", example="XL"),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="variations[0][color]",
- *         required=true,
- *         description="Color of the product variation at index 0",
- *         @OA\Schema(type="string", example="Red"),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="variations[0][price]",
- *         required=true,
- *         description="Price of the product variation at index 0",
- *         @OA\Schema(type="number", format="decimal", example=19.99),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="variations[0][stock]",
- *         required=true,
- *         description="Stock of the product variation at index 0",
- *         @OA\Schema(type="integer", example=100),
- *     ),
- *    @OA\Parameter(
- *         in="query",
- *         name="variations[0][discount]",
- *         required=true,
- *         description="Discount of the product variation at index 0",
- *         @OA\Schema(type="number", format="double", example=10.5),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="variations[0][quantity]",
- *         required=true,
- *         description="Quantity of the product variation at index 0",
- *         @OA\Schema(type="integer", example=50),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="variations[0][discount_type]",
- *         required=true,
- *         description="Discount type of the product variation at index 0",
- *         @OA\Schema(type="string", example="percentage"),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="variations[0][discount_start_date]",
- *         required=true,
- *         description="Start date of the discount for the product variation at index 0",
- *         @OA\Schema(type="string", format="date", example="2024-03-15"),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="variations[0][discount_end_date]",
- *         required=true,
- *         description="End date of the discount for the product variation at index 0",
- *         @OA\Schema(type="string", format="date", example="2024-03-20"),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="variations[0][varient_images]",
- *         required=true,
- *         description="Images of the product variation at index 0",
- *         @OA\Schema(
- *             type="array",
- *             @OA\Items(
- *                 required={"path"},
- *                 @OA\Property(property="path", type="string", example="image1.jpg"),
- *             ),
- *             example={{"path": "image1.jpg"}, {"path": "image2.jpg"}},
- *         ),
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Success",
- *         @OA\JsonContent(
- *             @OA\Property(property="success", type="boolean", example=true),
- *             @OA\Property(property="errors", type="json", example={"message": "Product Created successfully."}),
- *         ),
- *     ),
- *     @OA\Response(
- *         response=422,
- *         description="Invalid user",
- *         @OA\JsonContent(
- *             @OA\Property(property="success", type="boolean", example=false),
- *             @OA\Property(property="errors", type="json", example={"message": "Some this is wrong"}),
- *         ),
- *     ),
- * )
- */
-    public function store(StoreProductRequest $productRequest , StoreProductVariationRequest $productVariantRequest)
+    /**
+     * Product Created.
+     *
+     * @OA\Post(
+     *     path="/api/product",
+     *     tags={"Inventory"},
+     *     summary="Create a new product with variations",
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="name",
+     *         required=true,
+     *         description="Name of the product",
+     *         @OA\Schema(type="string", example="Product Name"),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="category_id",
+     *         required=true,
+     *         description="ID of the category",
+     *         @OA\Schema(type="integer", example=1),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="user_id",
+     *         required=true,
+     *         description="ID of the user",
+     *         @OA\Schema(type="integer", example=1),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="description",
+     *         required=true,
+     *         description="Description of the product",
+     *         @OA\Schema(type="string", example="Product Description"),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="product_images[]",
+     *         required=true,
+     *         description="Images of the product",
+     *         @OA\Schema(
+     *             type="array",
+     *             @OA\Items(
+     *                 required={"path"},
+     *                 @OA\Property(property="path", type="string", example="updated_product_image1.jpg"),
+     *             ),
+     *         ),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="variations[0][size]",
+     *         required=true,
+     *         description="Size of the product variation at index 0",
+     *         @OA\Schema(type="string", example="XL"),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="variations[0][color]",
+     *         required=true,
+     *         description="Color of the product variation at index 0",
+     *         @OA\Schema(type="string", example="Red"),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="variations[0][price]",
+     *         required=true,
+     *         description="Price of the product variation at index 0",
+     *         @OA\Schema(type="number", format="decimal", example=19.99),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="variations[0][stock]",
+     *         required=true,
+     *         description="Stock of the product variation at index 0",
+     *         @OA\Schema(type="integer", example=100),
+     *     ),
+     *    @OA\Parameter(
+     *         in="query",
+     *         name="variations[0][discount]",
+     *         required=true,
+     *         description="Discount of the product variation at index 0",
+     *         @OA\Schema(type="number", format="double", example=10.5),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="variations[0][quantity]",
+     *         required=true,
+     *         description="Quantity of the product variation at index 0",
+     *         @OA\Schema(type="integer", example=50),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="variations[0][discount_type]",
+     *         required=true,
+     *         description="Discount type of the product variation at index 0",
+     *         @OA\Schema(type="string", example="percentage"),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="variations[0][discount_start_date]",
+     *         required=true,
+     *         description="Start date of the discount for the product variation at index 0",
+     *         @OA\Schema(type="string", format="date", example="2024-03-15"),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="variations[0][discount_end_date]",
+     *         required=true,
+     *         description="End date of the discount for the product variation at index 0",
+     *         @OA\Schema(type="string", format="date", example="2024-03-20"),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="variations[0][varient_images]",
+     *         required=true,
+     *         description="Images of the product variation at index 0",
+     *         @OA\Schema(
+     *             type="array",
+     *             @OA\Items(
+     *                 required={"path"},
+     *                 @OA\Property(property="path", type="string", example="image1.jpg"),
+     *             ),
+     *             example={{"path": "image1.jpg"}, {"path": "image2.jpg"}},
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Success",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="errors", type="json", example={"message": "Product Created successfully."}),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Invalid user",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="errors", type="json", example={"message": "Some this is wrong"}),
+     *         ),
+     *     ),
+     * )
+     */
+    public function store(StoreProductRequest $productRequest, StoreProductVariationRequest $productVariantRequest)
     {
         try {
             DB::beginTransaction();
@@ -264,7 +265,7 @@ class ProductController extends Controller
                     ['product_id' => $product->id],
                     $variationData
                 );
-            if ($request->has('variations.'.$key.'.variant_images')) {
+            if ($request->has('variations.' . $key . '.variant_images')) {
                 FileUploadService::uploadFile($variationData['variant_images'], $variation);
             }
         }
@@ -284,13 +285,13 @@ class ProductController extends Controller
      *         @OA\Schema(type="integer", format="int64")
      *     ),
      *    @OA\Response(
-    *         response=200,
-    *         description="success",
-    *         @OA\JsonContent(
-    *             @OA\Property(property="success", type="boolean", example="true"),
-    *             @OA\Property(property="errors", type="json", example={"message": {"Product Created successfully."}}),
-    *         ),
-    *     ),
+     *         response=200,
+     *         description="success",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example="true"),
+     *             @OA\Property(property="errors", type="json", example={"message": {"Product Created successfully."}}),
+     *         ),
+     *     ),
      *     @OA\Response(
      *         response=404,
      *         description="Product not found",
@@ -325,162 +326,162 @@ class ProductController extends Controller
     }
 
     /**
- * Update Product.
- *
- * @OA\Put(
- *     path="/api/product/{id}",
- *     tags={"Inventory"},
- *     summary="Update an existing product with variations",
- *     @OA\Parameter(
- *         in="path",
- *         name="id",
- *         required=true,
- *         description="ID of the product to update",
- *         @OA\Schema(type="integer", example=1),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="name",
- *         required=true,
- *         description="Name of the product",
- *         @OA\Schema(type="string", example="Updated Product Name"),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="category_id",
- *         required=true,
- *         description="ID of the category",
- *         @OA\Schema(type="integer", example=2),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="user_id",
- *         required=true,
- *         description="ID of the user",
- *         @OA\Schema(type="integer", example=2),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="description",
- *         required=true,
- *         description="Description of the product",
- *         @OA\Schema(type="string", example="Updated Product Description"),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="variations[0][size]",
- *         required=true,
- *         description="Size of the product variation at index 0",
- *         @OA\Schema(type="string", example="M"),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="variations[0][color]",
- *         required=true,
- *         description="Color of the product variation at index 0",
- *         @OA\Schema(type="string", example="Blue"),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="variations[0][price]",
- *         required=true,
- *         description="Price of the product variation at index 0",
- *         @OA\Schema(type="number", format="decimal", example=24.99),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="variations[0][stock]",
- *         required=true,
- *         description="Stock of the product variation at index 0",
- *         @OA\Schema(type="integer", example=80),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="variations[0][discount]",
- *         required=true,
- *         description="Discount of the product variation at index 0",
- *         @OA\Schema(type="number", format="double", example=10.5),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="variations[0][quantity]",
- *         required=true,
- *         description="Quantity of the product variation at index 0",
- *         @OA\Schema(type="integer", example=30),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="variations[0][discount_type]",
- *         required=true,
- *         description="Discount type of the product variation at index 0",
- *         @OA\Schema(type="string", example="percentage"),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="variations[0][discount_start_date]",
- *         required=true,
- *         description="Start date of the discount for the product variation at index 0",
- *         @OA\Schema(type="string", format="date", example="2024-03-15"),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="variations[0][discount_end_date]",
- *         required=true,
- *         description="End date of the discount for the product variation at index 0",
- *         @OA\Schema(type="string", format="date", example="2024-03-20"),
- *     ),
- *      @OA\Parameter(
- *         in="query",
- *         name="deleted_image_ids[]",
- *         required=true,
- *         description="IDs of the images to be deleted",
- *         @OA\Schema(
- *             type="array",
- *             @OA\Items(
- *                 type="integer",
- *                 example={1, 5, 6, 7},
- *             ),
- *         ),
- *     ),
- *     @OA\Parameter(
- *         in="query",
- *         name="variations[0][varient_images][]",
- *         required=true,
- *         description="Images of the product variation at index 0",
- *         @OA\Schema(
- *             type="array",
- *             @OA\Items(
- *                 required={"path"},
- *                 @OA\Property(property="path", type="string", example="updated_image1.jpg"),
- *             ),
- *         ),
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Success",
- *         @OA\JsonContent(
- *             @OA\Property(property="success", type="boolean", example=true),
- *             @OA\Property(property="errors", type="json", example={"message": "Product Updated successfully."}),
- *         ),
- *     ),
- *     @OA\Response(
- *         response=422,
- *         description="Invalid data",
- *         @OA\JsonContent(
- *             @OA\Property(property="success", type="boolean", example=false),
- *             @OA\Property(property="errors", type="json", example={"message": "Some data is invalid"}),
- *         ),
- *     ),
- *     @OA\Response(
- *         response=404,
- *         description="Product not found",
- *         @OA\JsonContent(
- *             @OA\Property(property="success", type="boolean", example=false),
- *             @OA\Property(property="errors", type="json", example={"message": "Product not found"}),
- *         ),
- *     ),
- * )
- */
+     * Update Product.
+     *
+     * @OA\Put(
+     *     path="/api/product/{id}",
+     *     tags={"Inventory"},
+     *     summary="Update an existing product with variations",
+     *     @OA\Parameter(
+     *         in="path",
+     *         name="id",
+     *         required=true,
+     *         description="ID of the product to update",
+     *         @OA\Schema(type="integer", example=1),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="name",
+     *         required=true,
+     *         description="Name of the product",
+     *         @OA\Schema(type="string", example="Updated Product Name"),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="category_id",
+     *         required=true,
+     *         description="ID of the category",
+     *         @OA\Schema(type="integer", example=2),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="user_id",
+     *         required=true,
+     *         description="ID of the user",
+     *         @OA\Schema(type="integer", example=2),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="description",
+     *         required=true,
+     *         description="Description of the product",
+     *         @OA\Schema(type="string", example="Updated Product Description"),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="variations[0][size]",
+     *         required=true,
+     *         description="Size of the product variation at index 0",
+     *         @OA\Schema(type="string", example="M"),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="variations[0][color]",
+     *         required=true,
+     *         description="Color of the product variation at index 0",
+     *         @OA\Schema(type="string", example="Blue"),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="variations[0][price]",
+     *         required=true,
+     *         description="Price of the product variation at index 0",
+     *         @OA\Schema(type="number", format="decimal", example=24.99),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="variations[0][stock]",
+     *         required=true,
+     *         description="Stock of the product variation at index 0",
+     *         @OA\Schema(type="integer", example=80),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="variations[0][discount]",
+     *         required=true,
+     *         description="Discount of the product variation at index 0",
+     *         @OA\Schema(type="number", format="double", example=10.5),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="variations[0][quantity]",
+     *         required=true,
+     *         description="Quantity of the product variation at index 0",
+     *         @OA\Schema(type="integer", example=30),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="variations[0][discount_type]",
+     *         required=true,
+     *         description="Discount type of the product variation at index 0",
+     *         @OA\Schema(type="string", example="percentage"),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="variations[0][discount_start_date]",
+     *         required=true,
+     *         description="Start date of the discount for the product variation at index 0",
+     *         @OA\Schema(type="string", format="date", example="2024-03-15"),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="variations[0][discount_end_date]",
+     *         required=true,
+     *         description="End date of the discount for the product variation at index 0",
+     *         @OA\Schema(type="string", format="date", example="2024-03-20"),
+     *     ),
+     *      @OA\Parameter(
+     *         in="query",
+     *         name="deleted_image_ids[]",
+     *         required=true,
+     *         description="IDs of the images to be deleted",
+     *         @OA\Schema(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="integer",
+     *                 example={1, 5, 6, 7},
+     *             ),
+     *         ),
+     *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="variations[0][varient_images][]",
+     *         required=true,
+     *         description="Images of the product variation at index 0",
+     *         @OA\Schema(
+     *             type="array",
+     *             @OA\Items(
+     *                 required={"path"},
+     *                 @OA\Property(property="path", type="string", example="updated_image1.jpg"),
+     *             ),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Success",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="errors", type="json", example={"message": "Product Updated successfully."}),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Invalid data",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="errors", type="json", example={"message": "Some data is invalid"}),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Product not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="errors", type="json", example={"message": "Product not found"}),
+     *         ),
+     *     ),
+     * )
+     */
 
     public function update(UpdateProductRequest $updateProductRequest, UpdateProductVariationRequest $updateProductVariationRequest, Product $product): \Illuminate\Http\JsonResponse
     {

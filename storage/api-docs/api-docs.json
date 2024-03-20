@@ -1625,193 +1625,262 @@
                 "tags": [
                     "Inventory"
                 ],
-                "summary": "Product Created.",
+                "summary": "Create a new product with variations",
+                "description": "Product Created.",
                 "operationId": "1d0b0d8724685b7b8f9d87f403bfc4df",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "Name of the product",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "Product Name"
+                        }
+                    },
+                    {
+                        "name": "category_id",
+                        "in": "query",
+                        "description": "ID of the category",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "description": "ID of the user",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "description",
+                        "in": "query",
+                        "description": "Description of the product",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "Product Description"
+                        }
+                    },
+                    {
+                        "name": "product_images[]",
+                        "in": "query",
+                        "description": "Images of the product",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
                                 "required": [
-                                    "name",
-                                    "category_id",
-                                    "user_id",
-                                    "images",
-                                    "variations"
+                                    "path"
                                 ],
                                 "properties": {
-                                    "name": {
+                                    "path": {
                                         "type": "string",
-                                        "example": "Product Name"
-                                    },
-                                    "category_id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "user_id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "description": {
-                                        "type": "string",
-                                        "example": "Product Description"
-                                    },
-                                    "deleted_image_ids": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "integer"
-                                        },
-                                        "example": [
-                                            "1",
-                                            "2",
-                                            "3"
-                                        ]
-                                    },
-                                    "images": {
-                                        "type": "array",
-                                        "items": {
-                                            "required": [
-                                                "path"
-                                            ],
-                                            "properties": {
-                                                "path": {
-                                                    "type": "string",
-                                                    "example": "image1.jpg"
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "example": [
-                                            {
-                                                "path": "image1.jpg"
-                                            },
-                                            {
-                                                "path": "image2.jpg"
-                                            }
-                                        ]
-                                    },
-                                    "variations": {
-                                        "type": "array",
-                                        "items": {
-                                            "required": [
-                                                "price",
-                                                "stock",
-                                                "quantity"
-                                            ],
-                                            "properties": {
-                                                "size": {
-                                                    "type": "string",
-                                                    "example": "XL"
-                                                },
-                                                "color": {
-                                                    "type": "string",
-                                                    "example": "Red"
-                                                },
-                                                "price": {
-                                                    "type": "number",
-                                                    "format": "decimal",
-                                                    "example": 19.99
-                                                },
-                                                "stock": {
-                                                    "type": "integer",
-                                                    "example": 100
-                                                },
-                                                "discount": {
-                                                    "type": "number",
-                                                    "format": "double",
-                                                    "example": 10.5
-                                                },
-                                                "quantity": {
-                                                    "type": "integer",
-                                                    "example": 50
-                                                },
-                                                "discount_type": {
-                                                    "type": "string",
-                                                    "example": "percentage"
-                                                },
-                                                "discount_start_date": {
-                                                    "type": "string",
-                                                    "format": "date",
-                                                    "example": "2024-03-15"
-                                                },
-                                                "discount_end_date": {
-                                                    "type": "string",
-                                                    "format": "date",
-                                                    "example": "2024-03-20"
-                                                },
-                                                "varient_images": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "required": [
-                                                            "path"
-                                                        ],
-                                                        "properties": {
-                                                            "path": {
-                                                                "type": "string",
-                                                                "example": "image1.jpg"
-                                                            }
-                                                        },
-                                                        "type": "object"
-                                                    },
-                                                    "example": [
-                                                        {
-                                                            "path": "image1.jpg"
-                                                        },
-                                                        {
-                                                            "path": "image2.jpg"
-                                                        }
-                                                    ]
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "example": [
-                                            {
-                                                "size": "XL",
-                                                "color": "Red",
-                                                "price": 19.99,
-                                                "stock": 100,
-                                                "discount": 10.5,
-                                                "quantity": 50,
-                                                "discount_type": "percentage",
-                                                "discount_start_date": "2024-03-15",
-                                                "discount_end_date": "2024-03-20",
-                                                "varient_images": [
-                                                    {
-                                                        "path": "image1.jpg"
-                                                    },
-                                                    {
-                                                        "path": "image2.jpg"
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                "size": "L",
-                                                "color": "Blue",
-                                                "price": 24.99,
-                                                "stock": 80,
-                                                "discount": null,
-                                                "quantity": 30,
-                                                "discount_type": null,
-                                                "discount_start_date": null,
-                                                "discount_end_date": null,
-                                                "varient_images": [
-                                                    {
-                                                        "path": "image3.jpg"
-                                                    },
-                                                    {
-                                                        "path": "image4.jpg"
-                                                    }
-                                                ]
-                                            }
-                                        ]
+                                        "example": "updated_product_image1.jpg"
                                     }
                                 },
                                 "type": "object"
                             }
                         }
+                    },
+                    {
+                        "name": "variations[0][size]",
+                        "in": "query",
+                        "description": "Size of the product variation at index 0",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "XL"
+                        }
+                    },
+                    {
+                        "name": "variations[0][color]",
+                        "in": "query",
+                        "description": "Color of the product variation at index 0",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "Red"
+                        }
+                    },
+                    {
+                        "name": "variations[0][price]",
+                        "in": "query",
+                        "description": "Price of the product variation at index 0",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "decimal",
+                            "example": 19.99
+                        }
+                    },
+                    {
+                        "name": "variations[0][stock]",
+                        "in": "query",
+                        "description": "Stock of the product variation at index 0",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 100
+                        }
+                    },
+                    {
+                        "name": "variations[0][discount]",
+                        "in": "query",
+                        "description": "Discount of the product variation at index 0",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "double",
+                            "example": 10.5
+                        }
+                    },
+                    {
+                        "name": "variations[0][quantity]",
+                        "in": "query",
+                        "description": "Quantity of the product variation at index 0",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 50
+                        }
+                    },
+                    {
+                        "name": "variations[0][discount_type]",
+                        "in": "query",
+                        "description": "Discount type of the product variation at index 0",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "percentage"
+                        }
+                    },
+                    {
+                        "name": "variations[0][discount_start_date]",
+                        "in": "query",
+                        "description": "Start date of the discount for the product variation at index 0",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2024-03-15"
+                        }
+                    },
+                    {
+                        "name": "variations[0][discount_end_date]",
+                        "in": "query",
+                        "description": "End date of the discount for the product variation at index 0",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2024-03-20"
+                        }
+                    },
+                    {
+                        "name": "variations[0][varient_images]",
+                        "in": "query",
+                        "description": "Images of the product variation at index 0",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "required": [
+                                    "path"
+                                ],
+                                "properties": {
+                                    "path": {
+                                        "type": "string",
+                                        "example": "image1.jpg"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "example": [
+                                {
+                                    "path": "image1.jpg"
+                                },
+                                {
+                                    "path": "image2.jpg"
+                                }
+                            ]
+                        }
                     }
-                },
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": "Product Created successfully."
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": "Some this is wrong"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/product/{id}": {
+            "get": {
+                "tags": [
+                    "Inventory"
+                ],
+                "summary": "Retrieve a specific product.",
+                "operationId": "2768d88590e39a7ded1d0032e64dded7",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "get singe product by product id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "success",
@@ -1837,8 +1906,8 @@
                             }
                         }
                     },
-                    "422": {
-                        "description": "Invalid user",
+                    "404": {
+                        "description": "Product not found",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1847,13 +1916,9 @@
                                             "type": "boolean",
                                             "example": "false"
                                         },
-                                        "errors": {
-                                            "type": "json",
-                                            "example": {
-                                                "message": [
-                                                    "Some this is wrong"
-                                                ]
-                                            }
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Product not found"
                                         }
                                     },
                                     "type": "object"
@@ -1862,205 +1927,214 @@
                         }
                     }
                 }
-            }
-        },
-        "/api/product/{id}": {
+            },
             "put": {
                 "tags": [
                     "Inventory"
                 ],
-                "summary": "Update the product.",
+                "summary": "Update an existing product with variations",
+                "description": "Update Product.",
                 "operationId": "d3467c795490afbb49680821c9bd6b0d",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "ID of the product to be updated",
+                        "description": "ID of the product to update",
                         "required": true,
                         "schema": {
                             "type": "integer",
-                            "format": "int64"
+                            "example": 1
                         }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
+                    },
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "Name of the product",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "Updated Product Name"
+                        }
+                    },
+                    {
+                        "name": "category_id",
+                        "in": "query",
+                        "description": "ID of the category",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 2
+                        }
+                    },
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "description": "ID of the user",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 2
+                        }
+                    },
+                    {
+                        "name": "description",
+                        "in": "query",
+                        "description": "Description of the product",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "Updated Product Description"
+                        }
+                    },
+                    {
+                        "name": "variations[0][size]",
+                        "in": "query",
+                        "description": "Size of the product variation at index 0",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "M"
+                        }
+                    },
+                    {
+                        "name": "variations[0][color]",
+                        "in": "query",
+                        "description": "Color of the product variation at index 0",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "Blue"
+                        }
+                    },
+                    {
+                        "name": "variations[0][price]",
+                        "in": "query",
+                        "description": "Price of the product variation at index 0",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "decimal",
+                            "example": 24.99
+                        }
+                    },
+                    {
+                        "name": "variations[0][stock]",
+                        "in": "query",
+                        "description": "Stock of the product variation at index 0",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 80
+                        }
+                    },
+                    {
+                        "name": "variations[0][discount]",
+                        "in": "query",
+                        "description": "Discount of the product variation at index 0",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "double",
+                            "example": 10.5
+                        }
+                    },
+                    {
+                        "name": "variations[0][quantity]",
+                        "in": "query",
+                        "description": "Quantity of the product variation at index 0",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 30
+                        }
+                    },
+                    {
+                        "name": "variations[0][discount_type]",
+                        "in": "query",
+                        "description": "Discount type of the product variation at index 0",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "percentage"
+                        }
+                    },
+                    {
+                        "name": "variations[0][discount_start_date]",
+                        "in": "query",
+                        "description": "Start date of the discount for the product variation at index 0",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2024-03-15"
+                        }
+                    },
+                    {
+                        "name": "variations[0][discount_end_date]",
+                        "in": "query",
+                        "description": "End date of the discount for the product variation at index 0",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2024-03-20"
+                        }
+                    },
+                    {
+                        "name": "deleted_image_ids[]",
+                        "in": "query",
+                        "description": "IDs of the images to be deleted",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer",
+                                "example": [
+                                    1,
+                                    5,
+                                    6,
+                                    7
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "name": "variations[0][varient_images][]",
+                        "in": "query",
+                        "description": "Images of the product variation at index 0",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
                                 "required": [
-                                    "name",
-                                    "category_id",
-                                    "user_id",
-                                    "images",
-                                    "variations"
+                                    "path"
                                 ],
                                 "properties": {
-                                    "name": {
+                                    "path": {
                                         "type": "string",
-                                        "example": "Updated Product Name"
-                                    },
-                                    "category_id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "user_id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "description": {
-                                        "type": "string",
-                                        "example": "Updated Product Description"
-                                    },
-                                    "deleted_image_ids": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "integer"
-                                        },
-                                        "example": [
-                                            "1",
-                                            "2",
-                                            "3"
-                                        ]
-                                    },
-                                    "images": {
-                                        "type": "array",
-                                        "items": {
-                                            "required": [
-                                                "path"
-                                            ],
-                                            "properties": {
-                                                "path": {
-                                                    "type": "string",
-                                                    "example": "image3.jpg"
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "example": [
-                                            {
-                                                "path": "image3.jpg"
-                                            },
-                                            {
-                                                "path": "image4.jpg"
-                                            }
-                                        ]
-                                    },
-                                    "variations": {
-                                        "type": "array",
-                                        "items": {
-                                            "required": [
-                                                "price",
-                                                "stock",
-                                                "quantity"
-                                            ],
-                                            "properties": {
-                                                "size": {
-                                                    "type": "string",
-                                                    "example": "M"
-                                                },
-                                                "color": {
-                                                    "type": "string",
-                                                    "example": "Green"
-                                                },
-                                                "price": {
-                                                    "type": "number",
-                                                    "format": "decimal",
-                                                    "example": 29.99
-                                                },
-                                                "stock": {
-                                                    "type": "integer",
-                                                    "example": 150
-                                                },
-                                                "discount": {
-                                                    "type": "number",
-                                                    "format": "double",
-                                                    "example": 15.75
-                                                },
-                                                "quantity": {
-                                                    "type": "integer",
-                                                    "example": 80
-                                                },
-                                                "discount_type": {
-                                                    "type": "string",
-                                                    "example": "fixed"
-                                                },
-                                                "discount_start_date": {
-                                                    "type": "string",
-                                                    "format": "date",
-                                                    "example": "2024-03-18"
-                                                },
-                                                "discount_end_date": {
-                                                    "type": "string",
-                                                    "format": "date",
-                                                    "example": "2024-03-25"
-                                                },
-                                                "varient_images": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string",
-                                                        "example": "image1.jpg"
-                                                    },
-                                                    "nullable": true
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "example": [
-                                            {
-                                                "size": "M",
-                                                "color": "Green",
-                                                "price": 29.99,
-                                                "stock": 150,
-                                                "discount": 15.75,
-                                                "quantity": 80,
-                                                "discount_type": "fixed",
-                                                "discount_start_date": "2024-03-18",
-                                                "discount_end_date": "2024-03-25",
-                                                "varient_images": [
-                                                    "image1.jpg",
-                                                    "image2.jpg"
-                                                ]
-                                            },
-                                            {
-                                                "size": "S",
-                                                "color": "Yellow",
-                                                "price": 34.99,
-                                                "stock": 120,
-                                                "discount": null,
-                                                "quantity": 60,
-                                                "discount_type": null,
-                                                "discount_start_date": null,
-                                                "discount_end_date": null,
-                                                "varient_images": null
-                                            }
-                                        ]
+                                        "example": "updated_image1.jpg"
                                     }
                                 },
                                 "type": "object"
                             }
                         }
                     }
-                },
+                ],
                 "responses": {
                     "200": {
-                        "description": "success",
+                        "description": "Success",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "success": {
                                             "type": "boolean",
-                                            "example": "true"
+                                            "example": true
                                         },
-                                        "data": {
+                                        "errors": {
                                             "type": "json",
                                             "example": {
-                                                "id": 1,
-                                                "name": "Updated Product Name",
-                                                "category_id": 1,
-                                                "user_id": 1,
-                                                "description": "Updated Product Description"
+                                                "message": "Product Updated successfully."
                                             }
                                         }
                                     },
@@ -2070,21 +2144,41 @@
                         }
                     },
                     "422": {
-                        "description": "Invalid user",
+                        "description": "Invalid data",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "success": {
                                             "type": "boolean",
-                                            "example": "false"
+                                            "example": false
                                         },
                                         "errors": {
                                             "type": "json",
                                             "example": {
-                                                "message": [
-                                                    "Some this is wrong"
-                                                ]
+                                                "message": "Some data is invalid"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": "Product not found"
                                             }
                                         }
                                     },

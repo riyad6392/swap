@@ -115,13 +115,15 @@ class PlanController extends Controller
     public function store(StorePlanRequest $planRequest, StorePlanDetailsRequest $planDetailsRequest)
     {
         try {
+
             DB::beginTransaction();
-            $plan = Plan::create($planRequest->only(['name',
-                                                     'description',
-                                                     'amount',
-                                                     'currency',
-                                                     'interval',
-                                                     'interval_duration',
+            $plan = Plan::create($planRequest->only([
+                'name',
+                'description',
+                'amount',
+                'currency',
+                'interval',
+                'interval_duration',
             ]));
 
             PlanDetails::create([
@@ -129,21 +131,18 @@ class PlanController extends Controller
                 'feature' => $planDetailsRequest->feature,
                 'features_count' => $planDetailsRequest->features_count,
                 'value' => $planDetailsRequest->value,
-
             ]);
+
             $response = StripePaymentService::createPrice($plan);
             $plan->update(['stripe_price_id' => $response->id]);
+
             DB::commit();
-            return response()->json([
-                'success' => true,
-                'message' => 'Plan created successfully!'
-            ], 200);
-        }catch(\Exception $e) {
+
+            return response()->json(['success' => true, 'message' => 'Plan created successfully!'], 200);
+        } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
+
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
 
     }
@@ -248,20 +247,20 @@ class PlanController extends Controller
     public function update(Request $request, string $id)
     {
         $validateData = Validator::make($request->all(), [
-            'name'              => 'required',
-            'description'       => 'required',
-            'price'             => 'required',
-            'currency'          => 'required',
-            'interval'          => 'required',
+            'name' => 'required',
+            'description' => 'required',
+            'price' => 'required',
+            'currency' => 'required',
+            'interval' => 'required',
             'interval_duration' => 'required',
-            'created_by'        => 'required',
-            'updated_by'        => 'required',
+            'created_by' => 'required',
+            'updated_by' => 'required',
         ]);
 
         if ($validateData->fails()) {
             return response()->json([
                 'success' => false,
-                'errors'  => $validateData->errors()
+                'errors' => $validateData->errors()
             ], 422);
         }
 
