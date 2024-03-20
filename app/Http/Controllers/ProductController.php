@@ -257,7 +257,7 @@ class ProductController extends Controller
                 );
 
             if ($request->has('variations.'.$key.'.variant_images')) {
-                FileUploadService::uploadFile($variationData['varient_images'], $variation);
+                FileUploadService::uploadFile($variationData['variant_images'], $variation);
             }
         }
     }
