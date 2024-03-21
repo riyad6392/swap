@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Facades\StripePaymentGatewayFacade;
+use App\Facades\StripePaymentFacade;
 use App\Http\Requests\Plan\StorePlanDetailsRequest;
 use App\Http\Requests\Plan\StorePlanRequest;
 use App\Http\Requests\Plan\UpdatePlanDetailsRequest;
@@ -173,14 +173,13 @@ class PlanController extends Controller
                 'interval_duration',
             ]));
 
-            PlanDetails::create([
-                'plan_id' => $plan->id,
-                'feature' => $planDetailsRequest->feature,
-                'features_count' => $planDetailsRequest->features_count,
-                'value' => $planDetailsRequest->value,
-            ]);
+            $plan->planDetails()->create($planDetailsRequest->only([
+                'feature',
+                'features_count',
+                'value',
+            ]));
 
-            $response = StripePaymentGatewayFacade::createPrice($plan);
+            $response = StripePaymentFacade::createPrice($plan);
             $plan->update(['stripe_price_id' => $response->id]);
 
             DB::commit();
@@ -354,7 +353,7 @@ class PlanController extends Controller
                 'value' => $updatePlanDetailsRequest->value,
 
             ]);
-            $response = StripePaymentGatewayFacade::updatePrice($plan);
+            $response = StripePaymentFacade::updatePrice($plan);
             // $plan->update(['stripe_price_id' => $response->id]);
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Plan updated successfully!'], 200);

@@ -20,10 +20,10 @@ return new class extends Migration
             $table->string('start_date');
             $table->string('end_date');
             $table->double('amount', 8, 2);
+            $table->string('payment_method_id');
+            $table->string('stripe_subscription_id');
             $table->string('created_by');
             $table->string('updated_by');
-            $table->string('payment_method_id');
-
             $table->timestamps();
         });
     }

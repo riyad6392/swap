@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Facades\StripePaymentFacade;
 use App\Models\User;
 use App\Services\StripePaymentService;
 
@@ -12,7 +13,7 @@ class UserObserver
      */
     public function created(User $user): void
     {
-        $customer = StripePaymentService::createCustomer($user);
+        $customer = StripePaymentFacade::createCustomer($user);
         $user->stripe_customer_id = $customer->id;
         $user->save();
     }
@@ -30,7 +31,7 @@ class UserObserver
      */
     public function deleted(User $user): void
     {
-        $customer = StripePaymentService::deleteCustomer($user);
+        $customer = StripePaymentFacade::deleteCustomer($user);
     }
 
     /**

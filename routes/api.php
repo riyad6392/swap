@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\RegistrationController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\PlanSubscriptionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
@@ -45,6 +46,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::resource('category', \App\Http\Controllers\CategoryController::class);
         Route::resource('product', \App\Http\Controllers\ProductController::class);
         Route::resource('plan', \App\Http\Controllers\PlanController::class);
+        Route::post('plan-subscription', [PlanSubscriptionController::class , 'subscribe']);
 
     });
 

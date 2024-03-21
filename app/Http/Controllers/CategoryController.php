@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Category\StoreCategoryRequest;
+use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -65,7 +66,7 @@ class CategoryController extends Controller
         $categories = Category::query();
         if ($request->get('get_all')) {
 
-            return response()->json(['success' => true, 'data' => $categories->get() , 'message' => $request->get('get_all')]);
+            return response()->json(['success' => true, 'data' => $categories->get(), 'message' => $request->get('get_all')]);
         }
 
         $categories = $categories->paginate(10);
@@ -98,15 +99,6 @@ class CategoryController extends Controller
      *         example="Doel Rana",
      *     ),
      *
-     *     @OA\Parameter(
-     *         in="query",
-     *         name="description",
-     *         required=true,
-     *
-     *         @OA\Schema(type="string"),
-     *         example="This is just description",
-     *     ),
-     *
      *      @OA\Response(
      *          response=200,
      *          description="success",
@@ -132,7 +124,7 @@ class CategoryController extends Controller
      */
     public function store(StoreCategoryRequest $request)
     {
-        Category::create($request->only('name', 'description'));
+        Category::create($request->only('name'));
         return response()->json(['success' => true, 'message' => 'Category created successfully.']);
 
     }
@@ -141,7 +133,7 @@ class CategoryController extends Controller
      * Category Show.
      *
      * @OA\Get(
-     *     path="/api/category/{id}/show",
+     *     path="/api/category/{id}",
      *     tags={"Category"},
      *     security={{ "apiAuth": {} }},
      *
@@ -199,15 +191,6 @@ class CategoryController extends Controller
      *         example="Doel Rana",
      *     ),
      *
-     *     @OA\Parameter(
-     *         in="query",
-     *         name="description",
-     *         required=true,
-     *
-     *         @OA\Schema(type="string"),
-     *         example="This is just description",
-     *     ),
-     *
      *      @OA\Response(
      *          response=200,
      *          description="success",
@@ -231,20 +214,17 @@ class CategoryController extends Controller
      *      )
      * )
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateCategoryRequest $updateCategory, string $id): \Illuminate\Http\JsonResponse
     {
-        $validateData = Validator::make($request->all(), [
-            'name' => 'required|max:255',
-            'description' => 'required'
-        ]);
+        $category = Category::findOrFail($id);
+        if ($category) {
 
-        if ($validateData->fails()) {
-            return response()->json(['success' => false, 'errors' => $validateData->errors()], 422);
-        }else{
-            $category = Category::findOrFail($id);
-            $category->update($request->only('name', 'description'));
+            $category->update($updateCategory->only('name'));
             return response()->json(['success' => true, 'message' => 'Category updated successfully.']);
+
         }
+        return response()->json(['success' => false, 'message' => 'Category not found.'], 404);
+
     }
 
     /**
@@ -281,7 +261,10 @@ class CategoryController extends Controller
     public function destroy(string $id)
     {
         $category = Category::findOrFail($id);
-        $category->delete();
-        return response()->json(['success' => true, 'message' => 'Category deleted successfully.']);
+        if ($category) {
+            $category->delete();
+            return response()->json(['success' => true, 'message' => 'Category deleted successfully.']);
+        }
+        return response()->json(['success' => false, 'message' => 'Category not found.'], 404);
     }
 }
