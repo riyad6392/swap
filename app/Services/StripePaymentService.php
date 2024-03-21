@@ -61,9 +61,29 @@ class StripePaymentService
         ]);
     }
 
-    public function testing(): string
+    public function subscription($user, $plan): string
     {
-        return 'testing';
+        return $this->stripe->subscriptions->create([
+            'customer' => $user->stripe_customer_id,
+            'items' => [['price' => $plan->stripe_price_id]],
+        ]);
+    }
 
+    public function paymentMethod($data): \Stripe\PaymentMethod
+    {
+        $this->stripe->paymentMethods->create([
+            'type' => 'card',
+            'card' => [
+                'number' => $data['number'],
+                'exp_month' => $data['exp_month'],
+                'exp_year' => $data['exp_year'],
+                'cvc' => $data['cvc'],
+            ],
+        ]);
+
+        return $this->stripe->paymentMethods->attach(
+            $paymentMethod,
+            ['customer' => $clientId->id]
+        );
     }
 }
