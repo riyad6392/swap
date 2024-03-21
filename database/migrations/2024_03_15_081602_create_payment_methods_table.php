@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('user_id');
             $table->string('master_key');
             $table->string('master_value');
+            $table->string('stripe_payment_method_id');
             $table->string('status');
             $table->string('created_by');
             $table->string('updated_by');

@@ -126,7 +126,6 @@ class CategoryController extends Controller
     {
         Category::create($request->only('name'));
         return response()->json(['success' => true, 'message' => 'Category created successfully.']);
-
     }
 
     /**
@@ -224,7 +223,6 @@ class CategoryController extends Controller
 
         }
         return response()->json(['success' => false, 'message' => 'Category not found.'], 404);
-
     }
 
     /**
@@ -251,7 +249,6 @@ class CategoryController extends Controller
      *          description="Invalid data",
      *
      *          @OA\JsonContent(
-     *
      *              @OA\Property(property="success", type="boolean", example="false"),
      *              @OA\Property(property="errors", type="json", example={"message": {"The given data was invalid."}}),
      *          )
