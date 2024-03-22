@@ -11,6 +11,7 @@ Route::post('admin/register', [RegistrationController::class, 'register']);
 Route::post('admin/login', [LoginController::class, 'login'])->name('admin.login');
 Route::post('admin/forget-password', [ForgetPasswordController::class, 'forgetPassword'])->name('admin.forgot-password');
 Route::post('admin/reset-password', [ForgetPasswordController::class, 'resetPassword'])->name('admin.reset-password');
+Route::post('admin/refresh-token', [LoginController::class, 'refreshToken']);
 
 Route::group(['middleware' => 'auth:admin-api'], function () {
     Route::get('/admin-test' , function(){

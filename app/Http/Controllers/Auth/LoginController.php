@@ -227,8 +227,8 @@ class LoginController extends Controller
      * @throws ValidationException
      */
 
-    public function getRefreshToken(Request $request) {
-
+    public function getRefreshToken(Request $request)
+    {
         $validateData = Validator::make($request->all(), [
             'refresh_token' => 'required'
         ]);
@@ -237,7 +237,7 @@ class LoginController extends Controller
             return response()->json(['success' => false, 'errors' => $validateData->errors()], 422);
         }
 
-        $oClient = OClient::where('password_client', 1)->first();
+        $oClient = OClient::where('password_client', 1)->where('provider', 'users')->first();
 
         $response = request()->create('/oauth/token', 'post', [
             'grant_type' => 'refresh_token',
