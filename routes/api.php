@@ -26,7 +26,7 @@ Route::post('register', [RegistrationController::class, 'register']);
 Route::post('login', [LoginController::class, 'login'])->name('login');
 Route::post('forget-password', [ForgetPasswordController::class, 'forgetPassword']);
 Route::post('reset-password', [ForgetPasswordController::class, 'resetPassword']);
-Route::post('refresh-token', [ForgotPasswordController::class, 'getTokenAndRefreshTokenByRefreshToken']);
+Route::post('refresh-token', [LoginController::class, 'getRefreshToken']);
 
 
 
