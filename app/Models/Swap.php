@@ -23,6 +23,20 @@ class Swap extends Model
         'updated_by'
     ];
 
+    public function exchangeDetails()
+    {
+        return $this->hasMany(SwapExchangeDetail::class);
+    }
+    public function requestDetail()
+    {
+        return $this->hasMany(SwapRequestDetail::class);
+    }
+    public function shipments()
+    {
+        return $this->hasMany(Shipment::class);
+    }
+
+
     protected static function boot()
     {
         parent::boot();
