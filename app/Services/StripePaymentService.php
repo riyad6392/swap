@@ -91,14 +91,10 @@ class StripePaymentService
 
     public function attachPaymentMethodToCustomer($paymentMethod, $user): \Stripe\PaymentMethod
     {
-         $this->stripe->paymentMethods->attach(
+          return $this->stripe->paymentMethods->attach(
             $paymentMethod,
             ['customer' => $user->stripe_customer_id]
         );
-
-        if (! $user->hasDefaultPaymentMethod()) {
-            $user->updateDefaultPaymentMethod($paymentMethod);
-        }
     }
 
     public function updatePaymentMethod($request, $paymentMethod): \Stripe\PaymentMethod

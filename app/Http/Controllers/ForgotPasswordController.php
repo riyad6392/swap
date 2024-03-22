@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Passport\Client as OClient;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
@@ -55,7 +56,9 @@ class ForgotPasswordController extends Controller
             return response()->json(['success' => false, 'errors' => $validateData->errors()], 422);
         }
 
-        $oClient = OClient::where('password_client', 1)->first();
+        $oClient = OClient::where('password_client', 1)
+            ->where('name', 'User')
+            ->first();
 
         $response = request()->create('/oauth/token', 'post', [
             'grant_type' => 'refresh_token',
