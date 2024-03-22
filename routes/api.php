@@ -26,7 +26,7 @@ Route::post('register', [RegistrationController::class, 'register']);
 Route::post('login', [LoginController::class, 'login'])->name('login');
 Route::post('forget-password', [ForgetPasswordController::class, 'forgetPassword']);
 Route::post('reset-password', [ForgetPasswordController::class, 'resetPassword']);
-Route::post('refresh-token', [ForgotPasswordController::class, 'getTokenAndRefreshTokenByRefreshToken']);
+Route::post('refresh-token', [LoginController::class, 'getRefreshToken']);
 
 
 
@@ -47,7 +47,9 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::resource('category', \App\Http\Controllers\CategoryController::class);
         Route::resource('product', \App\Http\Controllers\ProductController::class);
         Route::resource('plan', \App\Http\Controllers\PlanController::class);
-        Route::resource('payment-method', PaymentMethodController::class);
+        Route::resource('swap', \App\Http\Controllers\SwapController::class);
+        Route::resource('swap', \App\Http\Controllers\SwapController::class);
+        Route::resource('swap-request-details', \App\Http\Controllers\SwapRequestDetailsController::class);
         Route::post('plan-subscription', [PlanSubscriptionController::class , 'subscribe']);
 
 

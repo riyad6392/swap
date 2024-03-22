@@ -169,7 +169,42 @@ class LoginController extends Controller
         return response()->json(['success' => true, 'message' => 'User logged out successfully'], 200);
     }
 
-    public function refreshToken(Request $request): \Illuminate\Http\JsonResponse
+    /**
+     * Refresh token
+     * @OA\Post (
+     *     path="/api/refresh-token",
+     *     tags={"Authentication"},
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="refresh_token",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     security={{ "apiAuth": {} }},
+     *      @OA\Response(
+     *          response=200,
+     *          description="success",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example="true"),
+     *              @OA\Property(property="token_type", type="string", example="Bearer"),
+     *              @OA\Property(property="expires_in", type="number", example="86400"),
+     *              @OA\Property(property="access_token", type="token", example="eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiOTAwNDU1YTJmZGY4YzQ3YmQ1ODQxODMwZDQzN2JhNWM4NDJhZDdlNTAwMDNiODBlNjJhZjFlYTJhZDhiZTAxY2FkMjdiOWIxZjkxZjkwZjMiLCJpYXQiOjE2Njc0MzQ1NTYuMTQ0MTk5LCJuYmYiOjE2Njc0MzQ1NTYuMTQ0MjAyLCJleHAiOjE2OTg5NzA1NTYuMDI2NDg3LCJzdWIiOiIyIiwic2NvcGVzIjpbXX0.LzRYUmOk7uCScSwi_RTR4nuKQ3tOeKiGAjM7PxvQUW9Fs93K3HqIxvIIBAnniTc8ee1plfy7qikxEsfOsJLaMjm7c2hmFyy4hhRxYJAxc0lAnA6G7i0Ue-kFeivs7cSzwEzvGRhnLgtv4J7vYbvJA8yh9KrvqvsB19_Y-RPzng6d4ZKR-Ij6nF5GfN-QCNP4nyqRfiPsuQVMJuP9KiWyacvpr7XUX2wjcY8xQtxQBfvaSNehujhX8B-0f0CwGpOBTi3fDdpvZbeqa9s7ZBDb9bSWahZ90XIvpls5bCnt7zuhXGte9HKeFulrISeCj-onCnGvqzFsxDESdCDVU0MC2hbXwHHLgQbBWhG0EM2u86VgdAqPktNsAK-4l7_zCRHuGMnT_qpY4He1e-MvECDQ8wfGtunKfizwTzxJ2VrsFPkWl90fldcmfTt0Mbd_HJfPCw4XViUYBQAPgSUKxKsuPN5RNott4zzCTtWJKA8Ot9L05H4zQQB6yWrj8juPUA3qBVO5jDC12SM32mrVwUTWXEfZa8EDUQ2MQytPR-uflfkTdYVPYvoRQPoEAAmD1oz4_kas0F23xSza6K8mwA3pT1Znqjbz4fDDrcoxQDENsPwTqfuZBWFfz5OXOh6f_5NO41g_qOWEdzwGLaST9p-8ALUC8oExDIfQq2EvM3Cqh-M"),
+     *              @OA\Property(property="refresh_token", type="token", example="def502000a6adbde3b00f2f16b60fe587d0fb88c2b1736cf26d562c433728e5c451cee8ddb8eb262e088c328f1748907301b94301afdaa4ff6dc714998a29d794ba65048c13a7859d9a9cb527c329e134ff7ab98b144f663b36c4f70866725dee75e3099ade9103b8c880f21010aa01f9b8ab2c0eada7561edb4da28c4c322e8a60ce3119776749a83ccd7560a995e1ea2614da33991403dd7ac1131fa5447fbed021b309176a02bece09b06a8bf8888a4bb84aef1ca9a23efaf4a06b57f33233d83aae99b1ee734f40830be2d9d57e5432c1ecaa4bd98fa31f30b57bbcd91dd79378c74f54616bdb0d0cfe73d996dbd0bf8602fa2056f223c5d93fe42806f327dc68af4f1a300fac0293eb5df83e969defb75a5204004a0d54008e07c94586d5c74f6773c94d0986ac151dd7f0f97ff8a35df5b044d59c8710e28e44f905639686698265a11003f471299c97e94a7efea30a4cc064f908c8ad147f5ad2a19f6c0e317e5")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Invalid token",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example="false"),
+     *              @OA\Property(property="errors", type="json", example={"message": {"Invalid token."}}),
+     *          )
+     *      )
+     * )
+     * @throws ValidationException
+     */
+
+    public function getRefreshToken(Request $request)
     {
         $validateData = Validator::make($request->all(), [
             'refresh_token' => 'required'
@@ -179,16 +214,18 @@ class LoginController extends Controller
             return response()->json(['success' => false, 'errors' => $validateData->errors()], 422);
         }
 
-        $oClient = OClient::where('password_client', 1)->first();
+        $oClient = OClient::where('password_client', 1)->where('provider', 'users')->first();
 
-        $response = Http::asForm()->post(config('app.url') . '/oauth/token', [
+        $response = request()->create('/oauth/token', 'post', [
             'grant_type' => 'refresh_token',
             'refresh_token' => $request->refresh_token,
             'client_id' => $oClient->id,
             'client_secret' => $oClient->secret,
-            'scope' => 'user'
+            'scope' => 'user',
         ]);
 
-        return response()->json($response->json());
+        $result = app()->handle($response);
+
+        return json_decode((string) $result->getContent(), true);
     }
 }
