@@ -43,13 +43,13 @@ class PaymentMethodController extends Controller
                 'status' => $paymentMethodRequest->status ?? 'active',
             ]);
 
-            StripePaymentFacade::attachPaymentMethodToCustomer(
+            $paymentMethod = StripePaymentFacade::attachPaymentMethodToCustomer(
                 $paymentMethod->stripe_payment_method_id,
                 auth()->user()
             );
 
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Payment method created successfully!'], 201);
+            return response()->json(['success' => true, 'message' => $paymentMethod], 201);
         } catch (\Exception $exception) {
             DB::rollBack();
             return response()->json(['success' => false, 'errors' => ['message' => [$exception->getMessage()]]], 500);

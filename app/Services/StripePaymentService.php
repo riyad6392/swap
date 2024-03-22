@@ -56,7 +56,7 @@ class StripePaymentService
         ]);
     }
 
-    public function subscription($user, $plan): string
+    public function subscription($plan, $user ): string
     {
         return $this->stripe->subscriptions->create([
             'customer' => $user->stripe_customer_id,
@@ -89,12 +89,19 @@ class StripePaymentService
         ]);
     }
 
-    public function attachPaymentMethodToCustomer($paymentMethod, $user): \Stripe\PaymentMethod
+    public function attachPaymentMethodToCustomer($paymentMethod, $user): \Stripe\Collection
     {
-          return $this->stripe->paymentMethods->attach(
+//        return $this->stripe->customers->allPaymentMethods('cus_PmcQvwUAvvj6W4', ['limit' => 3]);
+
+        dd($paymentMethod,$user->stripe_customer_id);
+        return $this->stripe->paymentMethods->attach(
             $paymentMethod,
             ['customer' => $user->stripe_customer_id]
         );
+
+//        if (! $user->hasDefaultPaymentMethod()) {
+//            $user->updateDefaultPaymentMethod($paymentMethod);
+//        }
     }
 
     public function updatePaymentMethod($request, $paymentMethod): \Stripe\PaymentMethod

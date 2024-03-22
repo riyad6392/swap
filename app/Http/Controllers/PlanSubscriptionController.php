@@ -23,7 +23,7 @@ class PlanSubscriptionController extends Controller
                 ->where('status', 'active')
                 ->first();
 
-            if ($paymentMethods) {
+            if (!$paymentMethods) {
                 return response()->json(['success' => false, 'message' => 'Please add payment method first!'], 422);
             }
 
@@ -33,7 +33,7 @@ class PlanSubscriptionController extends Controller
                 return response()->json(['success' => false, 'message' => 'Plan does not exist!'], 422);
             }
 
-            $stripeSubscription = StripePaymentFacade::subscription(auth()->user(), $plan);
+            $stripeSubscription = StripePaymentFacade::subscription($plan, auth()->user());
 
             Subscription::create([
                 'plan_id' => $planSubscriptionRequest->plan_id,

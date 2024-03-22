@@ -50,6 +50,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::resource('swap', \App\Http\Controllers\SwapController::class);
         Route::resource('swap', \App\Http\Controllers\SwapController::class);
         Route::resource('swap-request-details', \App\Http\Controllers\SwapRequestDetailsController::class);
+        Route::post('payment-method', [PaymentMethodController::class, 'store']);
         Route::post('plan-subscription', [PlanSubscriptionController::class , 'subscribe']);
 
 
