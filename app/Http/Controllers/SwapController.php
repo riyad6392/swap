@@ -61,7 +61,8 @@ class SwapController extends Controller
      */
     public function index()
     {
-        return Swap::paginate(self::PER_PAGE);
+        $swap = Swap::paginate(self::PER_PAGE);
+        return response()->json(['success' => true, 'data' => $swap]);
     }
 
     /**
