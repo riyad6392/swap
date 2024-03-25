@@ -89,4 +89,24 @@ class PaymentMethodController extends Controller
     {
         //
     }
+
+    public function cancelSubscription(){
+        try {
+            DB::beginTransaction();
+            $subscription = Subscription::where('user_id', auth()->user()->id)
+                ->where('status', 'active')
+                ->first();
+            if (!$subscription) {
+                return response()->json(['success' => false, 'message' => 'Subscription not found!'], 422);
+            }
+            $stripeSubscription = StripePaymentFacade::cancelSubscription($subscription->stripe_subscription_id);
+            $subscription->update(['status' => 'cancelled']);
+            auth()->user()->update(['subscription_is_active' => false]);
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Subscription cancelled successfully!'], 200);
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $exception->getMessage()], 422);
+        }
+    }
 }
