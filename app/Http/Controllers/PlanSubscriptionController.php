@@ -19,6 +19,7 @@ class PlanSubscriptionController extends Controller
     {
         try {
             DB::beginTransaction();
+
             $paymentMethods = PaymentMethods::where('user_id', auth()->user()->id)
                 ->where('status', 'active')
                 ->first();
@@ -48,6 +49,7 @@ class PlanSubscriptionController extends Controller
 
             auth()->user()->update(['subscription_is_active' => true]);
 
+            DB::commit();
             return response()->json(['success' => true, 'message' => 'Subscription created successfully!'], 200);
 
         }catch (\Exception $exception) {

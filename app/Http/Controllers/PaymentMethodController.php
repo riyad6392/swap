@@ -32,8 +32,8 @@ class PaymentMethodController extends Controller
     public function store(StorePaymentMethodRequest $paymentMethodRequest)
     {
         try {
-
             DB::beginTransaction();
+
             $paymentMethod = PaymentMethods::create([
                 'method_name' => $paymentMethodRequest->method_name,
                 'user_id' => auth()->user()->id,
@@ -49,6 +49,7 @@ class PaymentMethodController extends Controller
             );
 
             DB::commit();
+
             return response()->json(['success' => true, 'message' => $paymentMethod], 201);
         } catch (\Exception $exception) {
             DB::rollBack();

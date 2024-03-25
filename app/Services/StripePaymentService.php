@@ -56,7 +56,7 @@ class StripePaymentService
         ]);
     }
 
-    public function subscription($plan, $user ): string
+    public function subscription($plan, $user )
     {
         return $this->stripe->subscriptions->create([
             'customer' => $user->stripe_customer_id,
@@ -64,65 +64,16 @@ class StripePaymentService
         ]);
     }
 
-    public function createPaymentMethod($data)
+    public function attachPaymentMethodToCustomer($paymentMethod, $user): \Stripe\Customer
     {
-        return $this->stripe->paymentMethods->create([
-            'type' => $data['type'],
-            'billing_details' => [
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'phone' => $data['phone'],
-                'address' => [
-                    'country' => $data['country'],
-                    'city' => $data['city'],
-                    'state' => $data['state'],
-                    'postal_code' => $data['postal_code'],
-                    'line1' => $data['line1'],
-                ],
-            ],
-            'card' => [
-                'number' => $data['number'],
-                'exp_month' => $data['exp_month'],
-                'exp_year' => $data['exp_year'],
-                'cvc' => $data['cvc'],
-            ],
-        ]);
-    }
-
-    public function attachPaymentMethodToCustomer($paymentMethod, $user): \Stripe\Collection
-    {
-//        return $this->stripe->customers->allPaymentMethods('cus_PmcQvwUAvvj6W4', ['limit' => 3]);
-
-        dd($paymentMethod,$user->stripe_customer_id);
-        return $this->stripe->paymentMethods->attach(
+        $this->stripe->paymentMethods->attach(
             $paymentMethod,
             ['customer' => $user->stripe_customer_id]
         );
+        return $this->stripe->customers->update(
+            $user->stripe_customer_id,
+            ['invoice_settings' => ['default_payment_method' => $paymentMethod]]
+        );
 
-//        if (! $user->hasDefaultPaymentMethod()) {
-//            $user->updateDefaultPaymentMethod($paymentMethod);
-//        }
-    }
-
-    public function updatePaymentMethod($request, $paymentMethod): \Stripe\PaymentMethod
-    {
-        return $this->stripe->paymentMethods->update($paymentMethod, [
-            'billing_details' => [
-                'name' => $request->billing_details['name'] ?? null,
-                'email' => $request->billing_details['email'] ?? null,
-                'phone' => $request->billing_details['phone'] ?? null,
-                'address' => [
-                    'country' => $request->billing_details['address']['country_code'],
-                    'city' => $request->billing_details['address']['city'],
-                    'state' => $request->billing_details['address']['state'],
-                    'postal_code' => $request->billing_details['address']['postal_code'],
-                    'line1' => $request->billing_details['address']['line1'],
-                ],
-            ],
-            'card' => [
-                'exp_month' => $request->card['exp_month'],
-                'exp_year' => $request->card['exp_year'],
-            ],
-        ]);
     }
 }
