@@ -161,7 +161,7 @@ class LoginController extends Controller
     /**
      * Refresh token
      * @OA\Post (
-     *     path="/api/refresh-token",
+     *     path="/api/admin/refresh-token",
      *     tags={"Authentication"},
      *     @OA\Parameter(
      *         in="query",
