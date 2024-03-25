@@ -15,7 +15,7 @@ class SwapRequestDetailsController extends Controller
     const PER_PAGE = 10;
 
     /**
-     * Swap List.
+     * Swap Request Details List.
      *
      * @OA\Get(
      *     path="/api/swap-request-details",
