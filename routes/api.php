@@ -44,15 +44,26 @@ Route::group(['middleware' => 'auth:api'], function () {
             return response()->json(['success' => true, 'message' => 'You are subscribed to a plan.'], 200);
         });
 
+        //Inventory
+
         Route::resource('category', \App\Http\Controllers\CategoryController::class);
         Route::resource('product', \App\Http\Controllers\ProductController::class);
         Route::resource('plan', \App\Http\Controllers\PlanController::class);
+
+        //swap
+
         Route::resource('swap', \App\Http\Controllers\SwapController::class);
         Route::resource('swap', \App\Http\Controllers\SwapController::class);
         Route::resource('swap-request-details', \App\Http\Controllers\SwapRequestDetailsController::class);
-        Route::post('payment-method', [PaymentMethodController::class, 'store']);
-        Route::post('plan-subscription', [PlanSubscriptionController::class , 'subscribe']);
 
+        //Payment Method
+
+        Route::post('payment-method', [PaymentMethodController::class, 'store']);
+
+        //Subscription
+
+        Route::post('plan-subscription', [PlanSubscriptionController::class , 'subscribe']);
+        Route::delete('cancel-subscription', [PlanSubscriptionController::class , 'cancelSubscription']);
 
     });
 
