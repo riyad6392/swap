@@ -26,7 +26,7 @@ class UpdateProductRequest extends FormRequest
     {
         return [
             'name' => 'required',
-            'description' => 'required',
+            'description' => 'sometimes|required',
             'category_id' => 'required|exists:categories,id',
             'product_images' => 'sometimes|array',
             'deleted_image_ids' => 'sometimes|array',

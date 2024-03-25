@@ -24,9 +24,9 @@ class UpdateProductVariationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'variations' => 'required|array',
-            'variations.*.size' => 'nullable|string',
-            'variations.*.color' => 'nullable|string',
+            'variations' => 'sometimes|array',
+            'variations.*.size' => 'required|string',
+            'variations.*.color' => 'required|string',
             'variations.*.price' => 'required|numeric',
             'variations.*.stock' => 'required|integer',
             'variations.*.discount' => 'nullable|numeric',
