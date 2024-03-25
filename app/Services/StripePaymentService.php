@@ -77,7 +77,10 @@ class StripePaymentService
     }
     public function cancelSubscription($subscriptionId): \Stripe\Subscription
     {
-        return $this->stripe->subscriptions->cancel($subscriptionId, []);
+        return $this->stripe->subscriptions->cancel(
+            $subscriptionId,
+            []
+        );
     }
 
     public function resumeSubscription( $subscriptionId): \Stripe\Subscription{

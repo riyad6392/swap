@@ -68,19 +68,19 @@ class PlanSubscriptionController extends Controller
         }
     }
 
-    public function cancelSubscription(DeletePlanSubscriptionRequest $deletePlanSubscriptionRequest)
+    public function cancelSubscription(string $id)
     {
-        dd($deletePlanSubscriptionRequest->subscription_id);
         try {
             DB::beginTransaction();
 
-            $subscription = Subscription::where('id', $deletePlanSubscriptionRequest->subscription_id)
+            $subscription = Subscription::where('id', $id)
                 ->where('user_id', auth()->user()->id)
-                ->firstOrFail();
+                ->first();
 
             if (!$subscription) {
                 return response()->json(['success' => false, 'message' => 'Subscription not found!'], 422);
             }
+
 
             if ($subscription->status == 'cancelled') {
                 return response()->json(['success' => false, 'message' => 'Subscription already cancelled!'], 422);

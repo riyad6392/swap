@@ -63,7 +63,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         //Subscription
 
         Route::post('plan-subscription', [PlanSubscriptionController::class , 'subscribe']);
-        Route::delete('cancel-subscription', [PlanSubscriptionController::class , 'cancelSubscription']);
+        Route::delete('cancel-subscription/{id}', [PlanSubscriptionController::class , 'cancelSubscription']);
 
     });
 
