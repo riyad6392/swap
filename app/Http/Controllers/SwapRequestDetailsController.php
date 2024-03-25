@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Swap\StoreSwapRequest;
 use App\Http\Requests\Swap\StoreSwapRequestDetails;
 use App\Http\Requests\Swap\UpdateSwapRequestDetails;
-use App\Models\Swap;
 use App\Models\SwapRequestDetail;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class SwapRequestDetailsController extends Controller
