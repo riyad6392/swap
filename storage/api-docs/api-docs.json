@@ -335,6 +335,88 @@
                 ]
             }
         },
+        "/api/admin/refresh-token": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Refresh token",
+                "operationId": "bf47e4658e98c94e3d7f8890ff36a032",
+                "parameters": [
+                    {
+                        "name": "refresh_token",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        },
+                                        "expires_in": {
+                                            "type": "number",
+                                            "example": "86400"
+                                        },
+                                        "access_token": {
+                                            "type": "token",
+                                            "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiOTAwNDU1YTJmZGY4YzQ3YmQ1ODQxODMwZDQzN2JhNWM4NDJhZDdlNTAwMDNiODBlNjJhZjFlYTJhZDhiZTAxY2FkMjdiOWIxZjkxZjkwZjMiLCJpYXQiOjE2Njc0MzQ1NTYuMTQ0MTk5LCJuYmYiOjE2Njc0MzQ1NTYuMTQ0MjAyLCJleHAiOjE2OTg5NzA1NTYuMDI2NDg3LCJzdWIiOiIyIiwic2NvcGVzIjpbXX0.LzRYUmOk7uCScSwi_RTR4nuKQ3tOeKiGAjM7PxvQUW9Fs93K3HqIxvIIBAnniTc8ee1plfy7qikxEsfOsJLaMjm7c2hmFyy4hhRxYJAxc0lAnA6G7i0Ue-kFeivs7cSzwEzvGRhnLgtv4J7vYbvJA8yh9KrvqvsB19_Y-RPzng6d4ZKR-Ij6nF5GfN-QCNP4nyqRfiPsuQVMJuP9KiWyacvpr7XUX2wjcY8xQtxQBfvaSNehujhX8B-0f0CwGpOBTi3fDdpvZbeqa9s7ZBDb9bSWahZ90XIvpls5bCnt7zuhXGte9HKeFulrISeCj-onCnGvqzFsxDESdCDVU0MC2hbXwHHLgQbBWhG0EM2u86VgdAqPktNsAK-4l7_zCRHuGMnT_qpY4He1e-MvECDQ8wfGtunKfizwTzxJ2VrsFPkWl90fldcmfTt0Mbd_HJfPCw4XViUYBQAPgSUKxKsuPN5RNott4zzCTtWJKA8Ot9L05H4zQQB6yWrj8juPUA3qBVO5jDC12SM32mrVwUTWXEfZa8EDUQ2MQytPR-uflfkTdYVPYvoRQPoEAAmD1oz4_kas0F23xSza6K8mwA3pT1Znqjbz4fDDrcoxQDENsPwTqfuZBWFfz5OXOh6f_5NO41g_qOWEdzwGLaST9p-8ALUC8oExDIfQq2EvM3Cqh-M"
+                                        },
+                                        "refresh_token": {
+                                            "type": "token",
+                                            "example": "def502000a6adbde3b00f2f16b60fe587d0fb88c2b1736cf26d562c433728e5c451cee8ddb8eb262e088c328f1748907301b94301afdaa4ff6dc714998a29d794ba65048c13a7859d9a9cb527c329e134ff7ab98b144f663b36c4f70866725dee75e3099ade9103b8c880f21010aa01f9b8ab2c0eada7561edb4da28c4c322e8a60ce3119776749a83ccd7560a995e1ea2614da33991403dd7ac1131fa5447fbed021b309176a02bece09b06a8bf8888a4bb84aef1ca9a23efaf4a06b57f33233d83aae99b1ee734f40830be2d9d57e5432c1ecaa4bd98fa31f30b57bbcd91dd79378c74f54616bdb0d0cfe73d996dbd0bf8602fa2056f223c5d93fe42806f327dc68af4f1a300fac0293eb5df83e969defb75a5204004a0d54008e07c94586d5c74f6773c94d0986ac151dd7f0f97ff8a35df5b044d59c8710e28e44f905639686698265a11003f471299c97e94a7efea30a4cc064f908c8ad147f5ad2a19f6c0e317e5"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Invalid token."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
         "/api/admin/register": {
             "post": {
                 "tags": [
@@ -736,6 +818,88 @@
                                             "example": {
                                                 "message": [
                                                     "Unauthenticated"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/refresh-token": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Refresh token",
+                "operationId": "3dc430ddfdda64350e392c89a3e39b6a",
+                "parameters": [
+                    {
+                        "name": "refresh_token",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        },
+                                        "expires_in": {
+                                            "type": "number",
+                                            "example": "86400"
+                                        },
+                                        "access_token": {
+                                            "type": "token",
+                                            "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiOTAwNDU1YTJmZGY4YzQ3YmQ1ODQxODMwZDQzN2JhNWM4NDJhZDdlNTAwMDNiODBlNjJhZjFlYTJhZDhiZTAxY2FkMjdiOWIxZjkxZjkwZjMiLCJpYXQiOjE2Njc0MzQ1NTYuMTQ0MTk5LCJuYmYiOjE2Njc0MzQ1NTYuMTQ0MjAyLCJleHAiOjE2OTg5NzA1NTYuMDI2NDg3LCJzdWIiOiIyIiwic2NvcGVzIjpbXX0.LzRYUmOk7uCScSwi_RTR4nuKQ3tOeKiGAjM7PxvQUW9Fs93K3HqIxvIIBAnniTc8ee1plfy7qikxEsfOsJLaMjm7c2hmFyy4hhRxYJAxc0lAnA6G7i0Ue-kFeivs7cSzwEzvGRhnLgtv4J7vYbvJA8yh9KrvqvsB19_Y-RPzng6d4ZKR-Ij6nF5GfN-QCNP4nyqRfiPsuQVMJuP9KiWyacvpr7XUX2wjcY8xQtxQBfvaSNehujhX8B-0f0CwGpOBTi3fDdpvZbeqa9s7ZBDb9bSWahZ90XIvpls5bCnt7zuhXGte9HKeFulrISeCj-onCnGvqzFsxDESdCDVU0MC2hbXwHHLgQbBWhG0EM2u86VgdAqPktNsAK-4l7_zCRHuGMnT_qpY4He1e-MvECDQ8wfGtunKfizwTzxJ2VrsFPkWl90fldcmfTt0Mbd_HJfPCw4XViUYBQAPgSUKxKsuPN5RNott4zzCTtWJKA8Ot9L05H4zQQB6yWrj8juPUA3qBVO5jDC12SM32mrVwUTWXEfZa8EDUQ2MQytPR-uflfkTdYVPYvoRQPoEAAmD1oz4_kas0F23xSza6K8mwA3pT1Znqjbz4fDDrcoxQDENsPwTqfuZBWFfz5OXOh6f_5NO41g_qOWEdzwGLaST9p-8ALUC8oExDIfQq2EvM3Cqh-M"
+                                        },
+                                        "refresh_token": {
+                                            "type": "token",
+                                            "example": "def502000a6adbde3b00f2f16b60fe587d0fb88c2b1736cf26d562c433728e5c451cee8ddb8eb262e088c328f1748907301b94301afdaa4ff6dc714998a29d794ba65048c13a7859d9a9cb527c329e134ff7ab98b144f663b36c4f70866725dee75e3099ade9103b8c880f21010aa01f9b8ab2c0eada7561edb4da28c4c322e8a60ce3119776749a83ccd7560a995e1ea2614da33991403dd7ac1131fa5447fbed021b309176a02bece09b06a8bf8888a4bb84aef1ca9a23efaf4a06b57f33233d83aae99b1ee734f40830be2d9d57e5432c1ecaa4bd98fa31f30b57bbcd91dd79378c74f54616bdb0d0cfe73d996dbd0bf8602fa2056f223c5d93fe42806f327dc68af4f1a300fac0293eb5df83e969defb75a5204004a0d54008e07c94586d5c74f6773c94d0986ac151dd7f0f97ff8a35df5b044d59c8710e28e44f905639686698265a11003f471299c97e94a7efea30a4cc064f908c8ad147f5ad2a19f6c0e317e5"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Invalid token."
                                                 ]
                                             }
                                         }
@@ -1178,88 +1342,6 @@
                                             "example": {
                                                 "message": [
                                                     "The given data was invalid."
-                                                ]
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "apiAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/refresh-token": {
-            "post": {
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "Refresh token",
-                "operationId": "8ef4237fbf057b2f6efde5ba37dad89f",
-                "parameters": [
-                    {
-                        "name": "refresh_token",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": "true"
-                                        },
-                                        "token_type": {
-                                            "type": "string",
-                                            "example": "Bearer"
-                                        },
-                                        "expires_in": {
-                                            "type": "number",
-                                            "example": "86400"
-                                        },
-                                        "access_token": {
-                                            "type": "token",
-                                            "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiOTAwNDU1YTJmZGY4YzQ3YmQ1ODQxODMwZDQzN2JhNWM4NDJhZDdlNTAwMDNiODBlNjJhZjFlYTJhZDhiZTAxY2FkMjdiOWIxZjkxZjkwZjMiLCJpYXQiOjE2Njc0MzQ1NTYuMTQ0MTk5LCJuYmYiOjE2Njc0MzQ1NTYuMTQ0MjAyLCJleHAiOjE2OTg5NzA1NTYuMDI2NDg3LCJzdWIiOiIyIiwic2NvcGVzIjpbXX0.LzRYUmOk7uCScSwi_RTR4nuKQ3tOeKiGAjM7PxvQUW9Fs93K3HqIxvIIBAnniTc8ee1plfy7qikxEsfOsJLaMjm7c2hmFyy4hhRxYJAxc0lAnA6G7i0Ue-kFeivs7cSzwEzvGRhnLgtv4J7vYbvJA8yh9KrvqvsB19_Y-RPzng6d4ZKR-Ij6nF5GfN-QCNP4nyqRfiPsuQVMJuP9KiWyacvpr7XUX2wjcY8xQtxQBfvaSNehujhX8B-0f0CwGpOBTi3fDdpvZbeqa9s7ZBDb9bSWahZ90XIvpls5bCnt7zuhXGte9HKeFulrISeCj-onCnGvqzFsxDESdCDVU0MC2hbXwHHLgQbBWhG0EM2u86VgdAqPktNsAK-4l7_zCRHuGMnT_qpY4He1e-MvECDQ8wfGtunKfizwTzxJ2VrsFPkWl90fldcmfTt0Mbd_HJfPCw4XViUYBQAPgSUKxKsuPN5RNott4zzCTtWJKA8Ot9L05H4zQQB6yWrj8juPUA3qBVO5jDC12SM32mrVwUTWXEfZa8EDUQ2MQytPR-uflfkTdYVPYvoRQPoEAAmD1oz4_kas0F23xSza6K8mwA3pT1Znqjbz4fDDrcoxQDENsPwTqfuZBWFfz5OXOh6f_5NO41g_qOWEdzwGLaST9p-8ALUC8oExDIfQq2EvM3Cqh-M"
-                                        },
-                                        "refresh_token": {
-                                            "type": "token",
-                                            "example": "def502000a6adbde3b00f2f16b60fe587d0fb88c2b1736cf26d562c433728e5c451cee8ddb8eb262e088c328f1748907301b94301afdaa4ff6dc714998a29d794ba65048c13a7859d9a9cb527c329e134ff7ab98b144f663b36c4f70866725dee75e3099ade9103b8c880f21010aa01f9b8ab2c0eada7561edb4da28c4c322e8a60ce3119776749a83ccd7560a995e1ea2614da33991403dd7ac1131fa5447fbed021b309176a02bece09b06a8bf8888a4bb84aef1ca9a23efaf4a06b57f33233d83aae99b1ee734f40830be2d9d57e5432c1ecaa4bd98fa31f30b57bbcd91dd79378c74f54616bdb0d0cfe73d996dbd0bf8602fa2056f223c5d93fe42806f327dc68af4f1a300fac0293eb5df83e969defb75a5204004a0d54008e07c94586d5c74f6773c94d0986ac151dd7f0f97ff8a35df5b044d59c8710e28e44f905639686698265a11003f471299c97e94a7efea30a4cc064f908c8ad147f5ad2a19f6c0e317e5"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Invalid token",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": "false"
-                                        },
-                                        "errors": {
-                                            "type": "json",
-                                            "example": {
-                                                "message": [
-                                                    "Invalid token."
                                                 ]
                                             }
                                         }
@@ -2438,6 +2520,1095 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Product not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/swap": {
+            "get": {
+                "tags": [
+                    "Swaps"
+                ],
+                "summary": "Swap List.",
+                "operationId": "553ef66146bdc1744b27c08d985c38f5",
+                "parameters": [
+                    {
+                        "name": "pagination",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number"
+                        },
+                        "example": "10"
+                    },
+                    {
+                        "name": "get_all",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "json",
+                                            "example": []
+                                        },
+                                        "links": {
+                                            "type": "json",
+                                            "example": []
+                                        },
+                                        "meta": {
+                                            "type": "json",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Unauthenticated"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Swaps"
+                ],
+                "summary": "Create a new swap",
+                "description": "Create Swap.",
+                "operationId": "82590266f8107084d1a4b8f21149c9b2",
+                "parameters": [
+                    {
+                        "name": "requested_user_id",
+                        "in": "query",
+                        "description": "Requested User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 2
+                        }
+                    },
+                    {
+                        "name": "exchanged_user_id",
+                        "in": "query",
+                        "description": "Exchanged User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 3
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Status",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "pending"
+                        }
+                    },
+                    {
+                        "name": "requested_wholesale_amount",
+                        "in": "query",
+                        "description": "Requested Wholesale Amount",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 100
+                        }
+                    },
+                    {
+                        "name": "exchanged_wholesale_amount",
+                        "in": "query",
+                        "description": "Exchanged Wholesale Amount",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 120
+                        }
+                    },
+                    {
+                        "name": "requested_total_commission",
+                        "in": "query",
+                        "description": "Requested Total Commission",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "double",
+                            "example": 10.5
+                        }
+                    },
+                    {
+                        "name": "exchanged_total_commission",
+                        "in": "query",
+                        "description": "Exchanged Total Commission",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "double",
+                            "example": 12.5
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Swap created successfully."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "The given data was invalid."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/swap/{id}": {
+            "get": {
+                "tags": [
+                    "Swaps"
+                ],
+                "summary": "Get swap by ID.",
+                "operationId": "4ffa38f9c9085dca39056d5700f35baa",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "get singe swap by swap id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Get swap details."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Swap not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Swap not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Swaps"
+                ],
+                "summary": "Update an existing swap",
+                "description": "Update Swap.",
+                "operationId": "fc40f246522718458d0812709c728a69",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the swap to update",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "requested_user_id",
+                        "in": "query",
+                        "description": "Requested User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 2
+                        }
+                    },
+                    {
+                        "name": "exchanged_user_id",
+                        "in": "query",
+                        "description": "Exchanged User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 3
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Status",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "pending"
+                        }
+                    },
+                    {
+                        "name": "requested_wholesale_amount",
+                        "in": "query",
+                        "description": "Requested Wholesale Amount",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 100
+                        }
+                    },
+                    {
+                        "name": "exchanged_wholesale_amount",
+                        "in": "query",
+                        "description": "Exchanged Wholesale Amount",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 120
+                        }
+                    },
+                    {
+                        "name": "requested_total_commission",
+                        "in": "query",
+                        "description": "Requested Total Commission",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "double",
+                            "example": 10.5
+                        }
+                    },
+                    {
+                        "name": "exchanged_total_commission",
+                        "in": "query",
+                        "description": "Exchanged Total Commission",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "double",
+                            "example": 12.5
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Swap updated successfully."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "The given data was invalid."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Swap not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Swap not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Swaps"
+                ],
+                "summary": "Delete Swap.",
+                "operationId": "e8f53adca2752aabffa3b885d98b589a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Delete a swap by ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Swap and related data deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Swap not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/swap-request-details": {
+            "get": {
+                "tags": [
+                    "Swap Request Details"
+                ],
+                "summary": "Swap List.",
+                "operationId": "fd8a160472b66a4c858f554e00a5cad4",
+                "parameters": [
+                    {
+                        "name": "pagination",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number"
+                        },
+                        "example": "10"
+                    },
+                    {
+                        "name": "get_all",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "json",
+                                            "example": []
+                                        },
+                                        "links": {
+                                            "type": "json",
+                                            "example": []
+                                        },
+                                        "meta": {
+                                            "type": "json",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Unauthenticated"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Swap Request Details"
+                ],
+                "summary": "Create a new swap request details",
+                "description": "Create Swap Request Details.",
+                "operationId": "e8d6ba99d6c18c20581987fc8c636c1e",
+                "parameters": [
+                    {
+                        "name": "swap_id",
+                        "in": "query",
+                        "description": "Swap ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 2
+                        }
+                    },
+                    {
+                        "name": "product_id",
+                        "in": "query",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 3
+                        }
+                    },
+                    {
+                        "name": "product_variation_id",
+                        "in": "query",
+                        "description": "Product Variation ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 4
+                        }
+                    },
+                    {
+                        "name": "quantity",
+                        "in": "query",
+                        "description": "Quantity",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 5
+                        }
+                    },
+                    {
+                        "name": "unit_price",
+                        "in": "query",
+                        "description": "Unit Price",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "double",
+                            "example": 10.5
+                        }
+                    },
+                    {
+                        "name": "amount",
+                        "in": "query",
+                        "description": "Amount",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "double",
+                            "example": 52.5
+                        }
+                    },
+                    {
+                        "name": "commission",
+                        "in": "query",
+                        "description": "Commission",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "double",
+                            "example": 5.25
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Swap Request Details created successfully."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "The given data was invalid."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/swap-request-details/{id}": {
+            "get": {
+                "tags": [
+                    "Swap Request Details"
+                ],
+                "summary": "Retrieve a specific swap request detail.",
+                "operationId": "8f45b80b8677d7e9cdef33fba311aedf",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "get single swap by swap request details id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Get swap request details."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Swap request details not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Swap request details not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Swap Request Details"
+                ],
+                "summary": "Update swap request details",
+                "description": "Update Swap Request Details.",
+                "operationId": "6341bf5cd1568572d4ddc16ac372bb80",
+                "parameters": [
+                    {
+                        "name": "swap_id",
+                        "in": "query",
+                        "description": "Swap ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 2
+                        }
+                    },
+                    {
+                        "name": "product_id",
+                        "in": "query",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 3
+                        }
+                    },
+                    {
+                        "name": "product_variation_id",
+                        "in": "query",
+                        "description": "Product Variation ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 4
+                        }
+                    },
+                    {
+                        "name": "quantity",
+                        "in": "query",
+                        "description": "Quantity",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 5
+                        }
+                    },
+                    {
+                        "name": "unit_price",
+                        "in": "query",
+                        "description": "Unit Price",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "double",
+                            "example": 10.5
+                        }
+                    },
+                    {
+                        "name": "amount",
+                        "in": "query",
+                        "description": "Amount",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "double",
+                            "example": 52.5
+                        }
+                    },
+                    {
+                        "name": "commission",
+                        "in": "query",
+                        "description": "Commission",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "double",
+                            "example": 5.25
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Swap Request Details updated successfully."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "The given data was invalid."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Swap Request Details"
+                ],
+                "summary": "Delete Swap Request Details.",
+                "operationId": "230edc5c4976704500c55a049b716731",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Delete a swap request details by ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Swap request details and related data deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Swap request details not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/swap-request-details/{id}/edit": {
+            "get": {
+                "tags": [
+                    "Swap Request Details"
+                ],
+                "summary": "Edit a specific swap request detail.",
+                "operationId": "68f447161550907a5c9f2835b3033c27",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "get single swap by swap request details id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Get swap request  details."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Swap request details not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Swap request details not found"
                                         }
                                     },
                                     "type": "object"

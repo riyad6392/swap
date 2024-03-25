@@ -74,6 +74,16 @@ class StripePaymentService
             $user->stripe_customer_id,
             ['invoice_settings' => ['default_payment_method' => $paymentMethod]]
         );
+    }
+    public function cancelSubscription($subscriptionId): \Stripe\Subscription
+    {
+        return $this->stripe->subscriptions->cancel($subscriptionId, []);
+    }
 
+    public function resumeSubscription( $subscriptionId): \Stripe\Subscription{
+        return $this->stripe->subscriptions->resume(
+            $subscriptionId,
+            ['billing_cycle_anchor' => 'now']
+        );
     }
 }

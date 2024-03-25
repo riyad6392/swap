@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Facades\StripePaymentFacade;
+use App\Http\Requests\PlanSubscription\DeletePlanSubscriptionRequest;
 use App\Http\Requests\PlanSubscription\StorePlanSubscriptionRequest;
 use App\Models\PaymentMethods;
 use App\Models\Plan;
@@ -28,13 +29,22 @@ class PlanSubscriptionController extends Controller
                 return response()->json(['success' => false, 'message' => 'Please add payment method first!'], 422);
             }
 
-            $plan = Plan::with('planDetails')->find($planSubscriptionRequest->plan_id);
+            $plan = Plan::find($planSubscriptionRequest->plan_id);
 
             if ($plan->count() == 0) {
                 return response()->json(['success' => false, 'message' => 'Plan does not exist!'], 422);
             }
 
             $stripeSubscription = StripePaymentFacade::subscription($plan, auth()->user());
+
+            $previousSubscription = Subscription::where('user_id', auth()->user()->id)
+                ->where('status', 'active')
+                ->first();
+
+            if ($previousSubscription) {
+                StripePaymentFacade::cancelSubscription($previousSubscription->stripe_subscription_id);
+                $previousSubscription->update(['status' => 'cancelled']);
+            }
 
             Subscription::create([
                 'plan_id' => $planSubscriptionRequest->plan_id,
@@ -52,10 +62,42 @@ class PlanSubscriptionController extends Controller
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Subscription created successfully!'], 200);
 
-        }catch (\Exception $exception) {
+        } catch (\Exception $exception) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $exception->getMessage()], 422);
         }
+    }
 
+    public function cancelSubscription(DeletePlanSubscriptionRequest $deletePlanSubscriptionRequest)
+    {
+        dd($deletePlanSubscriptionRequest->subscription_id);
+        try {
+            DB::beginTransaction();
+
+            $subscription = Subscription::where('id', $deletePlanSubscriptionRequest->subscription_id)
+                ->where('user_id', auth()->user()->id)
+                ->firstOrFail();
+
+            if (!$subscription) {
+                return response()->json(['success' => false, 'message' => 'Subscription not found!'], 422);
+            }
+
+            if ($subscription->status == 'cancelled') {
+                return response()->json(['success' => false, 'message' => 'Subscription already cancelled!'], 422);
+            }
+
+            StripePaymentFacade::cancelSubscription($subscription->stripe_subscription_id);
+
+            $subscription->update(['status' => 'cancelled']);
+
+            auth()->user()->update(['subscription_is_active' => false]);
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Subscription cancelled successfully!'], 200);
+
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $exception->getMessage()], 422);
+        }
     }
 }
