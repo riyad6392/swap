@@ -1,14 +1,12 @@
 <?php
 
 use App\Http\Controllers\Auth\RegistrationController;
-use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\PlanSubscriptionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ForgetPasswordController;
-use App\Http\Controllers\ForgotPasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,16 +55,18 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::resource('swap-request-details', \App\Http\Controllers\SwapRequestDetailsController::class);
         Route::resource('swap-exchange-details', \App\Http\Controllers\SwapExchangeDetailsController::class);
 
-        //Payment Method
-
-        Route::post('payment-method', [PaymentMethodController::class, 'store']);
-
-        //Subscription
-
-        Route::post('plan-subscription', [PlanSubscriptionController::class , 'subscribe']);
-        Route::delete('cancel-subscription/{id}', [PlanSubscriptionController::class , 'cancelSubscription']);
-
     });
+
+    //Subscription
+
+    Route::post('plan-subscription', [PlanSubscriptionController::class , 'subscribe']);
+    Route::delete('cancel-subscription/{id}', [PlanSubscriptionController::class , 'cancelSubscription']);
+
+    //Payment Method
+
+    Route::post('payment-method', [PaymentMethodController::class, 'store']);
+
+
 
 });
 

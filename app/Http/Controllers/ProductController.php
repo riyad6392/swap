@@ -8,12 +8,12 @@ use App\Http\Requests\Product\UpdateProductRequest;
 use App\Http\Requests\ProductVariation\UpdateProductVariationRequest;
 use App\Models\Product;
 use App\Services\FileUploadService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
-    const UPDATE_REQUEST_TYPE = ['put', 'patch'];
-    private $deleted_image_ids = [];
+    const PER_PAGE = 10;
 
     /**
      * Product List.
@@ -65,9 +65,22 @@ class ProductController extends Controller
      *       )
      * )
      */
-    public function index()
+    public function index(Request $request): \Illuminate\Http\JsonResponse
     {
-        $inventories = Product::with('productVariations.images', 'images')->paginate(10);
+        $inventories = Product::query();
+
+        if ($request->name) {
+            $inventories = $inventories->where('name', 'like', '%' . $request->name . '%');
+        }
+
+        $inventories = $inventories->with('productVariations.images', 'images');
+
+        if ($request->get('get_all')) {
+            return response()->json(['success' => true, 'data' => $inventories->get()]);
+        }
+
+        $inventories = $inventories->paginate($request->pagination ?? self::PER_PAGE);
+
         return response()->json(['success' => true, 'data' => $inventories]);
     }
 
@@ -222,7 +235,7 @@ class ProductController extends Controller
      *     ),
      * )
      */
-    public function store(StoreProductRequest $productRequest, StoreProductVariationRequest $productVariantRequest)
+    public function store(StoreProductRequest $productRequest, StoreProductVariationRequest $productVariantRequest): \Illuminate\Http\JsonResponse
     {
         try {
             DB::beginTransaction();
@@ -245,21 +258,6 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-        }
-    }
-
-    protected function storeVariations($request, Product $product)
-    {
-        foreach ($request->variations as $key=> $variationData) {
-            $variation = $product->productVariations()
-                ->updateOrCreate(
-                    ['product_id' => $product->id],
-                    $variationData
-                );
-
-            if ($request->has('variations.'.$key.'.variant_images')) {
-                FileUploadService::uploadFile($variationData['variant_images'], $variation);
-            }
         }
     }
 
@@ -295,7 +293,7 @@ class ProductController extends Controller
      * )
      */
 
-    public function show(Product $product)
+    public function show(Product $product): \Illuminate\Http\JsonResponse
     {
         try {
             $product->load('images', 'productVariations');
@@ -480,7 +478,7 @@ class ProductController extends Controller
             }
 
             if ($updateProductRequest->has('deleted_image_ids')) {
-                FileUploadService::deleteImages($this->deleted_image_ids, $product);
+                FileUploadService::deleteImages($this->deleted_image_ids);
             }
 
             if ($updateProductVariationRequest->has('variations')) {
@@ -527,7 +525,7 @@ class ProductController extends Controller
      *     )
      * )
      */
-    public function destroy(Product $product)
+    public function destroy(Product $product): \Illuminate\Http\JsonResponse
     {
         $productImgIds = $product->images->pluck('id')->toArray();
         $variationImgIds = $product->productVariations->pluck('images')->flatten()->pluck('id')->toArray();
@@ -542,5 +540,20 @@ class ProductController extends Controller
         $product->delete();
 
         return response()->json(['success' => true, 'message' => 'Product and related data deleted successfully'], 200);
+    }
+
+    protected function storeVariations($request, Product $product): void
+    {
+        foreach ($request->variations as $key => $variationData) {
+            $variation = $product->productVariations()
+                ->updateOrCreate(
+                    ['product_id' => $product->id],
+                    $variationData
+                );
+
+            if ($request->has('variations.' . $key . '.variant_images')) {
+                FileUploadService::uploadFile($variationData['variant_images'], $variation);
+            }
+        }
     }
 }

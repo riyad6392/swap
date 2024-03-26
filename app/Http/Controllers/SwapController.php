@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreSwapRequest;
+use App\Http\Requests\Swap\StoreSwapRequest;
 use App\Http\Requests\UpdateSwapRequest;
 use App\Models\Swap;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class SwapController extends Controller
 {
     const PER_PAGE = 10;
+    const COMMISSION_PERCENTAGE = 0.25;
 
     /**
      * Swap List.
@@ -59,9 +61,13 @@ class SwapController extends Controller
      *       )
      * )
      */
-    public function index()
+    public function index(Request $request)
     {
-        $swap = Swap::paginate(self::PER_PAGE);
+        $swaps = Swap:: query();
+        if ($request->get('get_all')) {
+            return response()->json(['success' => true, 'data' => $swaps->get()]);
+        }
+        $swap = $swaps->paginate($request->pagination ?? self::PER_PAGE);
         return response()->json(['success' => true, 'data' => $swap]);
     }
 
@@ -147,7 +153,7 @@ class SwapController extends Controller
      *      )
      * )
      */
-    public function store(StoreSwapRequest $swapRequest)
+    public function store(StoreSwapRequest $swapRequest): \Illuminate\Http\JsonResponse
     {
         try {
             DB::beginTransaction();

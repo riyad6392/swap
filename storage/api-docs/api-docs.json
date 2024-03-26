@@ -1631,124 +1631,6 @@
                     }
                 ]
             },
-            "post": {
-                "tags": [
-                    "Plan"
-                ],
-                "summary": "Update this plan.",
-                "operationId": "6603194848979a9c2563867097783704",
-                "parameters": [
-                    {
-                        "name": "name",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "example": "Doel Rana"
-                    },
-                    {
-                        "name": "description",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "example": "This is just description"
-                    },
-                    {
-                        "name": "price",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "example": "100"
-                    },
-                    {
-                        "name": "currency",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "example": "USD"
-                    },
-                    {
-                        "name": "interval",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "example": "month"
-                    },
-                    {
-                        "name": "interval_duration",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "example": "1"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": "true"
-                                        },
-                                        "errors": {
-                                            "type": "json",
-                                            "example": {
-                                                "message": [
-                                                    "Category created successfully."
-                                                ]
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Invalid data",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": "false"
-                                        },
-                                        "errors": {
-                                            "type": "json",
-                                            "example": {
-                                                "message": [
-                                                    "The given data was invalid."
-                                                ]
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "apiAuth": []
-                    }
-                ]
-            },
             "delete": {
                 "tags": [
                     "Plan"
@@ -1781,6 +1663,138 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Plan and related data deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Plan not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/plan-subscription": {
+            "post": {
+                "tags": [
+                    "Subscription"
+                ],
+                "summary": "Create a new Subscription.",
+                "operationId": "c0eddc4e5d3d41bfe56a36929fb54e60",
+                "parameters": [
+                    {
+                        "name": "plan_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": "100"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Category created successfully."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Please add payment method first!"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cancel-subscription/{id}": {
+            "delete": {
+                "tags": [
+                    "Subscription"
+                ],
+                "summary": "Cancel the subscription.",
+                "description": "provide the Subscription id to cancel the subscription",
+                "operationId": "8107b6e7bafcc4f42697c3d1d78ca759",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Subscription deleted successfully"
                                         }
                                     },
                                     "type": "object"
@@ -2259,7 +2273,6 @@
                         "name": "description",
                         "in": "query",
                         "description": "Description of the product",
-                        "required": true,
                         "schema": {
                             "type": "string",
                             "example": "Updated Product Description"
@@ -2310,7 +2323,6 @@
                         "name": "variations[0][discount]",
                         "in": "query",
                         "description": "Discount of the product variation at index 0",
-                        "required": true,
                         "schema": {
                             "type": "number",
                             "format": "double",
@@ -2331,7 +2343,6 @@
                         "name": "variations[0][discount_type]",
                         "in": "query",
                         "description": "Discount type of the product variation at index 0",
-                        "required": true,
                         "schema": {
                             "type": "string",
                             "example": "percentage"
@@ -2341,7 +2352,6 @@
                         "name": "variations[0][discount_start_date]",
                         "in": "query",
                         "description": "Start date of the discount for the product variation at index 0",
-                        "required": true,
                         "schema": {
                             "type": "string",
                             "format": "date",
@@ -2352,7 +2362,6 @@
                         "name": "variations[0][discount_end_date]",
                         "in": "query",
                         "description": "End date of the discount for the product variation at index 0",
-                        "required": true,
                         "schema": {
                             "type": "string",
                             "format": "date",
@@ -2363,7 +2372,6 @@
                         "name": "deleted_image_ids[]",
                         "in": "query",
                         "description": "IDs of the images to be deleted",
-                        "required": true,
                         "schema": {
                             "type": "array",
                             "items": {
@@ -2381,7 +2389,6 @@
                         "name": "variations[0][varient_images][]",
                         "in": "query",
                         "description": "Images of the product variation at index 0",
-                        "required": true,
                         "schema": {
                             "type": "array",
                             "items": {
@@ -3045,12 +3052,586 @@
                 }
             }
         },
+        "/api/swap-exchange-details": {
+            "get": {
+                "tags": [
+                    "Swap Exchange Details"
+                ],
+                "summary": "Swap Exchange Details List.",
+                "operationId": "6fd198064c7eb6ffcf356a06f1e9f6b2",
+                "parameters": [
+                    {
+                        "name": "pagination",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number"
+                        },
+                        "example": "10"
+                    },
+                    {
+                        "name": "get_all",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "json",
+                                            "example": []
+                                        },
+                                        "links": {
+                                            "type": "json",
+                                            "example": []
+                                        },
+                                        "meta": {
+                                            "type": "json",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Unauthenticated"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Swap Exchange Details"
+                ],
+                "summary": "Create a new swap exchange details",
+                "description": "Create Swap Exchange Details.",
+                "operationId": "0931351683a1c5c4a49ab616e626de0d",
+                "parameters": [
+                    {
+                        "name": "swap_id",
+                        "in": "query",
+                        "description": "Swap ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 2
+                        }
+                    },
+                    {
+                        "name": "product_id",
+                        "in": "query",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 3
+                        }
+                    },
+                    {
+                        "name": "product_variation_id",
+                        "in": "query",
+                        "description": "Product Variation ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 4
+                        }
+                    },
+                    {
+                        "name": "quantity",
+                        "in": "query",
+                        "description": "Quantity",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 5
+                        }
+                    },
+                    {
+                        "name": "unit_price",
+                        "in": "query",
+                        "description": "Unit Price",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "double",
+                            "example": 10.5
+                        }
+                    },
+                    {
+                        "name": "amount",
+                        "in": "query",
+                        "description": "Amount",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "double",
+                            "example": 52.5
+                        }
+                    },
+                    {
+                        "name": "commission",
+                        "in": "query",
+                        "description": "Commission",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "double",
+                            "example": 5.25
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Swap Exchange Details created successfully."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "The given data was invalid."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/swap-exchange-details/{id}": {
+            "get": {
+                "tags": [
+                    "Swap Exchange Details"
+                ],
+                "summary": "Retrieve a specific swap exchange details.",
+                "operationId": "6e82f2aff34cf580f0153750734e4ba7",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "get single swap by swap exchange details id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Get swap exchange details."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Swap exchange details not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Swap exchange details not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Swap Exchange Details"
+                ],
+                "summary": "Update swap exchange details",
+                "description": "Update Swap Exchange Details.",
+                "operationId": "24981eaaae97806ef9c4755eda0a8298",
+                "parameters": [
+                    {
+                        "name": "swap_id",
+                        "in": "query",
+                        "description": "Swap ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 2
+                        }
+                    },
+                    {
+                        "name": "product_id",
+                        "in": "query",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 3
+                        }
+                    },
+                    {
+                        "name": "product_variation_id",
+                        "in": "query",
+                        "description": "Product Variation ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 4
+                        }
+                    },
+                    {
+                        "name": "quantity",
+                        "in": "query",
+                        "description": "Quantity",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 5
+                        }
+                    },
+                    {
+                        "name": "unit_price",
+                        "in": "query",
+                        "description": "Unit Price",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "double",
+                            "example": 10.5
+                        }
+                    },
+                    {
+                        "name": "amount",
+                        "in": "query",
+                        "description": "Amount",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "double",
+                            "example": 52.5
+                        }
+                    },
+                    {
+                        "name": "commission",
+                        "in": "query",
+                        "description": "Commission",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "double",
+                            "example": 5.25
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Swap Exchange Details updated successfully."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "The given data was invalid."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Swap Exchange Details"
+                ],
+                "summary": "Delete Swap Exchange Details.",
+                "operationId": "db4f3839eb4090ca8844d32d2a752ae6",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Delete a swap exchange details by ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Swap exchage details and related data deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Swap exchange details not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/swap-exchange-details/{id}/edit": {
+            "get": {
+                "tags": [
+                    "Swap Exchange Details"
+                ],
+                "summary": "Retrieve a specific swap exchange details.",
+                "operationId": "17dddd7727bf037ff9ab8a3b7d774224",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "get single swap by swap exchange details id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Get swap exchange details."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Swap exchange details not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Swap exchange details not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/swap-request-details": {
             "get": {
                 "tags": [
                     "Swap Request Details"
                 ],
-                "summary": "Swap List.",
+                "summary": "Swap Request Details List.",
                 "operationId": "fd8a160472b66a4c858f554e00a5cad4",
                 "parameters": [
                     {

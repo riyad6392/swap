@@ -1,6 +1,8 @@
 <?php
 namespace App\Services;
 
+use Psy\Util\Str;
+use Stripe\Stripe;
 use Stripe\StripeClient;
 
 class StripePaymentService
@@ -45,16 +47,10 @@ class StripePaymentService
 
     public function updatePrice($data): \Stripe\Price
     {
-        return $this->stripe->prices->update($data['stripe_price_id'], [
-            'unit_amount' => $data['amount'],
-            'currency' => $data['currency'],
-            'recurring' => [
-                'interval' => $data['interval'],
-                'interval_count' => $data['interval_duration']
-            ],
-            'product_data' => ['name' => $data['name']],
-        ]);
+
     }
+
+//    public function delete
 
     public function subscription($plan, $user )
     {

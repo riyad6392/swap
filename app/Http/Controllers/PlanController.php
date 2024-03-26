@@ -65,9 +65,18 @@ class PlanController extends Controller
      *       )
      * )
      */
-    public function index()
+    public function index(Request $request): \Illuminate\Http\JsonResponse
     {
-        $plans = Plan::with('planDetails')->paginate(self::PER_PAGE);
+        $plans = Plan::query();
+
+        $plans = $plans->with('planDetails');
+
+        if ($request->get('get_all')) {
+            return response()->json(['success' => true, 'data' => $plans->get()]);
+        }
+
+        $plans = $plans->paginate($request->pagination ?? self::PER_PAGE);
+
         return response()->json(['success' => true, 'data' => $plans]);
     }
 
@@ -233,7 +242,7 @@ class PlanController extends Controller
                 $plan->load('planDetails');
                 return response()->json(['success' => true, 'data' => $plan], 200);
             } else {
-                return response()->json(['success' => false, 'message' => 'Plan not exist'], 500);
+                return response()->json(['success' => false, 'message' => 'Plan not exist'], 422);
             }
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Failed to retrieve plan'], 500);
@@ -248,120 +257,120 @@ class PlanController extends Controller
         //
     }
 
-    /**
-     * Update this plan.
-     *
-     *
-     * @OA\Post (path="/api/plan/{id}",
-     *     tags={"Plan"},
-     *     security={{ "apiAuth": {} }},
-     *
-     *
-     *     @OA\Parameter(
-     *         in="query",
-     *         name="name",
-     *         required=true,
-     *
-     *         @OA\Schema(type="string"),
-     *         example="Doel Rana",
-     *     ),
-     *
-     *     @OA\Parameter(
-     *         in="query",
-     *         name="description",
-     *         required=true,
-     *
-     *         @OA\Schema(type="string"),
-     *         example="This is just description",
-     *     ),
-     *     @OA\Parameter(
-     *     in="query",
-     *     name="price",
-     *     required=true,
-     *     @OA\Schema(type="string"),
-     *     example="100",
-     *     ),
-     *
-     *     @OA\Parameter(
-     *     in="query",
-     *     name="currency",
-     *     required=true,
-     *     @OA\Schema(type="string"),
-     *     example="USD",
-     *     ),
-     *
-     *     @OA\Parameter(
-     *     in="query",
-     *     name="interval",
-     *     required=true,
-     *     @OA\Schema(type="string"),
-     *     example="month",
-     *     ),
-     *
-     *     @OA\Parameter(
-     *     in="query",
-     *     name="interval_duration",
-     *     required=true,
-     *     @OA\Schema(type="string"),
-     *     example="1",
-     *     ),
-     *
-     *      @OA\Response(
-     *          response=200,
-     *          description="success",
-     *
-     *          @OA\JsonContent(
-     *
-     *              @OA\Property(property="success", type="boolean", example="true"),
-     *               @OA\Property(property="errors", type="json", example={"message": {"Category created successfully."}}),
-     *          ),
-     *      ),
-     *
-     *      @OA\Response(
-     *          response=422,
-     *          description="Invalid data",
-     *
-     *          @OA\JsonContent(
-     *
-     *              @OA\Property(property="success", type="boolean", example="false"),
-     *              @OA\Property(property="errors", type="json", example={"message": {"The given data was invalid."}}),
-     *          )
-     *      )
-     * )
-     */
+//    /**
+//     * Update this plan.
+//     *
+//     *
+//     * @OA\Post (path="/api/plan/{id}",
+//     *     tags={"Plan"},
+//     *     security={{ "apiAuth": {} }},
+//     *
+//     *
+//     *     @OA\Parameter(
+//     *         in="query",
+//     *         name="name",
+//     *         required=true,
+//     *
+//     *         @OA\Schema(type="string"),
+//     *         example="Doel Rana",
+//     *     ),
+//     *
+//     *     @OA\Parameter(
+//     *         in="query",
+//     *         name="description",
+//     *         required=true,
+//     *
+//     *         @OA\Schema(type="string"),
+//     *         example="This is just description",
+//     *     ),
+//     *     @OA\Parameter(
+//     *     in="query",
+//     *     name="price",
+//     *     required=true,
+//     *     @OA\Schema(type="string"),
+//     *     example="100",
+//     *     ),
+//     *
+//     *     @OA\Parameter(
+//     *     in="query",
+//     *     name="currency",
+//     *     required=true,
+//     *     @OA\Schema(type="string"),
+//     *     example="USD",
+//     *     ),
+//     *
+//     *     @OA\Parameter(
+//     *     in="query",
+//     *     name="interval",
+//     *     required=true,
+//     *     @OA\Schema(type="string"),
+//     *     example="month",
+//     *     ),
+//     *
+//     *     @OA\Parameter(
+//     *     in="query",
+//     *     name="interval_duration",
+//     *     required=true,
+//     *     @OA\Schema(type="string"),
+//     *     example="1",
+//     *     ),
+//     *
+//     *      @OA\Response(
+//     *          response=200,
+//     *          description="success",
+//     *
+//     *          @OA\JsonContent(
+//     *
+//     *              @OA\Property(property="success", type="boolean", example="true"),
+//     *               @OA\Property(property="errors", type="json", example={"message": {"Category created successfully."}}),
+//     *          ),
+//     *      ),
+//     *
+//     *      @OA\Response(
+//     *          response=422,
+//     *          description="Invalid data",
+//     *
+//     *          @OA\JsonContent(
+//     *
+//     *              @OA\Property(property="success", type="boolean", example="false"),
+//     *              @OA\Property(property="errors", type="json", example={"message": {"The given data was invalid."}}),
+//     *          )
+//     *      )
+//     * )
+//     */
     public function update(UpdatePlanRequest $updatePlanRequest, UpdatePlanDetailsRequest $updatePlanDetailsRequest, string $id)
     {
-        $plan = Plan::find($id);
-        if (empty($plan)) {
-            return response()->json(['success' => false, 'message' => 'Plan does not exist'], 500);
-        }
-        try {
-            DB::beginTransaction();
-
-            $plan->update($updatePlanRequest->only(['name',
-                'description',
-                'amount',
-                'currency',
-                'interval',
-                'interval_duration',
-            ]));
-
-            PlanDetails::where('plan_id', $plan->id)->update([
-                'plan_id' => $plan->id,
-                'feature' => $updatePlanDetailsRequest->feature,
-                'features_count' => $updatePlanDetailsRequest->features_count,
-                'value' => $updatePlanDetailsRequest->value,
-
-            ]);
-            $response = StripePaymentFacade::updatePrice($plan);
-            // $plan->update(['stripe_price_id' => $response->id]);
-            DB::commit();
-            return response()->json(['success' => true, 'message' => 'Plan updated successfully!'], 200);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-        }
+//        $plan = Plan::find($id);
+//        if (empty($plan)) {
+//            return response()->json(['success' => false, 'message' => 'Plan does not exist'], 500);
+//        }
+//        try {
+//            DB::beginTransaction();
+//
+//            $plan->update($updatePlanRequest->only(['name',
+//                'description',
+//                'amount',
+//                'currency',
+//                'interval',
+//                'interval_duration',
+//            ]));
+//
+//            PlanDetails::where('plan_id', $plan->id)->update([
+//                'plan_id' => $plan->id,
+//                'feature' => $updatePlanDetailsRequest->feature,
+//                'features_count' => $updatePlanDetailsRequest->features_count,
+//                'value' => $updatePlanDetailsRequest->value,
+//
+//            ]);
+//            $response = StripePaymentFacade::updatePrice($plan);
+//            // $plan->update(['stripe_price_id' => $response->id]);
+//            DB::commit();
+//            return response()->json(['success' => true, 'message' => 'Plan updated successfully!'], 200);
+//
+//        } catch (\Exception $e) {
+//            DB::rollBack();
+//            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+//        }
     }
 
     /**
@@ -403,9 +412,9 @@ class PlanController extends Controller
             $plan->planDetails()->delete();
             $plan->delete();
             return response()->json(['success' => true, 'message' => 'Plan and related data deleted successfully'], 200);
-        } else {
-            return response()->json(['success' => false, 'message' => 'Plan not exist'], 500);
         }
+        return response()->json(['success' => false, 'message' => 'Plan not exist'], 422);
+
     }
 
 

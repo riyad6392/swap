@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends Controller
 {
+    const PER_PAGE = 10;
+
     /**
      * Category List.
      *
@@ -66,10 +68,10 @@ class CategoryController extends Controller
         $categories = Category::query();
         if ($request->get('get_all')) {
 
-            return response()->json(['success' => true, 'data' => $categories->get(), 'message' => $request->get('get_all')]);
+            return response()->json(['success' => true, 'data' => $categories->get()]);
         }
 
-        $categories = $categories->paginate(10);
+        $categories = $categories->paginate($request->pagination ?? self::PER_PAGE);
         return response()->json(['success' => true, 'data' => $categories]);
     }
 

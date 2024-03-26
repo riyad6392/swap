@@ -15,10 +15,15 @@ class checkSubscription
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->guard('api')->check() && !auth()->guard('api')->user()->subscription_is_active) {
-            return response()->json(['success' => false, 'message' => 'You are not subscribed to any plan.'], 403);
-        } else {
-            return $next($request);
+        if (auth()->guard('api')->check()) {
+            $user = auth()->guard('api')->user();
+            if ($user->subscription_is_check) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You are not subscribed to any plan.'
+                ], 403);
+            }
         }
+        return $next($request);
     }
 }

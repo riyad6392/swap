@@ -16,6 +16,50 @@ use Illuminate\Support\Facades\Validator;
 
 class PlanSubscriptionController extends Controller
 {
+    /**
+     * @param StorePlanSubscriptionRequest $planSubscriptionRequest
+     * @return \Illuminate\Http\JsonResponse
+     */
+
+    /**
+     * Create a new Subscription.
+     *
+     *
+     * @OA\Post (path="/api/plan-subscription",
+     *     tags={"Subscription"},
+     *     security={{ "apiAuth": {} }},
+
+     *     @OA\Parameter(
+     *     in="query",
+     *     name="plan_id",
+     *     required=true,
+     *     @OA\Schema(type="integer"),
+     *     example="100",
+     *     ),
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="success",
+     *
+     *          @OA\JsonContent(
+     *
+     *              @OA\Property(property="success", type="boolean", example="true"),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Category created successfully."}}),
+     *          ),
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=422,
+     *          description="Not found",
+     *
+     *          @OA\JsonContent(
+     *
+     *              @OA\Property(property="success", type="boolean", example="false"),
+     *              @OA\Property(property="errors", type="json", example={"message": {"Please add payment method first!"}}),
+     *          )
+     *      )
+     * )
+     */
     public function subscribe(StorePlanSubscriptionRequest $planSubscriptionRequest)
     {
         try {
@@ -68,6 +112,33 @@ class PlanSubscriptionController extends Controller
         }
     }
 
+    /**
+     * Cancel the subscription.
+     *
+     * @OA\Delete (
+     *     path="/api/cancel-subscription/{id}",
+     *     tags={"Subscription"},
+     *     security={{ "apiAuth": {} }},
+     *     description="provide the Subscription id to cancel the subscription",
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="success",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example="true"),
+     *             @OA\Property(property="message", type="string", example="Subscription deleted successfully")
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example="false"),
+     *             @OA\Property(property="message", type="string", example="Plan not found")
+     *         ),
+     *     )
+     * )
+     */
     public function cancelSubscription(string $id)
     {
         try {
