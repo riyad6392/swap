@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\Auth\RegistrationController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\PlanSubscriptionController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ForgetPasswordController;
@@ -53,6 +55,11 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::resource('swap', \App\Http\Controllers\SwapController::class);
         Route::resource('swap-request-details', \App\Http\Controllers\SwapRequestDetailsController::class);
         Route::resource('swap-exchange-details', \App\Http\Controllers\SwapExchangeDetailsController::class);
+
+//        Broadcast::routes();
+
+        Route::get('send-message', [MessageController::class , 'sendMessage']);
+
 
     });
 
