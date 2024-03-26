@@ -2,12 +2,12 @@
 
 namespace App\Http\Requests\ProductVariation;
 
-use Illuminate\Contracts\Validation\Validator;
+use App\Traits\ValidationErrorMessageTrait;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreProductVariationRequest extends FormRequest
 {
+    use ValidationErrorMessageTrait;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -23,7 +23,6 @@ class StoreProductVariationRequest extends FormRequest
      */
     public function rules(): array
     {
-//        dd($this->all());
         return [
             'variations' => 'required|array',
             'variations.*.size' => 'nullable|string',
@@ -37,15 +36,6 @@ class StoreProductVariationRequest extends FormRequest
             'variations.*.discount_end_date' => 'nullable|date',
             'variations.*.variant_images' => 'nullable|array',
         ];
-    }
-
-    public function failedValidation(Validator $validator)
-    {
-        throw new HttpResponseException(response()->json([
-            'success'   => false,
-            'message'   => 'Validation errors',
-            'errors'      => $validator->errors()
-        ], 422));
     }
 
     public function messages(): array

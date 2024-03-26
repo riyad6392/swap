@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Swap\StoreSwapExchageDetails;
 use App\Http\Requests\Swap\StoreSwapRequest;
+use App\Http\Requests\Swap\StoreSwapRequestDetails;
 use App\Http\Requests\UpdateSwapRequest;
 use App\Models\Swap;
 use Illuminate\Http\Request;
@@ -153,8 +155,10 @@ class SwapController extends Controller
      *      )
      * )
      */
-    public function store(StoreSwapRequest $swapRequest): \Illuminate\Http\JsonResponse
+//    public function store(StoreSwapRequest $swapRequest , StoreSwapRequestDetails $storeSwapRequestDetails , StoreSwapExchageDetails $storeSwapExchageDetails ): \Illuminate\Http\JsonResponse
+    public function store(Request $request): \Illuminate\Http\JsonResponse
     {
+        dd($request->all());
         try {
             DB::beginTransaction();
 
