@@ -55,6 +55,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::resource('swap', \App\Http\Controllers\SwapController::class);
         Route::resource('swap', \App\Http\Controllers\SwapController::class);
         Route::resource('swap-request-details', \App\Http\Controllers\SwapRequestDetailsController::class);
+        Route::resource('swap-exchange-details', \App\Http\Controllers\SwapExchangeDetailsController::class);
 
         //Payment Method
 

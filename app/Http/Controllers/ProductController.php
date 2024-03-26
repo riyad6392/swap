@@ -355,7 +355,6 @@ class ProductController extends Controller
      *     @OA\Parameter(
      *         in="query",
      *         name="description",
-     *         required=true,
      *         description="Description of the product",
      *         @OA\Schema(type="string", example="Updated Product Description"),
      *     ),
@@ -390,7 +389,6 @@ class ProductController extends Controller
      *     @OA\Parameter(
      *         in="query",
      *         name="variations[0][discount]",
-     *         required=true,
      *         description="Discount of the product variation at index 0",
      *         @OA\Schema(type="number", format="double", example=10.5),
      *     ),
@@ -404,28 +402,24 @@ class ProductController extends Controller
      *     @OA\Parameter(
      *         in="query",
      *         name="variations[0][discount_type]",
-     *         required=true,
      *         description="Discount type of the product variation at index 0",
      *         @OA\Schema(type="string", example="percentage"),
      *     ),
      *     @OA\Parameter(
      *         in="query",
      *         name="variations[0][discount_start_date]",
-     *         required=true,
      *         description="Start date of the discount for the product variation at index 0",
      *         @OA\Schema(type="string", format="date", example="2024-03-15"),
      *     ),
      *     @OA\Parameter(
      *         in="query",
      *         name="variations[0][discount_end_date]",
-     *         required=true,
      *         description="End date of the discount for the product variation at index 0",
      *         @OA\Schema(type="string", format="date", example="2024-03-20"),
      *     ),
      *      @OA\Parameter(
      *         in="query",
      *         name="deleted_image_ids[]",
-     *         required=true,
      *         description="IDs of the images to be deleted",
      *         @OA\Schema(
      *             type="array",
@@ -438,7 +432,6 @@ class ProductController extends Controller
      *     @OA\Parameter(
      *         in="query",
      *         name="variations[0][varient_images][]",
-     *         required=true,
      *         description="Images of the product variation at index 0",
      *         @OA\Schema(
      *             type="array",
@@ -496,7 +489,7 @@ class ProductController extends Controller
 
             DB::commit();
 
-            return response()->json(['success' => true, 'data' => $product], 201);
+            return response()->json(['success' => true, 'data' => $product->load('productVariations.images')], 201);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => 'Failed to update product'], 500);

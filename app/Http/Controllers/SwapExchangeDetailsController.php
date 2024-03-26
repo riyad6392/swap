@@ -2,21 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Swap\StoreSwapRequestDetails;
-use App\Http\Requests\Swap\UpdateSwapRequestDetails;
-use App\Models\SwapRequestDetail;
-use Illuminate\Support\Facades\DB;
+use App\Http\Requests\Swap\StoreSwapExchageDetails;
+use App\Http\Requests\Swap\UpdateSwapExchangeDetails;
+use App\Models\SwapExchangeDetail;
 
-class SwapRequestDetailsController extends Controller
+class SwapExchangeDetailsController extends Controller
 {
     const PER_PAGE = 10;
 
     /**
-     * Swap Request Details List.
+     * Swap Exchange Details List.
      *
      * @OA\Get(
-     *     path="/api/swap-request-details",
-     *     tags={"Swap Request Details"},
+     *     path="/api/swap-exchange-details",
+     *     tags={"Swap Exchange Details"},
      *     security={{ "apiAuth": {} }},
      *
      *     @OA\Parameter(
@@ -61,18 +60,19 @@ class SwapRequestDetailsController extends Controller
      */
     public function index()
     {
-        $swap_request_details = SwapRequestDetail::paginate(self::PER_PAGE);
-        return response()->json(['success' => true, 'data' => $swap_request_details]);
+        $swap_exchange_details = SwapExchangeDetail::paginate(self::PER_PAGE);
+        return response()->json(['success' => true, 'data' => $swap_exchange_details]);
     }
 
+
     /**
-     * Create Swap Request Details.
+     * Create Swap Exchange Details.
      *
      * @OA\Post (
-     *     path="/api/swap-request-details",
-     *     tags={"Swap Request Details"},
+     *     path="/api/swap-exchange-details",
+     *     tags={"Swap Exchange Details"},
      *     security={{ "apiAuth": {} }},
-     *     summary="Create a new swap request details",
+     *     summary="Create a new swap exchange details",
      *
      *     @OA\Parameter(
      *         in="query",
@@ -138,7 +138,7 @@ class SwapRequestDetailsController extends Controller
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="success", type="boolean", example="true"),
-     *               @OA\Property(property="errors", type="json", example={"message": {"Swap Request Details created successfully."}}),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Swap Exchange Details created successfully."}}),
      *          ),
      *      ),
      *
@@ -154,12 +154,12 @@ class SwapRequestDetailsController extends Controller
      *      )
      * )
      */
-    public function store(StoreSwapRequestDetails $storeSwapRequestDetails)
+    public function store(StoreSwapExchageDetails $storeSwapExchangeDetails)
     {
         try {
             DB::beginTransaction();
 
-            $swap = SwapRequestDetail::create($storeSwapRequestDetails->only(
+            $swap = SwapExchangeDetail::create($storeSwapExchangeDetails->only(
                 [
                     'swap_id',
                     'user_id',
@@ -181,16 +181,16 @@ class SwapRequestDetailsController extends Controller
     }
 
     /**
-     * Retrieve a specific swap request detail.
+     * Retrieve a specific swap exchange details.
      *
      * @OA\Get(
-     *     path="/api/swap-request-details/{id}",
-     *     tags={"Swap Request Details"},
+     *     path="/api/swap-exchange-details/{id}",
+     *     tags={"Swap Exchange Details"},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
-     *         description="get single swap by swap request details id",
+     *         description="get single swap by swap exchange details id",
      *         @OA\Schema(type="integer", format="int64")
      *     ),
      *    @OA\Response(
@@ -198,39 +198,39 @@ class SwapRequestDetailsController extends Controller
      *         description="success",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example="true"),
-     *             @OA\Property(property="errors", type="json", example={"message": {"Get swap request details."}}),
+     *             @OA\Property(property="errors", type="json", example={"message": {"Get swap exchange details."}}),
      *         ),
      *     ),
      *     @OA\Response(
      *         response=404,
-     *         description="Swap request details not found",
+     *         description="Swap exchange details not found",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example="false"),
-     *             @OA\Property(property="message", type="string", example="Swap request details not found")
+     *             @OA\Property(property="message", type="string", example="Swap exchange details not found")
      *         )
      *     )
      * )
      */
-    public function show(SwapRequestDetail $swapRequestDetail)
+    public function show(SwapExchangeDetail $SwapExchangeDetail)
     {
         try {
-            return response()->json(['success' => true, 'data' => $swapRequestDetail], 200);
+            return response()->json(['success' => true, 'data' => $SwapExchangeDetail], 200);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Failed to retrieve data'], 500);
+            return response()->json(['success' => false, 'message' => 'Failed to retrieve product'], 500);
         }
     }
 
     /**
-     * Edit a specific swap request detail.
+     * Retrieve a specific swap exchange details.
      *
      * @OA\Get(
-     *     path="/api/swap-request-details/{id}/edit",
-     *     tags={"Swap Request Details"},
+     *     path="/api/swap-exchange-details/{id}/edit",
+     *     tags={"Swap Exchange Details"},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
-     *         description="get single swap by swap request details id",
+     *         description="get single swap by swap exchange details id",
      *         @OA\Schema(type="integer", format="int64")
      *     ),
      *    @OA\Response(
@@ -238,32 +238,32 @@ class SwapRequestDetailsController extends Controller
      *         description="success",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example="true"),
-     *             @OA\Property(property="errors", type="json", example={"message": {"Get swap request  details."}}),
+     *             @OA\Property(property="errors", type="json", example={"message": {"Get swap exchange details."}}),
      *         ),
      *     ),
      *     @OA\Response(
      *         response=404,
-     *         description="Swap request details not found",
+     *         description="Swap exchange details not found",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example="false"),
-     *             @OA\Property(property="message", type="string", example="Swap request details not found")
+     *             @OA\Property(property="message", type="string", example="Swap exchange details not found")
      *         )
      *     )
      * )
      */
-    public function edit(SwapRequestDetail $swapRequestDetail)
+    public function edit(SwapExchangeDetail $SwapExchangeDetail)
     {
-        return response()->json(['success' => true, 'data' => $swapRequestDetail], 200);
+        return response()->json(['success' => true, 'data' => $SwapExchangeDetail], 200);
     }
 
     /**
-     * Update Swap Request Details.
+     * Update Swap Exchange Details.
      *
      * @OA\Post (
-     *     path="/api/swap-request-details/{id}",
-     *     tags={"Swap Request Details"},
+     *     path="/api/swap-exchange-details/{id}",
+     *     tags={"Swap Exchange Details"},
      *     security={{ "apiAuth": {} }},
-     *     summary="Update swap request details",
+     *     summary="Update swap exchange details",
      *
      *     @OA\Parameter(
      *         in="query",
@@ -329,7 +329,7 @@ class SwapRequestDetailsController extends Controller
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="success", type="boolean", example="true"),
-     *               @OA\Property(property="errors", type="json", example={"message": {"Swap Request Details updated successfully."}}),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Swap Exchange Details updated successfully."}}),
      *          ),
      *      ),
      *
@@ -345,11 +345,11 @@ class SwapRequestDetailsController extends Controller
      *      )
      * )
      */
-    public function update(UpdateSwapRequestDetails $updateSwapRequestDetails, SwapRequestDetail $swapRequestDetail)
+    public function update(UpdateSwapExchangeDetails $updateSwapExchangeDetails, SwapExchangeDetail $SwapExchangeDetail)
     {
         try {
             DB::beginTransaction();
-            $updateSwapRequestDetails->update($updateSwapRequestDetails->only(
+            $updateSwapExchangeDetails->update($updateSwapExchangeDetails->only(
                 [
                     'swap_id',
                     'user_id',
@@ -363,7 +363,7 @@ class SwapRequestDetailsController extends Controller
             ));
 
             DB::commit();
-            return response()->json(['success' => true, 'data' => $swapRequestDetail], 201);
+            return response()->json(['success' => true, 'data' => $SwapExchangeDetail], 201);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => 'Failed to update swap'], 500);
@@ -371,16 +371,16 @@ class SwapRequestDetailsController extends Controller
     }
 
     /**
-     * Delete Swap Request Details.
+     * Delete Swap Exchange Details.
      *
      * @OA\Delete (
-     *     path="/api/swap-request-details/{id}",
-     *     tags={"Swap Request Details"},
+     *     path="/api/swap-exchange-details/{id}",
+     *     tags={"Swap Exchange Details"},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
-     *         description="Delete a swap request details by ID",
+     *         description="Delete a swap exchange details by ID",
      *         @OA\Schema(type="integer", format="int64")
      *     ),
      *     @OA\Response(
@@ -388,7 +388,7 @@ class SwapRequestDetailsController extends Controller
      *         description="success",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example="true"),
-     *             @OA\Property(property="message", type="string", example="Swap request details and related data deleted successfully")
+     *             @OA\Property(property="message", type="string", example="Swap exchage details and related data deleted successfully")
      *         ),
      *     ),
      *     @OA\Response(
@@ -396,14 +396,14 @@ class SwapRequestDetailsController extends Controller
      *         description="Not found",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example="false"),
-     *             @OA\Property(property="message", type="string", example="Swap request details not found")
+     *             @OA\Property(property="message", type="string", example="Swap exchange details not found")
      *         ),
      *     )
      * )
      */
-    public function destroy(SwapRequestDetail $swapRequestDetail)
+    public function destroy(SwapExchangeDetail $SwapExchangeDetail)
     {
-        $swapRequestDetail->delete();
-        return response()->json(['success' => true, 'message' => 'Swap request details data deleted successfully'], 200);
+        $SwapExchangeDetail->delete();
+        return response()->json(['success' => true, 'message' => 'Swap exchange details data deleted successfully'], 200);
     }
 }
