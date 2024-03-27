@@ -78,14 +78,22 @@ class PaymentMethodController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatePaymentMethodRequest $updatePaymentMethodRequest, PaymentMethods $paymentMethods)
+    public function update(UpdatePaymentMethodRequest $updatePaymentMethodRequest)
     {
+        $user = auth()->user();
+        $paymentId = trim($updatePaymentMethodRequest->stripe_payment_method_id);
         try {
 
-            $paymentMethod = StripePaymentFacade::attachPaymentMethodToCustomer(
-                trim($updatePaymentMethodRequest->stripe_payment_method_id),
-                auth()->user()
+            $paymentMethod = StripePaymentFacade::updateCustomerPaymentMethod(
+                $paymentId,
+                $user
             );
+            
+            PaymentMethods::query()
+                ->where('user_id', $user->id)
+                ->update([
+                    'status' => \DB::raw("CASE WHEN stripe_payment_method_id = '{$paymentId}' THEN 'active' ELSE 'inactive' END")
+                ]);
 
             return response()->json(['success' => true, 'message' => $paymentMethod], 201);
         } catch (\Exception $exception) {

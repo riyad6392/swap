@@ -29,9 +29,9 @@ class UpdatePaymentMethodRequest extends FormRequest
 //            'exp_month' => 'required',
 //            'exp_year' => 'required',
 //            'cvc' => 'required',
-            'name' => 'string',
-            'email' => 'email',
-            'phone' => 'string',
+//            'name' => 'string',
+//            'email' => 'email',
+//            'phone' => 'string',
 
         ];
     }
@@ -54,9 +54,9 @@ class UpdatePaymentMethodRequest extends FormRequest
 //            'exp_month.required' => 'Expiry month is required',
 //            'exp_year.required' => 'Expiry year is required',
 //            'cvc.required' => 'CVC is required',
-            'name.string' => 'Name must be a string',
-            'email.email' => 'Email must be a valid email',
-            'phone.string' => 'Phone must be a string',
+//            'name.string' => 'Name must be a string',
+//            'email.email' => 'Email must be a valid email',
+//            'phone.string' => 'Phone must be a string',
         ];
     }
 }
