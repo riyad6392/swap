@@ -27,10 +27,10 @@ class StoreSwapRequest extends FormRequest
             'requested_user_id' => 'required|integer',
             'exchanged_user_id' => 'required|integer',
             'status' => 'required|string',
-            'requested_wholesale_amount' => 'required|integer',
-            'exchanged_wholesale_amount' => 'required|integer',
-            'requested_total_commission' => 'required|numeric',
-            'exchanged_total_commission' => 'required|numeric',
+//            'requested_wholesale_amount' => 'required|integer',
+//            'exchanged_wholesale_amount' => 'required|integer',
+//            'requested_total_commission' => 'required|numeric',
+//            'exchanged_total_commission' => 'required|numeric',
         ];
     }
 
@@ -40,10 +40,10 @@ class StoreSwapRequest extends FormRequest
             'requested_user_id.required' => 'Requested user id is required',
             'exchanged_user_id.required' => 'Exchanged user id is required',
             'status.required' => 'Status is required',
-            'requested_wholesale_amount.required' => 'Requested wholesale amount is required',
-            'exchanged_wholesale_amount.required' => 'Exchanged wholesale amount is required',
-            'requested_total_commission.required' => 'Requested total commission is required',
-            'exchanged_total_commission.required' => 'Exchanged total commission is required',
+//            'requested_wholesale_amount.required' => 'Requested wholesale amount is required',
+//            'exchanged_wholesale_amount.required' => 'Exchanged wholesale amount is required',
+//            'requested_total_commission.required' => 'Requested total commission is required',
+//            'exchanged_total_commission.required' => 'Exchanged total commission is required',
         ];
     }
 }

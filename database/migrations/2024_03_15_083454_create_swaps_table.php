@@ -15,13 +15,13 @@ return new class extends Migration
             $table->id();
             $table->integer('uid');
             $table->integer('user_id');
-            $table->integer('requested_user_id');
+            $table->integer('requested_user_id')->nullable();
             $table->integer('exchanged_user_id');
             $table->string('status');
-            $table->integer('requested_wholesale_amount');
-            $table->integer('exchanged_wholesale_amount');
-            $table->double('requested_total_commission',8, 2);
-            $table->double('exchanged_total_commission',8, 2);
+            $table->integer('requested_wholesale_amount')->nullable();
+            $table->integer('exchanged_wholesale_amount')->nullable();
+            $table->double('requested_total_commission',8, 2)->nullable();
+            $table->double('exchanged_total_commission',8, 2)->nullable();
             $table->integer('created_by');
             $table->integer('updated_by');
 
