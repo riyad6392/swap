@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\Swap;
 
+use App\Traits\ValidationErrorMessageTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateSwapExchangeDetailsRequest extends FormRequest
 {
+
+    use ValidationErrorMessageTrait;
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -22,13 +25,23 @@ class UpdateSwapExchangeDetailsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'requested_user_id' => 'sometimes|required|integer',
-            'exchanged_user_id' => 'sometimes|required|integer',
-            'status' => 'sometimes|required|string',
-            'requested_wholesale_amount' => 'sometimes|required|integer',
-            'exchanged_wholesale_amount' => 'sometimes|required|integer',
-            'requested_total_commission' => 'sometimes|required|numeric',
-            'exchanged_total_commission' => 'sometimes|required|numeric',
+            'exchange_product.*.product_id' => 'required|integer',
+            'exchange_product.*.variation_id' => 'required|integer',
+            'exchange_product.*.variation_size' => 'required',
+            'exchange_product.*.variation_color' => 'required',
+            'exchange_product.*.variation_quantity' => 'nullable|numeric',
+            'exchange_product.*.discount_end_date' => 'nullable|date',
+        ];
+    }
+    public function messages(): array
+    {
+        return [
+            'exchange_product.*.product_id.required' => 'Product id is required',
+            'exchange_product.*.variation_id.required' => 'Variation id is required',
+            'exchange_product.*.variation_size.required' => 'Variation size is required',
+            'exchange_product.*.variation_color.required' => 'Variation color is required',
+            'exchange_product.*.variation_quantity.numeric' => 'Variation quantity must be a number',
+            'exchange_product.*.discount_end_date.date' => 'Discount end date must be a date',
         ];
     }
 }

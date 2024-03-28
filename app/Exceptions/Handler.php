@@ -30,9 +30,9 @@ class Handler extends ExceptionHandler
                 return response()->json(['success' => false, 'message' => 'Data not found'], 404);
             }
 
-//            if ($request->is('api/*')) {
-//                return response()->json(['success' => false, 'message' => 'Failed to retrieve data'], 500);
-//            }
+            if ($request->is('api/*')) {
+                return response()->json(['success' => false, 'message' => 'Failed to retrieve data'], 500);
+            }
         });
     }
 }

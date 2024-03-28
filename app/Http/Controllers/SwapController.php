@@ -161,6 +161,7 @@ class SwapController extends Controller
      */
     public function store(StoreSwapRequest $swapRequest, StoreSwapExchangeDetailsRequest $SwapExchangeDetailsRequest): \Illuminate\Http\JsonResponse
     {
+        dd($SwapExchangeDetailsRequest->all());
         try {
             DB::beginTransaction();
 
@@ -173,7 +174,7 @@ class SwapController extends Controller
                 ]
             );
 
-            $prepareData = $this->prepareDetailsData($SwapExchangeDetailsRequest, $swap , 'exchange_product');
+            $prepareData = $this->prepareDetailsData($SwapExchangeDetailsRequest, $swap, 'exchange_product');
             SwapExchangeDetail::insert($prepareData['insertData']);
 
             $swap->update(
@@ -324,34 +325,38 @@ class SwapController extends Controller
      *     )
      * )
      */
-    public function update(UpdateSwapRequest $updateSwapRequest,UpdateSwapExchangeDetailsRequest $SwapExchangeDetailsRequest, Swap $swap)
+    public function update(UpdateSwapRequest                $updateSwapRequest,
+                           UpdateSwapExchangeDetailsRequest $SwapExchangeDetailsRequest,
+                           Swap                             $swap)
     {
-        dd($updateSwapRequest->all());
         try {
             DB::beginTransaction();
-            $swap->update($updateSwapRequest->only(
-                [
-                    'requested_user_id',
-                    'exchanged_user_id',
-                    'status',
-                ]
-            ));
 
-            $prepareData = $this->prepareDetailsData($SwapExchangeDetailsRequest, $swap , 'exchange_product');
+//            $swap->update($updateSwapRequest->only(
+//                [
+//                    'requested_user_id',
+//                    'exchanged_user_id',
+//                    'status',
+//                ]
+//            ));
+
+            $prepareData = $this->prepareDetailsData($SwapExchangeDetailsRequest, $swap, 'exchange_product');
             SwapExchangeDetail::insert($prepareData['insertData']);
 
             /// TODO: Need to delete the previous data
-            $this->deleteDetailsData($updateSwapRequest->deleted_id , $swap);
+            $this->deleteDetailsData($updateSwapRequest->deleted_id, $swap);
 
             ///TODO: Need to update the total amount and commission
+            $totalAmountAndCommission = $this->calculateTotalAmountAndCommission($swap);
 
             $swap->update(
                 [
-                    'exchanged_wholesale_amount' => $prepareData['wholeSaleAmount'],
-                    'exchanged_total_commission' => $prepareData['totalCommission'],
+                    'exchanged_wholesale_amount' => $prepareData['wholeSaleAmount'] +
+                        $totalAmountAndCommission['wholeSaleAmount'],
+                    'exchanged_total_commission' => $prepareData['totalCommission'] +
+                        $totalAmountAndCommission['totalCommission'],
                 ]
             );
-
 
             DB::commit();
             return response()->json(['success' => true, 'data' => $swap], 201);
@@ -394,11 +399,16 @@ class SwapController extends Controller
      */
     public function destroy(Swap $swap)
     {
+        if ($swap->user_id != auth()->id()) {
+            return response()->json(['success' => false, 'message' => 'You are not authorized to delete this swap'], 401);
+        }
+        $swap->exchangeDetails->delete();
+        $swap->requestDetail->delete();
         $swap->delete();
         return response()->json(['success' => true, 'message' => 'Swap and related data deleted successfully'], 200);
     }
 
-    protected function prepareDetailsData($request, object $swap , string $prepareFor): array
+    protected function prepareDetailsData($request, object $swap, string $prepareFor): array
     {
         $insertData = [];
         $wholeSaleAmount = 0;
@@ -410,35 +420,29 @@ class SwapController extends Controller
 
             if ($variation) {
                 $insertData[] = [
-                    'uid' => uniqid(),
-                    'swap_id' => $swap->id,
-                    'user_id' => auth()->id(),
                     'product_id' => $product['product_id'],
                     'product_variation_id' => $product['variation_id'],
                     'quantity' => $product['variation_quantity'],
+                    'uid' => uniqid(),
+                    'swap_id' => $swap->id,
                     'unit_price' => $variation->unit_price ?? 0,
-                    'amount' => $product['variation_quantity'] * $variation->unit_price ?? 0,
-                    'commission' => ($product['variation_quantity'] * $variation->unit_price ?? 0) * self::COMMISSION_PERCENTAGE,
+                    'amount' => $product['variation_quantity'] *
+                        $variation->unit_price ?? 0,
+                    'commission' => ($product['variation_quantity'] *
+                        $variation->unit_price ?? 0) *
+                        self::COMMISSION_PERCENTAGE,
+                    'user_id' => auth()->id(),
                     'created_by' => auth()->id(),
                     'updated_by' => auth()->id(),
                 ];
-                $wholeSaleAmount += $product['variation_quantity'] * $variation->unit_price ?? 0;
-                $totalCommission += ($product['variation_quantity'] * $variation->unit_price ?? 0) * self::COMMISSION_PERCENTAGE;
+                $wholeSaleAmount += $product['variation_quantity'] *
+                    $variation->unit_price ?? 0;
+                $totalCommission += ($product['variation_quantity'] *
+                    $variation->unit_price ?? 0) * self::COMMISSION_PERCENTAGE;
             }
         }
         return ['insertData' => $insertData, 'wholeSaleAmount' => $wholeSaleAmount, 'totalCommission' => $totalCommission];
     }
 
-    protected function deleteDetailsData($deleted_id, $swap): void
-    {
-        SwapExchangeDetail::where('user_id',auth()->id())
-            ->where('swap_id',$swap->id)
-            ->whereIn('id', $deleted_id)
-            ->delete();
-    }
 
-    protected function updateDetailsData()
-    {
-
-    }
 }

@@ -4,6 +4,8 @@ namespace App\Http\Requests\Swap;
 
 use App\Traits\ValidationErrorMessageTrait;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\RequiredIf;
 
 class StoreSwapExchangeDetailsRequest extends FormRequest
 {
@@ -24,18 +26,30 @@ class StoreSwapExchangeDetailsRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'define_type' => 'required|string|in:request_product,exchange_product',
             'exchange_product.*.product_id' => 'required|integer',
             'exchange_product.*.variation_id' => 'required|integer',
             'exchange_product.*.variation_size' => 'required',
             'exchange_product.*.variation_color' => 'required',
             'exchange_product.*.variation_quantity' => 'nullable|numeric',
             'exchange_product.*.discount_end_date' => 'nullable|date',
+
+
+            'request_product.*.product_id' => 'required|integer',
+            'request_product.*.variation_id' => 'required|integer',
+            'request_product.*.variation_size' => 'required',
+            'request_product.*.variation_color' => 'required',
+            'request_product.*.variation_quantity' => 'nullable|numeric',
+            'request_product.*.discount_end_date' => 'nullable|date',
         ];
     }
 
     public function messages(): array
     {
         return [
+            'define_type.required' => 'Define type is required',
+            'define_type.string' => 'Define type must be a string',
+            'define_type.in' => 'Define type must be either request_product or exchange_product',
             'exchange_product.*.product_id.required' => 'Product id is required',
             'exchange_product.*.variation_id.required' => 'Variation id is required',
             'exchange_product.*.variation_size.required' => 'Variation size is required',
