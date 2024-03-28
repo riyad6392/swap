@@ -10,6 +10,10 @@ use Illuminate\Database\Eloquent\Model;
 class PaymentMethods extends Model
 {
     use HasFactory, ModelAttributeTrait;
+
+    const STATUS_ACTIVE = 'active';
+    const STATUS_INACTIVE = 'inactive';
+
     protected $fillable = [
         'method_name',
         'user_id',
@@ -21,16 +25,18 @@ class PaymentMethods extends Model
         'updated_by',
     ];
 
-    public static function boot(){
+    public static function boot()
+    {
         parent::boot();
         self::bootCreatedUpdatedBy();
         static::updatePaymentMethodStatus();
 
     }
+
     public function scopeUpdatePaymentMethodStatus(Builder $query, $paymentId = null)
     {
         return $query->where('user_id', auth()->id())
-            ->update(['status' => \DB::raw("CASE WHEN stripe_payment_method_id = '{$paymentId}' THEN 'active' ELSE 'inactive' END")]);
+            ->update(['status' => \DB::raw("CASE WHEN stripe_payment_method_id = '{$paymentId}' THEN '" . self::STATUS_ACTIVE . "' ELSE '" . self::STATUS_INACTIVE . "' END")]);
     }
 
 }

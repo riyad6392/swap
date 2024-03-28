@@ -101,8 +101,22 @@ class PaymentMethodController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($payment_method_id)
     {
-
+        try {
+            $paymentMethod = StripePaymentFacade::detachCustomerPaymentMethod(
+                $payment_method_id
+            );
+            PaymentMethods::where(
+                [
+                    ['user_id', auth()->id()],
+                    ['stripe_payment_method_id', $payment_method_id]
+                ])
+                ->update(['status', PaymentMethods::STATUS_INACTIVE]);
+            return response()->json(['success' => true, 'message' => $paymentMethod], 201);
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'errors' => ['message' => [$exception->getMessage()]]], 500);
+        }
     }
 }

@@ -76,6 +76,10 @@ class StripePaymentService
             ['invoice_settings' => ['default_payment_method' => $paymentMethod]]
         );
     }
+    public function detachCustomerPaymentMethod($paymentMethod)
+    {
+        return $this->stripe->paymentMethods->detach($paymentMethod);
+    }
     public function cancelSubscription($subscriptionId): \Stripe\Subscription
     {
         return $this->stripe->subscriptions->cancel(
