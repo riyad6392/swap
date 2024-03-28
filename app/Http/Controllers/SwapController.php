@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Swap\StoreSwapExchangeDetailsRequest;
 use App\Http\Requests\Swap\StoreSwapRequest;
 use App\Http\Requests\Swap\StoreSwapRequestDetails;
-use App\Http\Requests\Swap\UpdateSwapExchangeDetailsRequest;
+use App\Http\Requests\Swap\StoreSwapRequestDetailsRequest;
+use App\Http\Requests\Swap\UpdateSwapDetailsRequest;
 use App\Http\Requests\Swap\UpdateSwapRequest;
 use App\Models\Product;
 use App\Models\ProductVariation;
 use App\Models\Swap;
-use App\Models\SwapExchangeDetail;
+use App\Models\SwapExchangeDetails;
+use App\Models\SwapRequestDetails;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -161,7 +163,6 @@ class SwapController extends Controller
      */
     public function store(StoreSwapRequest $swapRequest, StoreSwapExchangeDetailsRequest $SwapExchangeDetailsRequest): \Illuminate\Http\JsonResponse
     {
-        dd($SwapExchangeDetailsRequest->all());
         try {
             DB::beginTransaction();
 
@@ -174,8 +175,13 @@ class SwapController extends Controller
                 ]
             );
 
-            $prepareData = $this->prepareDetailsData($SwapExchangeDetailsRequest, $swap, 'exchange_product');
-            SwapExchangeDetail::insert($prepareData['insertData']);
+            $prepareData = $this->prepareDetailsData(
+                $SwapExchangeDetailsRequest,
+                $swap,
+                $SwapExchangeDetailsRequest->define_type
+            );
+
+            SwapExchangeDetails::insert($prepareData['insertData']);
 
             $swap->update(
                 [
@@ -325,36 +331,36 @@ class SwapController extends Controller
      *     )
      * )
      */
-    public function update(UpdateSwapRequest                $updateSwapRequest,
-                           UpdateSwapExchangeDetailsRequest $SwapExchangeDetailsRequest,
-                           Swap                             $swap)
+    public function update(UpdateSwapRequest        $updateSwapRequest,
+                           UpdateSwapDetailsRequest $SwapExchangeDetailsRequest,
+                           Swap                     $swap)
     {
         try {
             DB::beginTransaction();
 
-//            $swap->update($updateSwapRequest->only(
-//                [
-//                    'requested_user_id',
-//                    'exchanged_user_id',
-//                    'status',
-//                ]
-//            ));
+            $prepareData = $this->prepareDetailsData(
+                $SwapExchangeDetailsRequest,
+                $swap,
+                $SwapExchangeDetailsRequest->define_type
+            );
 
-            $prepareData = $this->prepareDetailsData($SwapExchangeDetailsRequest, $swap, 'exchange_product');
-            SwapExchangeDetail::insert($prepareData['insertData']);
+            SwapExchangeDetails::insert($prepareData['insertData']);
 
-            /// TODO: Need to delete the previous data
-            $this->deleteDetailsData($updateSwapRequest->deleted_id, $swap);
+            $this->deleteDetailsData(
+                $updateSwapRequest->deleted_details_id,
+                $swap ,
+                $this->matchClass($SwapExchangeDetailsRequest->define_type)
+            );
 
-            ///TODO: Need to update the total amount and commission
-            $totalAmountAndCommission = $this->calculateTotalAmountAndCommission($swap);
+            $totalAmountAndCommission = $this->calculateTotalAmountAndCommission($swap,$this->matchClass($SwapExchangeDetailsRequest->define_type));
+            dd('$deleted_id, $swap ,$define_type');
 
             $swap->update(
                 [
-                    'exchanged_wholesale_amount' => $prepareData['wholeSaleAmount'] +
-                        $totalAmountAndCommission['wholeSaleAmount'],
+                    'exchanged_wholesale_amount' => (int) $prepareData['wholeSaleAmount'] +
+                        (int) $totalAmountAndCommission['wholeSaleAmount'],
                     'exchanged_total_commission' => $prepareData['totalCommission'] +
-                        $totalAmountAndCommission['totalCommission'],
+                        (int) $totalAmountAndCommission['totalCommission'],
                 ]
             );
 
@@ -420,29 +426,58 @@ class SwapController extends Controller
 
             if ($variation) {
                 $insertData[] = [
+                    'uid' => uniqid(),
+                    'user_id' => auth()->id(),
+                    'swap_id' => $swap->id,
                     'product_id' => $product['product_id'],
                     'product_variation_id' => $product['variation_id'],
                     'quantity' => $product['variation_quantity'],
-                    'uid' => uniqid(),
-                    'swap_id' => $swap->id,
                     'unit_price' => $variation->unit_price ?? 0,
-                    'amount' => $product['variation_quantity'] *
-                        $variation->unit_price ?? 0,
-                    'commission' => ($product['variation_quantity'] *
-                        $variation->unit_price ?? 0) *
-                        self::COMMISSION_PERCENTAGE,
-                    'user_id' => auth()->id(),
+                    'amount' => $product['variation_quantity'] * $variation->unit_price ?? 0,
+                    'commission' => ($product['variation_quantity'] * $variation->unit_price ?? 0) * self::COMMISSION_PERCENTAGE,
                     'created_by' => auth()->id(),
                     'updated_by' => auth()->id(),
                 ];
-                $wholeSaleAmount += $product['variation_quantity'] *
-                    $variation->unit_price ?? 0;
-                $totalCommission += ($product['variation_quantity'] *
-                    $variation->unit_price ?? 0) * self::COMMISSION_PERCENTAGE;
+                $wholeSaleAmount += $product['variation_quantity'] * $variation->unit_price ?? 0;
+                $totalCommission += ($product['variation_quantity'] * $variation->unit_price ?? 0) * self::COMMISSION_PERCENTAGE;
             }
         }
         return ['insertData' => $insertData, 'wholeSaleAmount' => $wholeSaleAmount, 'totalCommission' => $totalCommission];
     }
+
+    protected function deleteDetailsData($deleted_id, $swap ,$class): void
+    {
+        if (gettype($deleted_id) == 'string') $deleted_id = json_decode($deleted_id);
+
+        $class::where('user_id', auth()->id())
+            ->where('swap_id', $swap->id)
+            ->whereIn('id', $deleted_id)
+            ->delete();
+
+    }
+
+    protected function calculateTotalAmountAndCommission($swap ,$class): array
+    {
+        $wholeSaleAmount = 0;
+        $totalCommission = 0;
+
+        $detailsData = $swap->load('exchangeDetails');
+
+        foreach ($detailsData as $detail) {
+            $wholeSaleAmount += $detail->amount;
+            $totalCommission += $detail->commission;
+        }
+        return ['wholeSaleAmount' => $wholeSaleAmount, 'totalCommission' => $totalCommission];
+    }
+
+    protected function matchClass($define_type): string
+    {
+        return match ($define_type) {
+            'exchange_product' => SwapExchangeDetails::class,
+            'request_product' => SwapRequestDetails::class,
+        };
+    }
+
 
 
 }

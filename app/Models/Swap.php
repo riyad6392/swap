@@ -25,11 +25,11 @@ class Swap extends Model
 
     public function exchangeDetails()
     {
-        return $this->hasMany(SwapExchangeDetail::class);
+        return $this->hasMany(SwapExchangeDetails::class);
     }
     public function requestDetail()
     {
-        return $this->hasMany(SwapRequestDetail::class);
+        return $this->hasMany(SwapRequestDetails::class);
     }
     public function shipments()
     {

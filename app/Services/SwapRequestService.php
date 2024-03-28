@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\ProductVariation;
-use App\Models\SwapExchangeDetail;
+use App\Models\SwapExchangeDetails;
 
 class SwapRequestService
 {
@@ -45,7 +45,7 @@ class SwapRequestService
 
     protected function deleteDetailsData($deleted_id, $swap): void
     {
-        SwapExchangeDetail::where('user_id', auth()->id())
+        SwapExchangeDetails::where('user_id', auth()->id())
             ->where('swap_id', $swap->id)
             ->whereIn('id', $deleted_id)
             ->delete();

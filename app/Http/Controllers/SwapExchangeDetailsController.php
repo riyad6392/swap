@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Swap\StoreSwapExchangeDetailsRequest;
-use App\Http\Requests\Swap\UpdateSwapExchangeDetailsRequest;
-use App\Models\SwapExchangeDetail;
+use App\Http\Requests\Swap\UpdateSwapDetailsRequest;
+use App\Models\SwapExchangeDetails;
 
 class SwapExchangeDetailsController extends Controller
 {
@@ -60,7 +60,7 @@ class SwapExchangeDetailsController extends Controller
      */
     public function index()
     {
-        $swap_exchange_details = SwapExchangeDetail::paginate(self::PER_PAGE);
+        $swap_exchange_details = SwapExchangeDetails::paginate(self::PER_PAGE);
         return response()->json(['success' => true, 'data' => $swap_exchange_details]);
     }
 
@@ -159,7 +159,7 @@ class SwapExchangeDetailsController extends Controller
         try {
             DB::beginTransaction();
 
-            $swap = SwapExchangeDetail::create($storeSwapExchangeDetails->only(
+            $swap = SwapExchangeDetails::create($storeSwapExchangeDetails->only(
                 [
                     'swap_id',
                     'user_id',
@@ -211,7 +211,7 @@ class SwapExchangeDetailsController extends Controller
      *     )
      * )
      */
-    public function show(SwapExchangeDetail $SwapExchangeDetail)
+    public function show(SwapExchangeDetails $SwapExchangeDetail)
     {
         try {
             return response()->json(['success' => true, 'data' => $SwapExchangeDetail], 200);
@@ -251,7 +251,7 @@ class SwapExchangeDetailsController extends Controller
      *     )
      * )
      */
-    public function edit(SwapExchangeDetail $SwapExchangeDetail)
+    public function edit(SwapExchangeDetails $SwapExchangeDetail)
     {
         return response()->json(['success' => true, 'data' => $SwapExchangeDetail], 200);
     }
@@ -345,7 +345,7 @@ class SwapExchangeDetailsController extends Controller
      *      )
      * )
      */
-    public function update(UpdateSwapExchangeDetailsRequest $updateSwapExchangeDetails, SwapExchangeDetail $SwapExchangeDetail)
+    public function update(UpdateSwapDetailsRequest $updateSwapExchangeDetails, SwapExchangeDetails $SwapExchangeDetail)
     {
         try {
             DB::beginTransaction();
@@ -401,7 +401,7 @@ class SwapExchangeDetailsController extends Controller
      *     )
      * )
      */
-    public function destroy(SwapExchangeDetail $SwapExchangeDetail)
+    public function destroy(SwapExchangeDetails $SwapExchangeDetail)
     {
         $SwapExchangeDetail->delete();
         return response()->json(['success' => true, 'message' => 'Swap exchange details data deleted successfully'], 200);
