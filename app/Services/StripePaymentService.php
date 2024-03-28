@@ -66,12 +66,10 @@ class StripePaymentService
             $paymentMethod,
             ['customer' => $user->stripe_customer_id]
         );
-        return $this->stripe->customers->update(
-            $user->stripe_customer_id,
-            ['invoice_settings' => ['default_payment_method' => $paymentMethod]]
-        );
+
+        return $this->updateCustomerPaymentMethod($paymentMethod, $user);
     }
-    public function updateCustomerPaymentMethod($paymentMethod, $user)
+    public function updateCustomerPaymentMethod($paymentMethod, $user): \Stripe\Customer
     {
         return $this->stripe->customers->update(
             $user->stripe_customer_id,
