@@ -24,8 +24,10 @@ class PaymentMethods extends Model
     public static function boot(){
         parent::boot();
         self::bootCreatedUpdatedBy();
+        static::updatePaymentMethodStatus();
+
     }
-    public function scopeUpdatePaymentMethodStatus(Builder $query, $paymentId)
+    public function scopeUpdatePaymentMethodStatus(Builder $query, $paymentId = null)
     {
         return $query->where('user_id', auth()->id())
             ->update(['status' => \DB::raw("CASE WHEN stripe_payment_method_id = '{$paymentId}' THEN 'active' ELSE 'inactive' END")]);
