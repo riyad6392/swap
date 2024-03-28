@@ -4,7 +4,7 @@ namespace App\Http\Requests\Swap;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateSwapExchangeDetails extends FormRequest
+class UpdateSwapExchangeDetailsRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

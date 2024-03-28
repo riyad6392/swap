@@ -16,7 +16,7 @@ return new class extends Migration
             $table->integer('product_id');
             $table->string('size');
             $table->string('color');
-            $table->decimal('price', 10, 2);
+            $table->decimal('unit_price', 10, 2);
             $table->integer('stock');
             $table->double('discount', 10, 2)->nullable();
             $table->integer('quantity');

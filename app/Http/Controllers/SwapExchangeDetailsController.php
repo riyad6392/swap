@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Swap\StoreSwapExchageDetails;
-use App\Http\Requests\Swap\UpdateSwapExchangeDetails;
+use App\Http\Requests\Swap\StoreSwapExchangeDetailsRequest;
+use App\Http\Requests\Swap\UpdateSwapExchangeDetailsRequest;
 use App\Models\SwapExchangeDetail;
 
 class SwapExchangeDetailsController extends Controller
@@ -154,7 +154,7 @@ class SwapExchangeDetailsController extends Controller
      *      )
      * )
      */
-    public function store(StoreSwapExchageDetails $storeSwapExchangeDetails)
+    public function store(StoreSwapExchangeDetailsRequest $storeSwapExchangeDetails)
     {
         try {
             DB::beginTransaction();
@@ -345,7 +345,7 @@ class SwapExchangeDetailsController extends Controller
      *      )
      * )
      */
-    public function update(UpdateSwapExchangeDetails $updateSwapExchangeDetails, SwapExchangeDetail $SwapExchangeDetail)
+    public function update(UpdateSwapExchangeDetailsRequest $updateSwapExchangeDetails, SwapExchangeDetail $SwapExchangeDetail)
     {
         try {
             DB::beginTransaction();
