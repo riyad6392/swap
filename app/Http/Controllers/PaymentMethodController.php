@@ -88,12 +88,8 @@ class PaymentMethodController extends Controller
                 $paymentId,
                 $user
             );
-            
-            PaymentMethods::query()
-                ->where('user_id', $user->id)
-                ->update([
-                    'status' => \DB::raw("CASE WHEN stripe_payment_method_id = '{$paymentId}' THEN 'active' ELSE 'inactive' END")
-                ]);
+
+            PaymentMethods::updatePaymentMethodStatus($paymentId);
 
             return response()->json(['success' => true, 'message' => $paymentMethod], 201);
         } catch (\Exception $exception) {
