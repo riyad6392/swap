@@ -352,7 +352,11 @@ class SwapController extends Controller
                 $this->matchClass($SwapExchangeDetailsRequest->define_type)
             );
 
-            $totalAmountAndCommission = $this->calculateTotalAmountAndCommission($swap,$this->matchClass($SwapExchangeDetailsRequest->define_type));
+            $totalAmountAndCommission = $this->calculateTotalAmountAndCommission(
+                $swap,
+                $this->matchRelation($SwapExchangeDetailsRequest->define_type)
+            );
+            
             dd('$deleted_id, $swap ,$define_type');
 
             $swap->update(
@@ -475,6 +479,14 @@ class SwapController extends Controller
         return match ($define_type) {
             'exchange_product' => SwapExchangeDetails::class,
             'request_product' => SwapRequestDetails::class,
+        };
+    }
+
+    public function matchRelation($define_type): string
+    {
+        return match ($define_type) {
+            'exchange_product' => 'exchangeDetails',
+            'request_product' => 'requestDetail',
         };
     }
 
