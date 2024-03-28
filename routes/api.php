@@ -50,6 +50,9 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::resource('product', \App\Http\Controllers\ProductController::class);
         Route::resource('plan', \App\Http\Controllers\PlanController::class);
 
+        //rating
+        Route::apiResource('ratings', \App\Http\Controllers\RatingController::class);
+
         //swap
 
         Route::resource('swap', \App\Http\Controllers\SwapController::class);
