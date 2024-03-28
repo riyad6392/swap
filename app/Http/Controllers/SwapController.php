@@ -356,7 +356,7 @@ class SwapController extends Controller
                 $swap,
                 $this->matchRelation($SwapExchangeDetailsRequest->define_type)
             );
-            
+
             dd('$deleted_id, $swap ,$define_type');
 
             $swap->update(
