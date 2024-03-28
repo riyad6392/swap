@@ -71,6 +71,13 @@ class StripePaymentService
             ['invoice_settings' => ['default_payment_method' => $paymentMethod]]
         );
     }
+    public function updateCustomerPaymentMethod($paymentMethod, $user)
+    {
+        return $this->stripe->customers->update(
+            $user->stripe_customer_id,
+            ['invoice_settings' => ['default_payment_method' => $paymentMethod]]
+        );
+    }
     public function cancelSubscription($subscriptionId): \Stripe\Subscription
     {
         return $this->stripe->subscriptions->cancel(

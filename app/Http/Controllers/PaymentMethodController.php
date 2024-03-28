@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Facades\StripePaymentFacade;
 use App\Http\Requests\paymentMethod\StorePaymentMethodRequest;
+use App\Http\Requests\paymentMethod\UpdatePaymentMethodRequest;
 use App\Models\PaymentMethods;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -44,7 +45,7 @@ class PaymentMethodController extends Controller
             ]);
 
             $paymentMethod = StripePaymentFacade::attachPaymentMethodToCustomer(
-                $paymentMethod->stripe_payment_method_id,
+                trim($paymentMethod->stripe_payment_method_id),
                 auth()->user()
             );
 
@@ -77,9 +78,28 @@ class PaymentMethodController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdatePaymentMethodRequest $updatePaymentMethodRequest)
     {
-        //
+        $user = auth()->user();
+        $paymentId = trim($updatePaymentMethodRequest->stripe_payment_method_id);
+        try {
+
+            $paymentMethod = StripePaymentFacade::updateCustomerPaymentMethod(
+                $paymentId,
+                $user
+            );
+            
+            PaymentMethods::query()
+                ->where('user_id', $user->id)
+                ->update([
+                    'status' => \DB::raw("CASE WHEN stripe_payment_method_id = '{$paymentId}' THEN 'active' ELSE 'inactive' END")
+                ]);
+
+            return response()->json(['success' => true, 'message' => $paymentMethod], 201);
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'errors' => ['message' => [$exception->getMessage()]]], 500);
+        }
     }
 
     /**
@@ -87,6 +107,6 @@ class PaymentMethodController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+
     }
 }

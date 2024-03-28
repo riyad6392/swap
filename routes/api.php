@@ -71,6 +71,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     //Payment Method
 
     Route::post('payment-method', [PaymentMethodController::class, 'store']);
+    Route::put('update-payment-method', [PaymentMethodController::class, 'update']);
 
 
 
