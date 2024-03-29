@@ -161,7 +161,8 @@ class SwapController extends Controller
      *      )
      * )
      */
-    public function store(StoreSwapRequest $swapRequest, StoreSwapExchangeDetailsRequest $SwapExchangeDetailsRequest): \Illuminate\Http\JsonResponse
+    public function store(StoreSwapRequest $swapRequest,
+                          StoreSwapExchangeDetailsRequest $SwapExchangeDetailsRequest): \Illuminate\Http\JsonResponse
     {
         try {
             DB::beginTransaction();
