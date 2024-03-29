@@ -6,7 +6,7 @@ use App\Traits\ModelAttributeTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SwapExchangeDetail extends Model
+class SwapExchangeDetails extends Model
 {
     use HasFactory, ModelAttributeTrait;
 

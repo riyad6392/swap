@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Swap\StoreSwapRequestDetails;
 use App\Http\Requests\Swap\UpdateSwapRequestDetails;
-use App\Models\SwapRequestDetail;
+use App\Models\SwapRequestDetails;
 use Illuminate\Support\Facades\DB;
 
 class SwapRequestDetailsController extends Controller
@@ -61,7 +61,7 @@ class SwapRequestDetailsController extends Controller
      */
     public function index()
     {
-        $swap_request_details = SwapRequestDetail::paginate(self::PER_PAGE);
+        $swap_request_details = SwapRequestDetails::paginate(self::PER_PAGE);
         return response()->json(['success' => true, 'data' => $swap_request_details]);
     }
 
@@ -159,7 +159,7 @@ class SwapRequestDetailsController extends Controller
         try {
             DB::beginTransaction();
 
-            $swap = SwapRequestDetail::create($storeSwapRequestDetails->only(
+            $swap = SwapRequestDetails::create($storeSwapRequestDetails->only(
                 [
                     'swap_id',
                     'user_id',
@@ -211,7 +211,7 @@ class SwapRequestDetailsController extends Controller
      *     )
      * )
      */
-    public function show(SwapRequestDetail $swapRequestDetail)
+    public function show(SwapRequestDetails $swapRequestDetail)
     {
         try {
             return response()->json(['success' => true, 'data' => $swapRequestDetail], 200);
@@ -251,7 +251,7 @@ class SwapRequestDetailsController extends Controller
      *     )
      * )
      */
-    public function edit(SwapRequestDetail $swapRequestDetail)
+    public function edit(SwapRequestDetails $swapRequestDetail)
     {
         return response()->json(['success' => true, 'data' => $swapRequestDetail], 200);
     }
@@ -345,7 +345,7 @@ class SwapRequestDetailsController extends Controller
      *      )
      * )
      */
-    public function update(UpdateSwapRequestDetails $updateSwapRequestDetails, SwapRequestDetail $swapRequestDetail)
+    public function update(UpdateSwapRequestDetails $updateSwapRequestDetails, SwapRequestDetails $swapRequestDetail)
     {
         try {
             DB::beginTransaction();
@@ -401,7 +401,7 @@ class SwapRequestDetailsController extends Controller
      *     )
      * )
      */
-    public function destroy(SwapRequestDetail $swapRequestDetail)
+    public function destroy(SwapRequestDetails $swapRequestDetail)
     {
         $swapRequestDetail->delete();
         return response()->json(['success' => true, 'message' => 'Swap request details data deleted successfully'], 200);

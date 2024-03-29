@@ -26,10 +26,10 @@ class Handler extends ExceptionHandler
     {
         $this->renderable(function (Throwable $exception, $request) {
 
-            if ($exception instanceof NotFoundHttpException && $request->is('api/*')) {
-                return response()->json(['success' => false, 'message' => 'Data not found'], 404);
-            }
-
+//            if ($exception instanceof NotFoundHttpException && $request->is('api/*')) {
+//                return response()->json(['success' => false, 'message' => 'Data not found'], 404);
+//            }
+//
 //            if ($request->is('api/*')) {
 //                return response()->json(['success' => false, 'message' => 'Failed to retrieve data'], 500);
 //            }

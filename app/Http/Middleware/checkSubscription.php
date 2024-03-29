@@ -17,7 +17,7 @@ class checkSubscription
     {
         if (auth()->guard('api')->check()) {
             $user = auth()->guard('api')->user();
-            if ($user->subscription_is_check) {
+            if (!$user->subscription_is_active) {
                 return response()->json([
                     'success' => false,
                     'message' => 'You are not subscribed to any plan.'
