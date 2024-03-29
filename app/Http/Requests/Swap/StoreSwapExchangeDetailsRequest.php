@@ -28,8 +28,8 @@ class StoreSwapExchangeDetailsRequest extends FormRequest
     {
         return [
             'define_type' => 'required|string|in:exchange_product',
-            'exchange_product.*.product_id' => 'required|integer',
-            'exchange_product.*.variation_id' => 'required|integer',
+            'exchange_product.*.product_id' => 'required|integer|exists:products,id',
+            'exchange_product.*.variation_id' => 'required|integer|exists:product_variations,id',
             'exchange_product.*.variation_size' => 'required',
             'exchange_product.*.variation_color' => 'required',
             'exchange_product.*.variation_quantity' => 'nullable|numeric',
@@ -47,6 +47,8 @@ class StoreSwapExchangeDetailsRequest extends FormRequest
             'define_type.in' => 'Define type must be either request_product or exchange_product',
 
             'exchange_product.*.product_id.required' => 'Product id is required',
+            'exchange_product.*.product_id.integer' => 'Product id must be a number',
+            'exchange_product.*.product_id.exists' => 'Product id does not exist',
             'exchange_product.*.variation_id.required' => 'Variation id is required',
             'exchange_product.*.variation_size.required' => 'Variation size is required',
             'exchange_product.*.variation_color.required' => 'Variation color is required',

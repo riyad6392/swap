@@ -15,6 +15,11 @@ Route::post('admin/refresh-token', [LoginController::class, 'refreshToken']);
 
 Route::group(['middleware' => 'auth:admin-api'], function () {
     Route::get('/admin-test' , function(){
+        foreach (array_keys(config('auth.guards')) as $guard) {
+
+            if (auth()->guard($guard)->check()) return $guard;
+        }
+        return null;
         return response()->json(['success' => true, 'message' => 'You are authorized to access this data!'], 200);
     })->name('data');
 

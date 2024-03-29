@@ -3691,45 +3691,68 @@
                         }
                     },
                     {
-                        "name": "requested_wholesale_amount",
-                        "in": "query",
-                        "description": "Requested Wholesale Amount",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 100
-                        }
-                    },
-                    {
-                        "name": "exchanged_wholesale_amount",
+                        "name": "define_type",
                         "in": "query",
                         "description": "Exchanged Wholesale Amount",
                         "required": true,
                         "schema": {
-                            "type": "integer",
-                            "example": 120
+                            "type": "enum",
+                            "example": "exchange_product | request_product"
                         }
                     },
                     {
-                        "name": "requested_total_commission",
+                        "name": "exchange_product[0][product_id]",
                         "in": "query",
-                        "description": "Requested Total Commission",
+                        "description": "Product ID",
                         "required": true,
                         "schema": {
                             "type": "number",
-                            "format": "double",
-                            "example": 10.5
+                            "format": "integer",
+                            "example": 1
                         }
                     },
                     {
-                        "name": "exchanged_total_commission",
+                        "name": "exchange_product[0][variation_id]",
                         "in": "query",
-                        "description": "Exchanged Total Commission",
+                        "description": "Product ID",
                         "required": true,
                         "schema": {
                             "type": "number",
-                            "format": "double",
-                            "example": 12.5
+                            "format": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "exchange_product[0][variation_size]",
+                        "in": "query",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "exchange_product[0][variation_color]",
+                        "in": "query",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "exchange_product[0][variation_quantity]",
+                        "in": "query",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "integer",
+                            "example": 1
                         }
                     }
                 ],

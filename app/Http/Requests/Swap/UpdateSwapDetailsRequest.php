@@ -31,8 +31,8 @@ class UpdateSwapDetailsRequest extends FormRequest
         if ($this->define_type == 'exchange_product') {
             $rules = [
 //                'define_type' => 'required|string|in:request_product,exchange_product',
-                'exchange_product.*.product_id' => 'required|integer',
-                'exchange_product.*.variation_id' => 'required|integer',
+                'exchange_product.*.product_id' => 'required|integer|exists:products,id',
+                'exchange_product.*.variation_id' => 'required|integer|exists:product_variations,id',
                 'exchange_product.*.variation_size' => 'required',
                 'exchange_product.*.variation_color' => 'required',
                 'exchange_product.*.variation_quantity' => 'nullable|numeric',
@@ -41,8 +41,8 @@ class UpdateSwapDetailsRequest extends FormRequest
         } else {
             $rules = [
 //                'define_type' => 'required|string|in:request_product,exchange_product',
-                'request_product.*.product_id' => 'required|integer',
-                'request_product.*.variation_id' => 'required|integer',
+                'request_product.*.product_id' => 'required|integer|exists:products,id',
+                'request_product.*.variation_id' => 'required|integer|exists:product_variations,id',
                 'request_product.*.variation_size' => 'required',
                 'request_product.*.variation_color' => 'required',
                 'request_product.*.variation_quantity' => 'nullable|numeric',
@@ -59,6 +59,8 @@ class UpdateSwapDetailsRequest extends FormRequest
             'define_type.in' => 'Define type must be either request_product or exchange_product',
 
             'exchange_product.*.product_id.required' => 'Product id is required',
+            'exchange_product.*.product_id.integer' => 'Product id must be a number',
+            'exchange_product.*.product_id.exists' => 'Product id does not exist',
             'exchange_product.*.variation_id.required' => 'Variation id is required',
             'exchange_product.*.variation_size.required' => 'Variation size is required',
             'exchange_product.*.variation_color.required' => 'Variation color is required',
@@ -66,6 +68,8 @@ class UpdateSwapDetailsRequest extends FormRequest
             'exchange_product.*.discount_end_date.date' => 'Discount end date must be a date',
 
             'request_product.*.product_id.required' => 'Product id is required',
+            'request_product.*.product_id.integer' => 'Product id must be a number',
+            'request_product.*.product_id.exists' => 'Product id does not exist',
             'request_product.*.variation_id.required' => 'Variation id is required',
             'request_product.*.variation_size.required' => 'Variation size is required',
             'request_product.*.variation_color.required' => 'Variation color is required',

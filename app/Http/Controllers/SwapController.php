@@ -111,33 +111,46 @@ class SwapController extends Controller
      *     ),
      *     @OA\Parameter(
      *         in="query",
-     *         name="requested_wholesale_amount",
-     *         required=true,
-     *         description="Requested Wholesale Amount",
-     *         @OA\Schema(type="integer", example=100),
-     *     ),
-     *     @OA\Parameter(
-     *         in="query",
-     *         name="exchanged_wholesale_amount",
+     *         name="define_type",
      *         required=true,
      *         description="Exchanged Wholesale Amount",
-     *         @OA\Schema(type="integer", example=120),
+     *         @OA\Schema(type="enum", example="exchange_product | request_product"),
      *     ),
      *     @OA\Parameter(
      *         in="query",
-     *         name="requested_total_commission",
+     *         name="exchange_product[0][product_id]",
      *         required=true,
-     *         description="Requested Total Commission",
-     *         @OA\Schema(type="number", format="double", example=10.5),
+     *         description="Product ID",
+     *         @OA\Schema(type="number", format="integer", example=1),
      *     ),
      *     @OA\Parameter(
      *         in="query",
-     *         name="exchanged_total_commission",
+     *         name="exchange_product[0][variation_id]",
      *         required=true,
-     *         description="Exchanged Total Commission",
-     *         @OA\Schema(type="number", format="double", example=12.5),
+     *         description="Product ID",
+     *         @OA\Schema(type="number", format="integer", example=1),
      *     ),
-     *
+     *     @OA\Parameter(
+     *          in="query",
+     *          name="exchange_product[0][variation_size]",
+     *          required=true,
+     *          description="Product ID",
+     *          @OA\Schema(type="number", format="integer", example=1),
+     *      ),
+     *     @OA\Parameter(
+     *          in="query",
+     *          name="exchange_product[0][variation_color]",
+     *          required=true,
+     *          description="Product ID",
+     *          @OA\Schema(type="number", format="integer", example=1),
+     *      ),
+     *     @OA\Parameter(
+     *          in="query",
+     *          name="exchange_product[0][variation_quantity]",
+     *          required=true,
+     *          description="Product ID",
+     *          @OA\Schema(type="number", format="integer", example=1),
+     *      ),
      *     @OA\Response(
      *          response=200,
      *          description="success",
@@ -164,6 +177,7 @@ class SwapController extends Controller
     public function store(StoreSwapRequest $swapRequest,
                           StoreSwapExchangeDetailsRequest $SwapExchangeDetailsRequest): \Illuminate\Http\JsonResponse
     {
+        dd($swapRequest, $SwapExchangeDetailsRequest);
         try {
             DB::beginTransaction();
 
@@ -236,71 +250,97 @@ class SwapController extends Controller
     }
 
     /**
-     * Update Swap.
+     * Edit Swap.
      *
      * @OA\Post (
      *     path="/api/swap/{id}",
      *     tags={"Swaps"},
      *     security={{ "apiAuth": {} }},
-     *     summary="Update an existing swap",
-     *     @OA\Parameter(
-     *         in="path",
-     *         name="id",
-     *         required=true,
-     *         description="ID of the swap to update",
-     *         @OA\Schema(type="integer", example=1),
-     *     ),
-     *
+     *     summary="Create a new swap",
      *     @OA\Parameter(
      *         in="query",
-     *         name="requested_user_id",
-     *         required=true,
-     *         description="Requested User ID",
-     *         @OA\Schema(type="integer", example=2),
-     *     ),
-     *     @OA\Parameter(
-     *         in="query",
-     *         name="exchanged_user_id",
-     *         required=true,
-     *         description="Exchanged User ID",
-     *         @OA\Schema(type="integer", example=3),
-     *     ),
-     *     @OA\Parameter(
-     *         in="query",
-     *         name="status",
-     *         required=true,
-     *         description="Status",
-     *         @OA\Schema(type="string", example="pending"),
-     *     ),
-     *     @OA\Parameter(
-     *         in="query",
-     *         name="requested_wholesale_amount",
-     *         required=true,
-     *         description="Requested Wholesale Amount",
-     *         @OA\Schema(type="integer", example=100),
-     *     ),
-     *     @OA\Parameter(
-     *         in="query",
-     *         name="exchanged_wholesale_amount",
+     *         name="define_type",
      *         required=true,
      *         description="Exchanged Wholesale Amount",
-     *         @OA\Schema(type="integer", example=120),
+     *         @OA\Schema(type="enum", example="exchange_product | request_product"),
      *     ),
      *     @OA\Parameter(
      *         in="query",
-     *         name="requested_total_commission",
+     *         name="exchange_product[0][product_id]",
      *         required=true,
-     *         description="Requested Total Commission",
-     *         @OA\Schema(type="number", format="double", example=10.5),
+     *         description="Product ID",
+     *         @OA\Schema(type="number", format="integer", example=1),
      *     ),
      *     @OA\Parameter(
      *         in="query",
-     *         name="exchanged_total_commission",
+     *         name="exchange_product[0][variation_id]",
      *         required=true,
-     *         description="Exchanged Total Commission",
-     *         @OA\Schema(type="number", format="double", example=12.5),
+     *         description="Product ID",
+     *         @OA\Schema(type="number", format="integer", example=1),
      *     ),
-     *
+     *     @OA\Parameter(
+     *          in="query",
+     *          name="exchange_product[0][variation_size]",
+     *          required=true,
+     *          description="Product ID",
+     *          @OA\Schema(type="number", format="integer", example=1),
+     *      ),
+     *     @OA\Parameter(
+     *          in="query",
+     *          name="exchange_product[0][variation_color]",
+     *          required=true,
+     *          description="Product ID",
+     *          @OA\Schema(type="number", format="integer", example=1),
+     *      ),
+     *     @OA\Parameter(
+     *          in="query",
+     *          name="exchange_product[0][variation_quantity]",
+     *          required=true,
+     *          description="Product ID",
+     *          @OA\Schema(type="number", format="integer", example=1),
+     *      ),
+     *          @OA\Parameter(
+     *          in="query",
+     *          name="define_type",
+     *          required=true,
+     *          description="Exchanged Wholesale Amount",
+     *          @OA\Schema(type="enum", example="exchange_product | request_product"),
+     *      ),
+     *      @OA\Parameter(
+     *          in="query",
+     *          name="request_product[0][product_id]",
+     *          required=true,
+     *          description="Product ID",
+     *          @OA\Schema(type="number", format="integer", example=1),
+     *      ),
+     *      @OA\Parameter(
+     *          in="query",
+     *          name="request_product[0][variation_id]",
+     *          required=true,
+     *          description="Product ID",
+     *          @OA\Schema(type="number", format="integer", example=1),
+     *      ),
+     *      @OA\Parameter(
+     *           in="query",
+     *           name="request_product[0][variation_size]",
+     *           required=true,
+     *           description="Product ID",
+     *           @OA\Schema(type="number", format="integer", example=1),
+     *       ),
+     *      @OA\Parameter(
+     *           in="query",
+     *           name="request_product[0][variation_color]",
+     *           required=true,
+     *           description="Product ID",
+     *           @OA\Schema(type="number", format="integer", example=1),
+     *       ),
+     *      @OA\Parameter(
+     *           in="query",
+     *           name="request_product[0][variation_quantity]",
+     *           required=true,
+     *           description="Product ID",
+     *           @OA\Schema(type="number", format="integer", example=1),
+     *       ),
      *     @OA\Response(
      *          response=200,
      *          description="success",
@@ -308,7 +348,7 @@ class SwapController extends Controller
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="success", type="boolean", example="true"),
-     *               @OA\Property(property="errors", type="json", example={"message": {"Swap updated successfully."}}),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Swap created successfully."}}),
      *          ),
      *      ),
      *
@@ -321,15 +361,7 @@ class SwapController extends Controller
      *              @OA\Property(property="success", type="boolean", example="false"),
      *              @OA\Property(property="errors", type="json", example={"message": {"The given data was invalid."}}),
      *          )
-     *      ),
-     *      @OA\Response(
-     *         response=404,
-     *         description="Swap not found",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example="false"),
-     *             @OA\Property(property="message", type="string", example="Swap not found")
-     *         )
-     *     )
+     *      )
      * )
      */
     public function update(UpdateSwapRequest        $updateSwapRequest,

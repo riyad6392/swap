@@ -24,8 +24,8 @@ class UpdateSwapRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'requested_user_id' => 'sometimes|required|integer',
-            'exchanged_user_id' => 'sometimes|required|integer',
+            'requested_user_id' => 'sometimes|required|integer|exists:users,id',
+            'exchanged_user_id' => 'sometimes|required|integer|exists:users,id',
             'status' => 'sometimes|required|string',
 
 //            'requested_wholesale_amount' => 'sometimes|required|integer',
@@ -42,7 +42,9 @@ class UpdateSwapRequest extends FormRequest
             'define_type.string' => 'Define type must be a string',
             'define_type.in' => 'Define type must be either request_product or exchange_product',
             'requested_user_id.required' => 'Requested user id is required',
+            'requested_user_id.exists' => 'Requested user id does not exist',
             'requested_user_id.integer' => 'Requested user id must be a number',
+            'exchanged_user_id.exists' => 'Exchanged user id does not exist',
             'exchanged_user_id.required' => 'Exchanged user id is required',
             'exchanged_user_id.integer' => 'Exchanged user id must be a number',
             'status.required' => 'Status is required',

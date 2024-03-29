@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\RegistrationController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\PlanSubscriptionController;
+use App\Http\Controllers\RatingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
