@@ -19,6 +19,7 @@ Route::group(['middleware' => 'auth:admin-api'], function () {
     })->name('data');
 
     Route::post('admin/logout', [LoginController::class, 'logout']);
+    Route::post('admin/approve-user/{user}', 'AdminController@approveUser')->name('admin.approve-user');
 
 //    Route::resource('product', \App\Http\Controllers\ProductController::class);
 
