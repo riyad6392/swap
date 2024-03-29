@@ -177,7 +177,6 @@ class SwapController extends Controller
     public function store(StoreSwapRequest $swapRequest,
                           StoreSwapExchangeDetailsRequest $SwapExchangeDetailsRequest): \Illuminate\Http\JsonResponse
     {
-        dd($swapRequest, $SwapExchangeDetailsRequest);
         try {
             DB::beginTransaction();
 
