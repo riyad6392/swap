@@ -98,17 +98,19 @@ class LoginController extends Controller
 
         if (auth()->attempt($request->only('email', 'password'), (bool)$request->remember)) {
             $user = auth()->user();
-            if ($user->is_approved_by_admin) {
-                $token = $this->getTokenAndRefreshToken($request->email, $request->password, 'user');
-                return response()->json([
-                    'success' => true,
-                    'message' => 'User successfully login!',
-                    'user' => $user,
-                    'token' => $token,
-                ], 200);
-            } else {
-                return response()->json(['success' => false, 'message' => 'User is not approved by admin'], 401);
-            }
+            $token = $this->getTokenAndRefreshToken($request->email, $request->password, 'user');
+            return response()->json([
+                'success' => true,
+                'message' => 'User successfully login!',
+                'user' => $user,
+                'token' => $token,
+            ], 200);
+
+//            if ($user->is_approved_by_admin) {
+//
+//            } else {
+//                return response()->json(['success' => false, 'message' => 'User is not approved by admin'], 401);
+//            }
         }
         return response()->json(['success' => false, 'message' => 'Authentication failed'], 422);
     }
