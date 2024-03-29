@@ -52,6 +52,8 @@ Route::group(['middleware' => 'auth:api'], function () {
 
         //rating
         Route::apiResource('ratings', \App\Http\Controllers\RatingController::class);
+        Route::get('ratings/given-to-me', [RatingController::class, 'ratingsGivenToMe']);
+        Route::get('ratings/given-by-me', [RatingController::class, 'ratingsGivenByMe']);
 
         //swap
 

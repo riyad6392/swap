@@ -288,6 +288,66 @@ class RatingController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/ratings/that-rated-me",
+     *     summary="Get ratings that were given to the authenticated user",
+     *     tags={"Ratings"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of ratings that were given to the authenticated user",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="user_id", type="integer", example=2),
+     *                 @OA\Property(property="rated_id", type="integer", example=1),
+     *                 @OA\Property(property="rating", type="number", format="float", example=4.0),
+     *                 @OA\Property(property="comments", type="string", example="Great service!"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2024-03-12 15:30:00"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2024-03-12 15:30:00"),
+     *             ),
+     *         ),
+     *     ),
+     * )
+     */
+    public function ratingsGivenToMe(Request $request)
+    {
+        $ratings = Rating::where('rated_id', auth()->id())->get();
+        return response()->json(['success' => true, 'data' => $ratings], 201);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/ratings/i-rated",
+     *     summary="Get ratings that the authenticated user has given",
+     *     tags={"Ratings"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of ratings given by the authenticated user",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="user_id", type="integer", example=1),
+     *                 @OA\Property(property="rated_id", type="integer", example=2),
+     *                 @OA\Property(property="rating", type="number", format="float", example=4.5),
+     *                 @OA\Property(property="comments", type="string", example="Good experience!"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2024-03-12 15:30:00"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2024-03-12 15:30:00"),
+     *             ),
+     *         ),
+     *     ),
+     * )
+     */
+    public function ratingsGivenByMe(Request $request)
+    {
+        $ratings = Rating::where('user_id', auth()->id())->get();
+        return response()->json(['success' => true, 'data' => $ratings], 201);
+    }
+
+    /**
      * Remove the specified rating from storage.
      *
      * @OA\Delete (
