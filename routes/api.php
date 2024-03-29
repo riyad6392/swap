@@ -50,6 +50,11 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::resource('product', \App\Http\Controllers\ProductController::class);
         Route::resource('plan', \App\Http\Controllers\PlanController::class);
 
+        //rating
+        Route::apiResource('ratings', \App\Http\Controllers\RatingController::class);
+        Route::get('ratings/given-to-me', [RatingController::class, 'ratingsGivenToMe']);
+        Route::get('ratings/given-by-me', [RatingController::class, 'ratingsGivenByMe']);
+
         //swap
 
         Route::resource('swap', \App\Http\Controllers\SwapController::class);
@@ -72,6 +77,7 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     Route::post('payment-method', [PaymentMethodController::class, 'store']);
     Route::put('update-payment-method', [PaymentMethodController::class, 'update']);
+    Route::delete('delete-payment-method/{payment_method_id}', [PaymentMethodController::class, 'destroy']);
 
 
 
