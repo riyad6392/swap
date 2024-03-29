@@ -14,7 +14,6 @@ use Laravel\Passport\Passport;
 use Illuminate\Support\Facades\Http;
 
 
-
 class LoginController extends Controller
 {
     public int $expiresInDays = 7;
@@ -99,14 +98,17 @@ class LoginController extends Controller
 
         if (auth()->attempt($request->only('email', 'password'), (bool)$request->remember)) {
             $user = auth()->user();
-            $token = $this->getTokenAndRefreshToken( $request->email, $request->password, 'user');
-
-            return response()->json([
-                'success' => true,
-                'message' => 'User successfully login!',
-                'user' => $user,
-                'token' => $token,
-            ], 200);
+            if ($user->is_approved_by_admin) {
+                $token = $this->getTokenAndRefreshToken($request->email, $request->password, 'user');
+                return response()->json([
+                    'success' => true,
+                    'message' => 'User successfully login!',
+                    'user' => $user,
+                    'token' => $token,
+                ], 200);
+            } else {
+                return response()->json(['success' => false, 'message' => 'User is not approved by admin'], 401);
+            }
         }
         return response()->json(['success' => false, 'message' => 'Authentication failed'], 422);
     }
@@ -127,7 +129,7 @@ class LoginController extends Controller
 
         $result = app()->handle($response);
 
-        return json_decode((string) $result->getContent(), true);
+        return json_decode((string)$result->getContent(), true);
 
     }
 
@@ -226,6 +228,6 @@ class LoginController extends Controller
 
         $result = app()->handle($response);
 
-        return json_decode((string) $result->getContent(), true);
+        return json_decode((string)$result->getContent(), true);
     }
 }
