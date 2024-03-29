@@ -130,19 +130,16 @@ class RatingController extends Controller
     public function store(StoreRatingRequest $storeRatingRequest)
     {
         try {
-            DB::beginTransaction();
-            $rating = Rating::create($storeRatingRequest->only(
+            Rating::create($storeRatingRequest->only(
                 [
                     'user_id',
                     'rated_id',
                     'rating',
                     'comments'
                 ]));
-            DB::commit();
 
-            return response()->json(['success' => true, 'data' => $rating], 201);
+            return response()->json(['success' => true, 'message' => 'Rating create successfully'], 201);
         } catch (\Exception $e) {
-            DB::rollBack();
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
@@ -271,18 +268,15 @@ class RatingController extends Controller
     public function update(UpdateRatingRequest $updateRatingRequest, Rating $rating)
     {
         try {
-            DB::beginTransaction();
-            $rating = tap($rating)->update($updateRatingRequest->only([
+            tap($rating)->update($updateRatingRequest->only([
                 'user_id',
                 'rated_id',
                 'rating',
                 'comments'
             ]));
-            DB::commit();
 
-            return response()->json(['success' => true, 'data' => $rating], 201);
+            return response()->json(['success' => true, 'message'=> 'Rating update successfully'], 201);
         } catch (\Exception $e) {
-            DB::rollBack();
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
@@ -311,7 +305,7 @@ class RatingController extends Controller
      *     ),
      * )
      */
-    public function ratingsGivenToMe(Request $request)
+    public function ratingsGivenToMe(Request $request): \Illuminate\Http\JsonResponse
     {
         $ratings = Rating::where('rated_id', auth()->id())->get();
         return response()->json(['success' => true, 'data' => $ratings], 201);
@@ -341,7 +335,7 @@ class RatingController extends Controller
      *     ),
      * )
      */
-    public function ratingsGivenByMe(Request $request)
+    public function ratingsGivenByMe(Request $request): \Illuminate\Http\JsonResponse
     {
         $ratings = Rating::where('user_id', auth()->id())->get();
         return response()->json(['success' => true, 'data' => $ratings], 201);
