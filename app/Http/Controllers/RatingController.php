@@ -2,36 +2,77 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Rating\StoreRatingRequest;
+use App\Http\Requests\Rating\UpdateRatingRequest;
+use App\Models\Rating;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class RatingController extends Controller
 {
-    public function index()
+    const PER_PAGE = 10;
+    public function index(Request $request)
     {
-        return Rating::all();
+        $rating =  Rating::query();
+        if ($request->get('get_all')) {
+            return response()->json(['success' => true, 'data' => $rating->get()]);
+        }
+        $rating = $rating->paginate($request->pagination ?? self::PER_PAGE);
+        
+        return response()->json(['success' => true, 'data' => $rating]);
     }
 
-    public function store(Request $request)
+    public function store(StoreRatingRequest $storeRatingRequest)
     {
-        return Rating::create($request->all());
+        try {
+            DB::beginTransaction();
+            $rating = Rating::create($storeRatingRequest->only(
+                [
+                    'user_id',
+                    'rated_id',
+                    'rating',
+                    'comments'
+                ]));
+            DB::commit();
+
+            return response()->json(['success' => true, 'data' => $rating], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
     }
 
-    public function show($id)
+    public function show(Rating $rating)
     {
-        return Rating::findOrFail($id);
+        try {
+            return response()->json(['success' => true, 'data' => $rating], 200);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to retrieve rating'], 500);
+        }
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateRatingRequest $updateRatingRequest, Rating $rating)
     {
-        $rating = Rating::findOrFail($id);
-        $rating->update($request->all());
-        return $rating;
+        try {
+            DB::beginTransaction();
+            $rating= tap($rating)->update($updateRatingRequest->only([
+                'user_id',
+                'rated_id',
+                'rating',
+                'comments'
+            ]));
+            DB::commit();
+
+            return response()->json(['success' => true, 'data' => $rating], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
     }
 
-    public function destroy($id)
+    public function destroy(Rating $rating)
     {
-        $rating = Rating::findOrFail($id);
         $rating->delete();
-        return 204; // No content response
+        return response()->json(['success' => true, 'message' => 'Rating data deleted successfully'], 200);
     }
 }
