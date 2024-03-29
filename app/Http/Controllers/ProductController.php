@@ -372,7 +372,7 @@ class ProductController extends Controller
      *     ),
      *     @OA\Parameter(
      *         in="query",
-     *         name="variations[0][price]",
+     *         name="variations[0][unit_price]",
      *         required=true,
      *         description="Price of the product variation at index 0",
      *         @OA\Schema(type="number", format="decimal", example=24.99),

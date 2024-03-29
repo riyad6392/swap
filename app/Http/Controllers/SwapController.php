@@ -161,7 +161,8 @@ class SwapController extends Controller
      *      )
      * )
      */
-    public function store(StoreSwapRequest $swapRequest, StoreSwapExchangeDetailsRequest $SwapExchangeDetailsRequest): \Illuminate\Http\JsonResponse
+    public function store(StoreSwapRequest $swapRequest,
+                          StoreSwapExchangeDetailsRequest $SwapExchangeDetailsRequest): \Illuminate\Http\JsonResponse
     {
         try {
             DB::beginTransaction();
@@ -346,25 +347,25 @@ class SwapController extends Controller
 
             SwapExchangeDetails::insert($prepareData['insertData']);
 
-            $this->deleteDetailsData(
-                $updateSwapRequest->deleted_details_id,
-                $swap ,
-                $this->matchClass($SwapExchangeDetailsRequest->define_type)
-            );
+            if ($updateSwapRequest->deleted_details_id) {
+                $this->deleteDetailsData(
+                    $updateSwapRequest->deleted_details_id,
+                    $swap,
+                    $this->matchClass($SwapExchangeDetailsRequest->define_type)
+                );
+            }
 
             $totalAmountAndCommission = $this->calculateTotalAmountAndCommission(
                 $swap,
                 $this->matchRelation($SwapExchangeDetailsRequest->define_type)
             );
 
-            dd('$deleted_id, $swap ,$define_type');
-
             $swap->update(
                 [
-                    'exchanged_wholesale_amount' => (int) $prepareData['wholeSaleAmount'] +
-                        (int) $totalAmountAndCommission['wholeSaleAmount'],
+                    'exchanged_wholesale_amount' => (int)$prepareData['wholeSaleAmount'] +
+                        (int)$totalAmountAndCommission['wholeSaleAmount'],
                     'exchanged_total_commission' => $prepareData['totalCommission'] +
-                        (int) $totalAmountAndCommission['totalCommission'],
+                        (int)$totalAmountAndCommission['totalCommission'],
                 ]
             );
 
@@ -449,7 +450,7 @@ class SwapController extends Controller
         return ['insertData' => $insertData, 'wholeSaleAmount' => $wholeSaleAmount, 'totalCommission' => $totalCommission];
     }
 
-    protected function deleteDetailsData($deleted_id, $swap ,$class): void
+    protected function deleteDetailsData($deleted_id, $swap, $class): void
     {
         if (gettype($deleted_id) == 'string') $deleted_id = json_decode($deleted_id);
 
@@ -460,17 +461,18 @@ class SwapController extends Controller
 
     }
 
-    protected function calculateTotalAmountAndCommission($swap ,$class): array
+    protected function calculateTotalAmountAndCommission($swap, $relation): array
     {
         $wholeSaleAmount = 0;
         $totalCommission = 0;
 
-        $detailsData = $swap->load('exchangeDetails');
+        $detailsData = $swap->$relation; //relation
 
         foreach ($detailsData as $detail) {
             $wholeSaleAmount += $detail->amount;
             $totalCommission += $detail->commission;
         }
+
         return ['wholeSaleAmount' => $wholeSaleAmount, 'totalCommission' => $totalCommission];
     }
 
@@ -489,7 +491,6 @@ class SwapController extends Controller
             'request_product' => 'requestDetail',
         };
     }
-
 
 
 }

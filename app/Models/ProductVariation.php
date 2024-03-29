@@ -13,7 +13,7 @@ class ProductVariation extends Model
         'product_id',
         'size',
         'color',
-        'price',
+        'unit_price',
         'stock',
         'discount',
         'quantity',

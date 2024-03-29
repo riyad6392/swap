@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\UserSpecificDataScope;
 use App\Traits\ModelAttributeTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -38,6 +39,8 @@ class Product extends Model
     {
         parent::boot();
         self::bootCreatedUpdatedBy();
+
+        static::addGlobalScope(new UserSpecificDataScope());
 
     }
 
