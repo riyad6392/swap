@@ -8,12 +8,17 @@ use App\Http\Requests\Swap\StoreSwapRequestDetails;
 use App\Http\Requests\Swap\StoreSwapRequestDetailsRequest;
 use App\Http\Requests\Swap\UpdateSwapDetailsRequest;
 use App\Http\Requests\Swap\UpdateSwapRequest;
+use App\Models\Notification;
 use App\Models\Product;
 use App\Models\ProductVariation;
 use App\Models\Swap;
 use App\Models\SwapExchangeDetails;
 use App\Models\SwapRequestDetails;
+use App\Models\User;
+use App\Notifications\SwapRequestNotification;
+use App\Services\SwapNotificationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class SwapController extends Controller
@@ -204,6 +209,8 @@ class SwapController extends Controller
                 ]
             );
 
+            SwapNotificationService::sendNotification($swap);
+
             DB::commit();
             return response()->json(['success' => true, 'data' => $swap], 201);
         } catch (\Exception $e) {
@@ -245,7 +252,7 @@ class SwapController extends Controller
      */
     public function show(Swap $swap)
     {
-        return $swap;
+
     }
 
     /**

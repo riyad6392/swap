@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('swaps', function (Blueprint $table) {
             $table->id();
-            $table->integer('uid');
+            $table->string('uid');
             $table->integer('user_id');
             $table->integer('requested_user_id')->nullable();
             $table->integer('exchanged_user_id');

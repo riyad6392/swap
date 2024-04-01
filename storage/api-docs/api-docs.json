@@ -5,6 +5,66 @@
         "version": "latest"
     },
     "paths": {
+        "/api/admin/approve-user/{user}": {
+            "post": {
+                "tags": [
+                    "Admin Authentication"
+                ],
+                "summary": "User Approved by Admin.",
+                "operationId": "4576bb244938fd86e33b8b5352349863",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User approved by admin!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Unauthenticated"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
         "/api/admin/forget-password": {
             "post": {
                 "tags": [
@@ -3883,90 +3943,138 @@
                 "tags": [
                     "Swaps"
                 ],
-                "summary": "Update an existing swap",
-                "description": "Update Swap.",
+                "summary": "Create a new swap",
+                "description": "Edit Swap.",
                 "operationId": "fc40f246522718458d0812709c728a69",
                 "parameters": [
                     {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID of the swap to update",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 1
-                        }
-                    },
-                    {
-                        "name": "requested_user_id",
-                        "in": "query",
-                        "description": "Requested User ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 2
-                        }
-                    },
-                    {
-                        "name": "exchanged_user_id",
-                        "in": "query",
-                        "description": "Exchanged User ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 3
-                        }
-                    },
-                    {
-                        "name": "status",
-                        "in": "query",
-                        "description": "Status",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "example": "pending"
-                        }
-                    },
-                    {
-                        "name": "requested_wholesale_amount",
-                        "in": "query",
-                        "description": "Requested Wholesale Amount",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 100
-                        }
-                    },
-                    {
-                        "name": "exchanged_wholesale_amount",
+                        "name": "define_type",
                         "in": "query",
                         "description": "Exchanged Wholesale Amount",
                         "required": true,
                         "schema": {
-                            "type": "integer",
-                            "example": 120
+                            "type": "enum",
+                            "example": "exchange_product | request_product"
                         }
                     },
                     {
-                        "name": "requested_total_commission",
+                        "name": "exchange_product[0][product_id]",
                         "in": "query",
-                        "description": "Requested Total Commission",
+                        "description": "Product ID",
                         "required": true,
                         "schema": {
                             "type": "number",
-                            "format": "double",
-                            "example": 10.5
+                            "format": "integer",
+                            "example": 1
                         }
                     },
                     {
-                        "name": "exchanged_total_commission",
+                        "name": "exchange_product[0][variation_id]",
                         "in": "query",
-                        "description": "Exchanged Total Commission",
+                        "description": "Product ID",
                         "required": true,
                         "schema": {
                             "type": "number",
-                            "format": "double",
-                            "example": 12.5
+                            "format": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "exchange_product[0][variation_size]",
+                        "in": "query",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "exchange_product[0][variation_color]",
+                        "in": "query",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "exchange_product[0][variation_quantity]",
+                        "in": "query",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "define_type",
+                        "in": "query",
+                        "description": "Exchanged Wholesale Amount",
+                        "required": true,
+                        "schema": {
+                            "type": "enum",
+                            "example": "exchange_product | request_product"
+                        }
+                    },
+                    {
+                        "name": "request_product[0][product_id]",
+                        "in": "query",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "request_product[0][variation_id]",
+                        "in": "query",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "request_product[0][variation_size]",
+                        "in": "query",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "request_product[0][variation_color]",
+                        "in": "query",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "request_product[0][variation_quantity]",
+                        "in": "query",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "integer",
+                            "example": 1
                         }
                     }
                 ],
@@ -3985,7 +4093,7 @@
                                             "type": "json",
                                             "example": {
                                                 "message": [
-                                                    "Swap updated successfully."
+                                                    "Swap created successfully."
                                                 ]
                                             }
                                         }
@@ -4012,26 +4120,6 @@
                                                     "The given data was invalid."
                                                 ]
                                             }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Swap not found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": "false"
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Swap not found"
                                         }
                                     },
                                     "type": "object"
