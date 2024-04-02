@@ -2,12 +2,14 @@
 
 namespace App\Models\Scopes;
 
+use App\Traits\ScopeTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
 
 class UserSpecificDataScope implements Scope
 {
+    use ScopeTrait;
     /**
      * Apply the scope to a given Eloquent query builder.
      */
@@ -18,12 +20,4 @@ class UserSpecificDataScope implements Scope
         }
     }
 
-    protected function defineGuard(): int|string|null
-    {
-        foreach (array_keys(config('auth.guards')) as $guard) {
-
-            if (auth()->guard($guard)->check()) return $guard;
-        }
-        return null;
-    }
 }

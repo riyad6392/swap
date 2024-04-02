@@ -81,6 +81,7 @@ class RegistrationController extends Controller
             User::create([
                 'name' => $request->name,
                 'email' => $request->email,
+                'is_approved_by_admin' => 1, // This is for admin approval, if you want to approve user by admin then set 0 otherwise set 1
                 'password' => bcrypt($request->password),
                 'subscription_is_active' => 1
             ]);
