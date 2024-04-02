@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('password');
             $table->string('subscription_is_active')->default(0);
             $table->string('stripe_customer_id')->nullable();
+            $table->boolean('is_approved_by_admin')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });
