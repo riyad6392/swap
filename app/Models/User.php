@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Notifications\HasDatabaseNotifications;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Cashier\Billable;
 use Laravel\Passport\HasApiTokens;
@@ -13,7 +14,7 @@ use Stripe\PaymentMethod;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable,Billable;
+    use HasApiTokens, HasFactory, Notifiable,Billable,HasDatabaseNotifications;
 
     /**
      * The attributes that are mass assignable.
@@ -64,5 +65,13 @@ class User extends Authenticatable
     {
         return $this->morphMany(Notification::class, 'notifiable')
                     ->orderBy('created_at', 'desc');
+    }
+    public function unreadNotifications()
+    {
+        return $this->notifications()->whereNull('read_at');
+    }
+    public function readNotifications()
+    {
+        return $this->notifications()->whereNotNull('read_at');
     }
 }

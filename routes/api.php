@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\RegistrationController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\PlanSubscriptionController;
 use App\Http\Controllers\RatingController;
@@ -65,6 +66,11 @@ Route::group(['middleware' => 'auth:api'], function () {
 //        Broadcast::routes();
 
         Route::get('send-message', [MessageController::class , 'sendMessage']);
+
+        //Notification
+        Route::get('notifications', [NotificationController::class , 'index']);
+        Route::get('mark-as-read', [NotificationController::class , 'markAllAsRead']);
+        Route::get('mark-as-unread', [NotificationController::class , 'markAllAsUnRead']);
 
 
     });
