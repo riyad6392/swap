@@ -74,7 +74,7 @@ class SwapController extends Controller
      *       )
      * )
      */
-    public function index(Request $request)
+    public function index(Request $request): \Illuminate\Http\JsonResponse
     {
         $swaps = Swap:: query();
         if ($request->get('get_all')) {
@@ -372,7 +372,7 @@ class SwapController extends Controller
      */
     public function update(UpdateSwapRequest        $updateSwapRequest,
                            UpdateSwapDetailsRequest $SwapExchangeDetailsRequest,
-                           Swap                     $swap)
+                           Swap                     $swap): \Illuminate\Http\JsonResponse
     {
         try {
             DB::beginTransaction();
@@ -446,7 +446,7 @@ class SwapController extends Controller
      *     )
      * )
      */
-    public function destroy(Swap $swap)
+    public function destroy(Swap $swap): \Illuminate\Http\JsonResponse
     {
         if ($swap->user_id != auth()->id()) {
             return response()->json(['success' => false, 'message' => 'You are not authorized to delete this swap'], 401);
