@@ -98,8 +98,8 @@ class LoginController extends Controller
 
         if (auth()->attempt($request->only('email', 'password'), (bool)$request->remember)) {
             $user = auth()->user();
-            $token = $this->getTokenAndRefreshToken($request->email, $request->password, 'user');
             if ($user->is_approved_by_admin) {
+                $token = $this->getTokenAndRefreshToken($request->email, $request->password, 'user');
                 return response()->json([
                     'success' => true,
                     'message' => 'User successfully login!',
