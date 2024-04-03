@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\ProductVariation;
 use App\Models\SwapExchangeDetails;
+use App\Models\SwapRequestDetails;
 
 class SwapRequestService
 {
@@ -22,17 +23,14 @@ class SwapRequestService
             if ($variation) {
                 $insertData[] = [
                     'uid' => uniqid(),
-                    'swap_id' => $swap->id,
                     'user_id' => auth()->id(),
+                    'swap_id' => $swap->id,
                     'product_id' => $product['product_id'],
                     'product_variation_id' => $product['variation_id'],
                     'quantity' => $product['variation_quantity'],
                     'unit_price' => $variation->unit_price ?? 0,
-                    'amount' => $product['variation_quantity'] *
-                        $variation->unit_price ?? 0,
-                    'commission' => ($product['variation_quantity'] *
-                        $variation->unit_price ?? 0) *
-                        self::COMMISSION_PERCENTAGE,
+                    'amount' => $product['variation_quantity'] * $variation->unit_price ?? 0,
+                    'commission' => ($product['variation_quantity'] * $variation->unit_price ?? 0) * self::COMMISSION_PERCENTAGE,
                     'created_by' => auth()->id(),
                     'updated_by' => auth()->id(),
                 ];
@@ -43,26 +41,46 @@ class SwapRequestService
         return ['insertData' => $insertData, 'wholeSaleAmount' => $wholeSaleAmount, 'totalCommission' => $totalCommission];
     }
 
-    protected function deleteDetailsData($deleted_id, $swap): void
+    public static function deleteDetailsData($deleted_id, $swap, $class): void
     {
-        SwapExchangeDetails::where('user_id', auth()->id())
+        if (gettype($deleted_id) == 'string') $deleted_id = json_decode($deleted_id);
+
+        $class::where('user_id', auth()->id())
             ->where('swap_id', $swap->id)
             ->whereIn('id', $deleted_id)
             ->delete();
+
     }
 
-    protected function calculateTotalAmountAndCommission($swap): array
+    public static function calculateTotalAmountAndCommission($swap, $relation): array
     {
         $wholeSaleAmount = 0;
         $totalCommission = 0;
 
-        $detailsData = $swap->load('exchangeDetails');
+        $detailsData = $swap->$relation; //relation
 
         foreach ($detailsData as $detail) {
             $wholeSaleAmount += $detail->amount;
             $totalCommission += $detail->commission;
         }
+
         return ['wholeSaleAmount' => $wholeSaleAmount, 'totalCommission' => $totalCommission];
+    }
+
+    public static function matchClass($define_type): string
+    {
+        return match ($define_type) {
+            'exchange_product' => SwapExchangeDetails::class,
+            'request_product' => SwapRequestDetails::class,
+        };
+    }
+
+    public static function matchRelation($define_type): string
+    {
+        return match ($define_type) {
+            'exchange_product' => 'exchangeDetails',
+            'request_product' => 'requestDetail',
+        };
     }
 
 }

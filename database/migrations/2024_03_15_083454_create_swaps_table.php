@@ -17,11 +17,17 @@ return new class extends Migration
             $table->integer('user_id');
             $table->integer('requested_user_id')->nullable();
             $table->integer('exchanged_user_id');
-            $table->string('status');
+            $table->enum('status', ['requested', 'accepted', 'completed', 'decline'])->default('requested');
+
             $table->integer('requested_wholesale_amount')->nullable();
-            $table->integer('exchanged_wholesale_amount')->nullable();
             $table->double('requested_total_commission',8, 2)->nullable();
+
+            $table->integer('exchanged_wholesale_amount')->nullable();
             $table->double('exchanged_total_commission',8, 2)->nullable();
+
+            $table->boolean('is_approved_by_requester')->default(false);
+            $table->boolean('is_approved_by_exchanger')->default(false);
+
             $table->integer('created_by');
             $table->integer('updated_by');
 

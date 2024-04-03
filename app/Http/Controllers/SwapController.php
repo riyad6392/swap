@@ -17,6 +17,7 @@ use App\Models\SwapRequestDetails;
 use App\Models\User;
 use App\Notifications\SwapRequestNotification;
 use App\Services\SwapNotificationService;
+use App\Services\SwapRequestService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -194,7 +195,7 @@ class SwapController extends Controller
                 ]
             );
 
-            $prepareData = $this->prepareDetailsData(
+            $prepareData = SwapRequestService::prepareDetailsData(
                 $SwapExchangeDetailsRequest,
                 $swap,
                 $SwapExchangeDetailsRequest->define_type
@@ -209,7 +210,11 @@ class SwapController extends Controller
                 ]
             );
 
-            SwapNotificationService::sendNotification($swap);
+            SwapNotificationService::sendNotification(
+                $swap,
+                $swap->exchanged_user_id,
+                'You have a new swap request '. $swap->id
+            );
 
             DB::commit();
             return response()->json(['success' => true, 'data' => $swap], 201);
@@ -377,7 +382,7 @@ class SwapController extends Controller
         try {
             DB::beginTransaction();
 
-            $prepareData = $this->prepareDetailsData(
+            $prepareData = SwapRequestService::prepareDetailsData(
                 $SwapExchangeDetailsRequest,
                 $swap,
                 $SwapExchangeDetailsRequest->define_type
@@ -386,16 +391,16 @@ class SwapController extends Controller
             SwapExchangeDetails::insert($prepareData['insertData']);
 
             if ($updateSwapRequest->deleted_details_id) {
-                $this->deleteDetailsData(
+                SwapRequestService::deleteDetailsData(
                     $updateSwapRequest->deleted_details_id,
                     $swap,
-                    $this->matchClass($SwapExchangeDetailsRequest->define_type)
+                    SwapRequestService::matchClass($SwapExchangeDetailsRequest->define_type)
                 );
             }
 
-            $totalAmountAndCommission = $this->calculateTotalAmountAndCommission(
+            $totalAmountAndCommission = SwapRequestService::calculateTotalAmountAndCommission(
                 $swap,
-                $this->matchRelation($SwapExchangeDetailsRequest->define_type)
+                SwapRequestService::matchRelation($SwapExchangeDetailsRequest->define_type)
             );
 
             $swap->update(
@@ -457,78 +462,21 @@ class SwapController extends Controller
         return response()->json(['success' => true, 'message' => 'Swap and related data deleted successfully'], 200);
     }
 
-    protected function prepareDetailsData($request, object $swap, string $prepareFor): array
+    public function approve(Request $request, Swap $swap): \Illuminate\Http\JsonResponse
     {
-        $insertData = [];
-        $wholeSaleAmount = 0;
-        $totalCommission = 0;
-        foreach ($request->$prepareFor as $product) {
-            $variation = ProductVariation::where('id', $product['variation_id'])
-                ->where('product_id', $product['product_id'])
-                ->first();
+        if ($swap->exchanged_user_id == auth()->id()) {
 
-            if ($variation) {
-                $insertData[] = [
-                    'uid' => uniqid(),
-                    'user_id' => auth()->id(),
-                    'swap_id' => $swap->id,
-                    'product_id' => $product['product_id'],
-                    'product_variation_id' => $product['variation_id'],
-                    'quantity' => $product['variation_quantity'],
-                    'unit_price' => $variation->unit_price ?? 0,
-                    'amount' => $product['variation_quantity'] * $variation->unit_price ?? 0,
-                    'commission' => ($product['variation_quantity'] * $variation->unit_price ?? 0) * self::COMMISSION_PERCENTAGE,
-                    'created_by' => auth()->id(),
-                    'updated_by' => auth()->id(),
-                ];
-                $wholeSaleAmount += $product['variation_quantity'] * $variation->unit_price ?? 0;
-                $totalCommission += ($product['variation_quantity'] * $variation->unit_price ?? 0) * self::COMMISSION_PERCENTAGE;
-            }
-        }
-        return ['insertData' => $insertData, 'wholeSaleAmount' => $wholeSaleAmount, 'totalCommission' => $totalCommission];
-    }
+            $swap->update(['status' => 'accepted']);
 
-    protected function deleteDetailsData($deleted_id, $swap, $class): void
-    {
-        if (gettype($deleted_id) == 'string') $deleted_id = json_decode($deleted_id);
+            SwapNotificationService::sendNotification(
+                $swap ,
+                $swap->requested_user_id ,
+                'Swap request has been accepted'
+            );
 
-        $class::where('user_id', auth()->id())
-            ->where('swap_id', $swap->id)
-            ->whereIn('id', $deleted_id)
-            ->delete();
-
-    }
-
-    protected function calculateTotalAmountAndCommission($swap, $relation): array
-    {
-        $wholeSaleAmount = 0;
-        $totalCommission = 0;
-
-        $detailsData = $swap->$relation; //relation
-
-        foreach ($detailsData as $detail) {
-            $wholeSaleAmount += $detail->amount;
-            $totalCommission += $detail->commission;
+            return response()->json(['success' => true, 'message' => 'You accept the swap request'], 200);
         }
 
-        return ['wholeSaleAmount' => $wholeSaleAmount, 'totalCommission' => $totalCommission];
+        return response()->json(['success' => true, 'message' => 'You are not allow to change the swap status'], 200);
     }
-
-    protected function matchClass($define_type): string
-    {
-        return match ($define_type) {
-            'exchange_product' => SwapExchangeDetails::class,
-            'request_product' => SwapRequestDetails::class,
-        };
-    }
-
-    public function matchRelation($define_type): string
-    {
-        return match ($define_type) {
-            'exchange_product' => 'exchangeDetails',
-            'request_product' => 'requestDetail',
-        };
-    }
-
-
 }

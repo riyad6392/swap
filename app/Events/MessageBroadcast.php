@@ -33,7 +33,7 @@ class MessageBroadcast implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel("user.{$this->request->id}"),
+            new PrivateChannel("user.2"),
 //            new Channel('testing-channel'),
         ];
     }

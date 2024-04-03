@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -76,17 +77,27 @@ class RegistrationController extends Controller
 
         if ($validateData->fails()) {
             return response()->json(['success' => false, 'message' => 'Validation errors', 'errors' => $validateData->errors()], 422);
-        }else{
+        } else {
 
-            User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'is_approved_by_admin' => 1, // This is for admin approval, if you want to approve user by admin then set 0 otherwise set 1
-                'password' => bcrypt($request->password),
-                'subscription_is_active' => 1
-            ]);
+            try {
+                DB::beginTransaction();
+                User::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'is_approved_by_admin' => 1, // This is for admin approval, if you want to approve user by admin then set 0 otherwise set 1
+                    'password' => bcrypt($request->password),
+                    'subscription_is_active' => 1
+                ]);
 
-            return response()->json(['success' => true, 'message' => 'Your registration successfully done'], 200);
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Your registration successfully done'], 200);
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return response()->json(['success' => false, 'message' => 'Something went wrong', 'errors' => $e->getMessage()], 500);
+            }
+
+
         }
     }
 }

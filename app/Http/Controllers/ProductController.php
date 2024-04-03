@@ -250,11 +250,12 @@ class ProductController extends Controller
             if ($productRequest->has('product_images')) {
                 FileUploadService::uploadFile($productRequest->product_images, $product);
             }
+
             $this->storeVariations($productVariantRequest, $product);
 
             DB::commit();
 
-            return response()->json(['success' => true, 'data' => $product], 201);
+            return response()->json(['success' => true, 'data' => 'Inventory created successfully'], 201);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);

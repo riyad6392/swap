@@ -12,15 +12,16 @@ class SwapRequestNotification extends Notification
 {
     use Queueable;
 
-    protected string $message = 'You have a new swap request.';
     protected object $swap;
+    protected string $message;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(object $swap)
+    public function __construct(object $swap, string $message)
     {
         $this->swap = $swap;
+        $this->message = $message;
     }
 
     /**
@@ -31,17 +32,6 @@ class SwapRequestNotification extends Notification
     public function via(object $notifiable): array
     {
         return ['broadcast'];
-    }
-
-    /**
-     * Get the mail representation of the notification.
-     */
-    public function toMail(object $notifiable): MailMessage
-    {
-        return (new MailMessage)
-            ->line('The introduction to the notification.')
-            ->action('Notification Action', url('/'))
-            ->line('Thank you for using our application!');
     }
 
     /**

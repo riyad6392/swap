@@ -93,6 +93,7 @@ class LoginController extends Controller
         ]);
 
         if ($validateData->fails()) {
+
             return response()->json(['success' => false, 'message' => 'Validation errors', 'errors' => $validateData->errors()], 422);
         }
 

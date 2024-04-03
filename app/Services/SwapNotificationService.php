@@ -11,20 +11,22 @@ use Illuminate\Support\Facades\Notification;
 enum SwapNotificationService: string
 {
     case MESSAGE = 'Swap request has been sent';
-    public static function sendNotification($swap): void
+
+    public static function sendNotification($swap, $id, $message): void
     {
-        User::find($swap->exchanged_user_id)
-            ->notifications()
+        $user = User::find($id);
+
+        $user->notifications()
             ->create([
                 'type' => 'App\Notifications\SwapRequestNotification',
                 'data' => [
                     'swap_id' => $swap->id,
-                    'data' => self::MESSAGE,
+                    'data' => $message,
                 ],
-                'notifi_by' => auth()->user()->id(),
+                'notifi_by' => auth()->user()->id,
             ]);
 
-        Notification::send(User::find($swap->requested_user_id), new SwapRequestNotification($swap));
+        Notification::send($user, new SwapRequestNotification($swap, $message));
     }
 
 }
