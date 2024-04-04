@@ -46,8 +46,8 @@ class SwapRequestNotification extends Notification
             'id' => $this->id,
             'swap_id' => $this->swap->id,
             'data' => $this->message,
-            'notifiable_id' => $this->swap->requested_user_id,
-            'notififor_id' => (int) $this->swap->exchanged_user_id,
+            'requester_id' => $this->swap->requested_user_id,
+            'exchanger_id' => (int) $this->swap->exchanged_user_id,
         ]);
     }
 }

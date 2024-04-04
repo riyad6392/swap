@@ -69,6 +69,7 @@ Route::group(['middleware' => 'auth:api'], function () {
 
         //Notification
         Route::get('notifications', [NotificationController::class , 'index']);
+        Route::get('notification-show/{id}', [NotificationController::class , 'show']);
         Route::get('mark-as-read', [NotificationController::class , 'markAllAsRead']);
         Route::get('mark-as-unread', [NotificationController::class , 'markAllAsUnRead']);
 

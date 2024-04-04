@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Notification;
-use App\Models\User;
+use App\Models\Scopes\Notification;
+use App\Models\Swap;
 use Illuminate\Http\Request;
-use Mockery\Matcher\Not;
 
 class NotificationController extends Controller
 {
@@ -113,6 +112,19 @@ class NotificationController extends Controller
      *       )
      * )
      */
+
+    public function show($id): \Illuminate\Http\JsonResponse
+    {
+        $notification = Notification::with('swap')->find($id);
+        dump($notification);
+        dd($notification->data['swap_id']);
+        $notification->swap = Swap::find($notification->data['swap_id']);
+
+        dd($notification);
+
+        return response()->json(['success' => true, 'message' => 'Notifications update successfully', 'data' => $notification], 200);
+    }
+
     public function markAllAsRead(Request $request): \Illuminate\Http\JsonResponse
     {
         $notification = Notification::query();
@@ -171,7 +183,7 @@ class NotificationController extends Controller
     {
         $notification = Notification::query();
 
-        if($request->has('id')){
+        if ($request->has('id')) {
             $notification->where('id', $request->id);
         }
 

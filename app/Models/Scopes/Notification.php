@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Scopes;
 
+use App\Models\Swap;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -9,12 +10,14 @@ class Notification extends Model
 {
     use HasFactory;
 
+    protected $table = 'notifications';
+
     protected $fillable = [
         'id',
         'type',
-        'swap_id',
-        'requester_id',
-        'exchanger_id',
+        'notifiable_type',
+        'notifiable_id',
+        'notifi_by',
         'data',
         'read_at',
         'created_at',
@@ -25,7 +28,8 @@ class Notification extends Model
         'data' => 'array',
     ];
 
-    public function swap(){
-        return $this->belongsTo(Swap::class , 'swap_id' , 'id');
+    public function swap()
+    {
+        return $this->belongsTo(Swap::class, 'data.swap_id', 'id');
     }
 }

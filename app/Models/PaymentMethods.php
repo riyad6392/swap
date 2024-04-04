@@ -29,14 +29,14 @@ class PaymentMethods extends Model
     {
         parent::boot();
         self::bootCreatedUpdatedBy();
-        static::updatePaymentMethodStatus();
+//        static::updatePaymentMethodStatus();
 
     }
 
-    public function scopeUpdatePaymentMethodStatus(Builder $query, $paymentId = null)
-    {
-        return $query->where('user_id', auth()->id())
-            ->update(['status' => \DB::raw("CASE WHEN stripe_payment_method_id = '{$paymentId}' THEN '" . self::STATUS_ACTIVE . "' ELSE '" . self::STATUS_INACTIVE . "' END")]);
-    }
+//    public function scopeUpdatePaymentMethodStatus(Builder $query, $paymentId = null)
+//    {
+//        return $query->where('user_id', auth()->id())
+//            ->update(['status' => \DB::raw("CASE WHEN stripe_payment_method_id = '{$paymentId}' THEN '" . self::STATUS_ACTIVE . "' ELSE '" . self::STATUS_INACTIVE . "' END")]);
+//    }
 
 }

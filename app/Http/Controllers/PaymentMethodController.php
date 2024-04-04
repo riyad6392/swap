@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\DB;
 
 class PaymentMethodController extends Controller
 {
+    const STATUS_ACTIVE = 'active';
+    const STATUS_INACTIVE = 'inactive';
+
     /**
      * Display a listing of the resource.
      */
@@ -214,7 +217,12 @@ class PaymentMethodController extends Controller
                 $user
             );
 
-            PaymentMethods::updatePaymentMethodStatus($paymentId);
+            PaymentMethods::where('user_id', auth()->id())
+                ->update(['status' =>
+                    \DB::raw("CASE WHEN stripe_payment_method_id =
+                    '{$paymentId}' THEN '" . self::STATUS_ACTIVE .
+                        "' ELSE '" .
+                        self::STATUS_INACTIVE . "' END")]);
 
             return response()->json(['success' => true, 'message' => $paymentMethod], 201);
         } catch (\Exception $exception) {

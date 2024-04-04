@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
-            $table->string('type');
-            $table->morphs('notifiable');
-            $table->integer('notifi_by');
-            $table->text('data');
+            $table->integer('swap_id');
+            $table->integer('requester_id');
+            $table->integer('exchanger_id');
+            $table->json('data');
             $table->timestamp('read_at')->nullable();
             $table->timestamps();
         });

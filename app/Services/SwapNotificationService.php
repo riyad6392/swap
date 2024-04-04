@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Notifications\SwapRequestNotification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
+use App\Models\Notification as NotificationModel;
 
 
 enum SwapNotificationService: string
@@ -14,16 +15,17 @@ enum SwapNotificationService: string
 
     public static function sendNotification($swap, $id, $message): void
     {
+
         $user = User::find($id);
 
-        $user->notifications()
-            ->create([
-                'type' => 'App\Notifications\SwapRequestNotification',
+        NotificationModel::create([
+                'swap_id' => $swap->id,
+                'requester_id' => auth()->user()->id,
+                'exchanger_id' => $user->id,
                 'data' => [
                     'swap_id' => $swap->id,
                     'data' => $message,
                 ],
-                'notifi_by' => auth()->user()->id,
             ]);
 
         Notification::send($user, new SwapRequestNotification($swap, $message));
