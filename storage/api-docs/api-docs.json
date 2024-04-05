@@ -4595,6 +4595,73 @@
                 }
             }
         },
+        "/api/swap-decline/{id}": {
+            "get": {
+                "tags": [
+                    "Swaps"
+                ],
+                "summary": "Swap Decline by user.",
+                "operationId": "14e1028d748068bb6f44611f86b5ef22",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Decline swap by ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Get swap details."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Swap not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Swap not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/swap-exchange-details": {
             "get": {
                 "tags": [

@@ -178,7 +178,7 @@ class SwapController extends Controller
      *      )
      * )
      */
-    public function store(StoreSwapRequest $swapRequest,
+    public function store(StoreSwapRequest                $swapRequest,
                           StoreSwapExchangeDetailsRequest $SwapExchangeDetailsRequest): \Illuminate\Http\JsonResponse
     {
         try {
@@ -211,7 +211,7 @@ class SwapController extends Controller
             SwapNotificationService::sendNotification(
                 $swap,
                 $swap->exchanged_user_id,
-                'You have a new swap request '. $swap->id
+                'You have a new swap request ' . $swap->id
             );
 
             DB::commit();
@@ -386,40 +386,45 @@ class SwapController extends Controller
         try {
             DB::beginTransaction();
 
-//            $swap->
+            if (($swap->requested_user_id == auth()->id() || $swap->exchanged_user_id == auth()->id()) && $swap->status == 'accepted') {
 
-            $prepareData = SwapRequestService::prepareDetailsData(
-                $SwapExchangeDetailsRequest,
-                $swap,
-                $SwapExchangeDetailsRequest->define_type
-            );
-
-            SwapExchangeDetails::insert($prepareData['insertData']);
-
-            if ($updateSwapRequest->deleted_details_id) {
-                SwapRequestService::deleteDetailsData(
-                    $updateSwapRequest->deleted_details_id,
+                $prepareData = SwapRequestService::prepareDetailsData(
+                    $SwapExchangeDetailsRequest,
                     $swap,
-                    SwapRequestService::matchClass($SwapExchangeDetailsRequest->define_type)
+                    $SwapExchangeDetailsRequest->define_type
                 );
+
+                SwapExchangeDetails::insert($prepareData['insertData']);
+
+                if ($updateSwapRequest->deleted_details_id) {
+                    SwapRequestService::deleteDetailsData(
+                        $updateSwapRequest->deleted_details_id,
+                        $swap,
+                        SwapRequestService::matchClass($SwapExchangeDetailsRequest->define_type)
+                    );
+                }
+
+                $totalAmountAndCommission = SwapRequestService::calculateTotalAmountAndCommission(
+                    $swap,
+                    SwapRequestService::matchRelation($SwapExchangeDetailsRequest->define_type)
+                );
+
+                $swap->update(
+                    [
+                        'exchanged_wholesale_amount' => (int)$prepareData['wholeSaleAmount'] +
+                            (int)$totalAmountAndCommission['wholeSaleAmount'],
+                        'exchanged_total_commission' => $prepareData['totalCommission'] +
+                            (int)$totalAmountAndCommission['totalCommission'],
+                    ]
+                );
+
+                DB::commit();
+
+                return response()->json(['success' => true, 'data' => $swap], 201);
             }
 
-            $totalAmountAndCommission = SwapRequestService::calculateTotalAmountAndCommission(
-                $swap,
-                SwapRequestService::matchRelation($SwapExchangeDetailsRequest->define_type)
-            );
+            return response()->json(['success' => false, 'message' => 'You are not authorized to update this swap'], 401);
 
-            $swap->update(
-                [
-                    'exchanged_wholesale_amount' => (int)$prepareData['wholeSaleAmount'] +
-                        (int)$totalAmountAndCommission['wholeSaleAmount'],
-                    'exchanged_total_commission' => $prepareData['totalCommission'] +
-                        (int)$totalAmountAndCommission['totalCommission'],
-                ]
-            );
-
-            DB::commit();
-            return response()->json(['success' => true, 'data' => $swap], 201);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => 'Failed to update swap'], 500);
@@ -460,6 +465,7 @@ class SwapController extends Controller
     public function destroy(Swap $swap): \Illuminate\Http\JsonResponse
     {
         if ($swap->user_id != auth()->id()) {
+
             return response()->json(['success' => false, 'message' => 'You are not authorized to delete this swap'], 401);
         }
         $swap->exchangeDetails->delete();
@@ -501,15 +507,15 @@ class SwapController extends Controller
      */
     public function approve($id): \Illuminate\Http\JsonResponse
     {
-       $swap = Swap::find($id);
+        $swap = Swap::find($id);
 
         if ($swap->exchanged_user_id == auth()->id()) {
 
             $swap->update(['status' => 'accepted']);
 
             SwapNotificationService::sendNotification(
-                $swap ,
-                $swap->requested_user_id ,
+                $swap,
+                $swap->requested_user_id,
                 'Swap request has been accepted'
             );
 
@@ -520,7 +526,7 @@ class SwapController extends Controller
     }
 
     /**
-     * Swap Approve by user.
+     * Swap Decline by user.
      *
      * @OA\Get(
      *     path="/api/swap-decline/{id}",
@@ -529,7 +535,7 @@ class SwapController extends Controller
      *         name="id",
      *         in="path",
      *         required=true,
-     *         description="Approve swap by ID",
+     *         description="Decline swap by ID",
      *         @OA\Schema(type="integer", format="int64")
      *     ),
      *    @OA\Response(
@@ -559,8 +565,8 @@ class SwapController extends Controller
             $swap->update(['status' => 'decline']);
 
             SwapNotificationService::sendNotification(
-                $swap ,
-                $swap->requested_user_id ,
+                $swap,
+                $swap->requested_user_id,
                 'your swap request has been declined'
             );
 
