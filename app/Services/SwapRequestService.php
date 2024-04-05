@@ -8,7 +8,7 @@ use App\Models\SwapRequestDetails;
 
 class SwapRequestService
 {
-    const COMMISSION_PERCENTAGE = 0.25;
+    const COMMISSION = 0.25;
 
     public static function prepareDetailsData($request, object $swap, string $prepareFor): array
     {
@@ -21,6 +21,10 @@ class SwapRequestService
                 ->first();
 
             if ($variation) {
+
+                $product_amount = $product['variation_quantity'] * $variation->unit_price ?? 0;
+                $product_commission = $product['variation_quantity'] * ($variation->unit_price ?? 0 * self::COMMISSION);
+
                 $insertData[] = [
                     'uid' => uniqid(),
                     'user_id' => auth()->id(),
@@ -29,13 +33,14 @@ class SwapRequestService
                     'product_variation_id' => $product['variation_id'],
                     'quantity' => $product['variation_quantity'],
                     'unit_price' => $variation->unit_price ?? 0,
-                    'amount' => $product['variation_quantity'] * $variation->unit_price ?? 0,
-                    'commission' => ($product['variation_quantity'] * $variation->unit_price ?? 0) * self::COMMISSION_PERCENTAGE,
+                    'amount' => $product_amount,
+                    'commission' => $product_commission,
                     'created_by' => auth()->id(),
                     'updated_by' => auth()->id(),
                 ];
-                $wholeSaleAmount += $product['variation_quantity'] * $variation->unit_price ?? 0;
-                $totalCommission += ($product['variation_quantity'] * $variation->unit_price ?? 0) * self::COMMISSION_PERCENTAGE;
+
+                $wholeSaleAmount += $product_amount;
+                $totalCommission += $product_commission;
             }
         }
         return ['insertData' => $insertData, 'wholeSaleAmount' => $wholeSaleAmount, 'totalCommission' => $totalCommission];

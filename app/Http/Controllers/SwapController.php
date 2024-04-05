@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\DB;
 class SwapController extends Controller
 {
     const PER_PAGE = 10;
-    const COMMISSION_PERCENTAGE = 0.25;
+    const COMMISSION = 0.25;
 
     /**
      * Swap List.
@@ -71,10 +71,15 @@ class SwapController extends Controller
     public function index(Request $request): \Illuminate\Http\JsonResponse
     {
         $swaps = Swap:: query();
+
+        $swaps->where('requested_user_id', auth()->id());
+
         if ($request->get('get_all')) {
             return response()->json(['success' => true, 'data' => $swaps->get()]);
         }
+
         $swap = $swaps->paginate($request->pagination ?? self::PER_PAGE);
+
         return response()->json(['success' => true, 'data' => $swap]);
     }
 
@@ -250,7 +255,12 @@ class SwapController extends Controller
      */
     public function show(Swap $swap)
     {
-        return response()->json(['success' => true, 'data' => $swap]);
+        if ($swap->requested_user_id == auth()->id()) {
+
+            return response()->json(['success' => true, 'data' => $swap]);
+        }
+        return response()->json(['success' => false, 'message' => 'You are not authorized to view this swap'], 401);
+
 
     }
 

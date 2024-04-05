@@ -128,6 +128,10 @@ class NotificationController extends Controller
         $notification = Notification::where('exchanger_id', auth()->id())
             ->with('swap')->find($id);
 
+        if (!$notification) {
+            return response()->json(['success' => false, 'message' => 'Notification not found'], 404);
+        }
+
         $notification->update(['read_at' => now()]);
 
         return response()->json(['success' => true, 'message' => 'Notifications update successfully', 'data' => $notification], 200);

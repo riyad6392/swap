@@ -12,14 +12,11 @@ class Notification extends Model
 
     protected $fillable = [
         'id',
-        'type',
         'swap_id',
         'requester_id',
         'exchanger_id',
         'data',
         'read_at',
-        'created_at',
-        'updated_at',
     ];
 
     protected $casts = [
@@ -32,6 +29,7 @@ class Notification extends Model
 
     public static function boot()
     {
+        parent::boot();
         static::addGlobalScope(new UserNotificationScope());
     }
 }
