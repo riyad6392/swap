@@ -456,8 +456,10 @@ class SwapController extends Controller
         return response()->json(['success' => true, 'message' => 'Swap and related data deleted successfully'], 200);
     }
 
-    public function approve(Request $request, Swap $swap): \Illuminate\Http\JsonResponse
+    public function approve($id): \Illuminate\Http\JsonResponse
     {
+       $swap = Swap::find($id);
+
         if ($swap->exchanged_user_id == auth()->id()) {
 
             $swap->update(['status' => 'accepted']);
@@ -469,6 +471,26 @@ class SwapController extends Controller
             );
 
             return response()->json(['success' => true, 'message' => 'You accept the swap request'], 200);
+        }
+
+        return response()->json(['success' => true, 'message' => 'You are not allow to change the swap status'], 200);
+    }
+
+    public function decline($id): \Illuminate\Http\JsonResponse
+    {
+        $swap = Swap::find($id);
+
+        if ($swap->exchanged_user_id == auth()->id()) {
+
+            $swap->update(['status' => 'decline']);
+
+            SwapNotificationService::sendNotification(
+                $swap ,
+                $swap->requested_user_id ,
+                'your swap request has been declined'
+            );
+
+            return response()->json(['success' => true, 'message' => 'You decline the swap request'], 200);
         }
 
         return response()->json(['success' => true, 'message' => 'You are not allow to change the swap status'], 200);

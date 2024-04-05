@@ -16,8 +16,7 @@ class UserNotificationScope implements Scope
     public function apply(Builder $builder, Model $model): void
     {
         if ($this->defineGuard() == 'api') {
-            $builder->where('notifiable_type', 'App\Models\User')
-                ->where('notifiable_id', auth()->id());
+            $builder->where('exchanger_id', auth()->id());
         }
     }
 

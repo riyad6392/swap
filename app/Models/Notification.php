@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\UserNotificationScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -27,5 +28,10 @@ class Notification extends Model
 
     public function swap(){
         return $this->belongsTo(Swap::class , 'swap_id' , 'id');
+    }
+
+    public static function boot()
+    {
+        static::addGlobalScope(new UserNotificationScope());
     }
 }

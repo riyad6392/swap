@@ -2,12 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Scopes\Notification;
+use App\Http\Requests\Notification\UpdateReadAndUnreadNotificationRequest;
+use App\Models\Notification;
 use App\Models\Swap;
 use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
+    /**
+     *
+     * Use scope to get the notifications of the authenticated user
+     * Scope name is UserNotificationScope
+     *
+     */
+
     const PER_PAGE = 10;
 
     /**
@@ -62,6 +70,8 @@ class NotificationController extends Controller
     {
         $notification = Notification::query();
 
+        $notification->orderBy('created_at', 'desc');
+
         if ($request->get('get_all')) {
 
             return response()->json(['success' => true, 'data' => $notification->get()]);
@@ -73,10 +83,10 @@ class NotificationController extends Controller
     }
 
     /**
-     * Mark As Read.
+     * A Single Notification show.
      *
      * @OA\Get(
-     *     path="/api/mark-as-read",
+     *     path="/api/notification-show/{id}",
      *     tags={"Notifications"},
      *     security={{ "apiAuth": {} }},
      *
@@ -115,45 +125,35 @@ class NotificationController extends Controller
 
     public function show($id): \Illuminate\Http\JsonResponse
     {
-        $notification = Notification::with('swap')->find($id);
-        dump($notification);
-        dd($notification->data['swap_id']);
-        $notification->swap = Swap::find($notification->data['swap_id']);
+        $notification = Notification::where('exchanger_id', auth()->id())
+            ->with('swap')->find($id);
 
-        dd($notification);
+        $notification->update(['read_at' => now()]);
 
         return response()->json(['success' => true, 'message' => 'Notifications update successfully', 'data' => $notification], 200);
     }
 
-    public function markAllAsRead(Request $request): \Illuminate\Http\JsonResponse
-    {
-        $notification = Notification::query();
-
-        if ($request->has('id')) {
-            $notification->where('id', $request->id);
-        }
-
-        $notification->update(['read_at' => now()]);
-
-        return response()->json(['success' => true, 'message' => 'Notifications update successfully'], 200);
-    }
-
     /**
-     * Mark As Un Read.
+     * Mark As Read.
      *
-     * @OA\Get(
-     *     path="/api/mark-as-unread",
+     * @OA\Post(
+     *     path="/api/mark-as-read",
      *     tags={"Notifications"},
      *     security={{ "apiAuth": {} }},
      *
      *     @OA\Parameter(
-     *     in="query",
-     *     name="id",
-     *     required=false,
-     *
-     *     @OA\Schema(type="number"),
-     *     example="1"
-     *    ),
+     *          in="query",
+     *         name="id[]",
+     *         required=true,
+     *         description="Notification id",
+     *         @OA\Schema(
+     *             type="array",
+     *             @OA\Items(
+     *                 required={"path"},
+     *                 @OA\Property(property="path", type="string", example="[1,2,3]"),
+     *             ),
+     *         ),
+     *     ),
      *
      *     @OA\Response(
      *           response=200,
@@ -179,13 +179,69 @@ class NotificationController extends Controller
      * )
      */
 
-    public function markAllAsUnRead(Request $request): \Illuminate\Http\JsonResponse
+    public function markAllAsRead(UpdateReadAndUnreadNotificationRequest $readAndUnreadNotificationRequest): \Illuminate\Http\JsonResponse
     {
         $notification = Notification::query();
 
-        if ($request->has('id')) {
-            $notification->where('id', $request->id);
-        }
+        $notification->whereIn('id', $readAndUnreadNotificationRequest->id);
+
+
+        $notification->update(['read_at' => now()]);
+
+        return response()->json(['success' => true, 'message' => 'Notifications update successfully'], 200);
+    }
+
+    /**
+     * Mark As Unread.
+     *
+     * @OA\Post(
+     *     path="/api/mark-as-unread",
+     *     tags={"Notifications"},
+     *     security={{ "apiAuth": {} }},
+     *
+     *     @OA\Parameter(
+     *          in="query",
+     *         name="id[]",
+     *         required=true,
+     *         description="Notification id",
+     *         @OA\Schema(
+     *             type="array",
+     *             @OA\Items(
+     *                 required={"path"},
+     *                 @OA\Property(property="path", type="string", example="[1,2,3]"),
+     *             ),
+     *         ),
+     *     ),
+     *
+     *     @OA\Response(
+     *           response=200,
+     *           description="success",
+     *
+     *           @OA\JsonContent(
+     *
+     *              @OA\Property(property="success", type="boolean", example="true"),
+     *               @OA\Property(property="true", type="json", example={"message": {"All notifications marked as unread."}}),
+     *           ),
+     *       ),
+     *
+     *       @OA\Response(
+     *           response=401,
+     *           description="Invalid user",
+     *
+     *           @OA\JsonContent(
+     *
+     *               @OA\Property(property="success", type="boolean", example="false"),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Unauthenticated"}}),
+     *           )
+     *       )
+     * )
+     */
+
+    public function markAllAsUnRead(UpdateReadAndUnreadNotificationRequest $readAndUnreadNotificationRequest): \Illuminate\Http\JsonResponse
+    {
+        $notification = Notification::query();
+
+        $notification->whereIn('id', $readAndUnreadNotificationRequest->id);
 
         $notification->update(['read_at' => null]);
 

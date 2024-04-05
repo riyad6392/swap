@@ -1,11 +1,17 @@
 <?php
 
 use App\Http\Controllers\Auth\RegistrationController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentMethodController;
+use App\Http\Controllers\PlanController;
 use App\Http\Controllers\PlanSubscriptionController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RatingController;
+use App\Http\Controllers\SwapController;
+use App\Http\Controllers\SwapExchangeDetailsController;
+use App\Http\Controllers\SwapRequestDetailsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
@@ -48,20 +54,22 @@ Route::group(['middleware' => 'auth:api'], function () {
 
         //Inventory
 
-        Route::resource('category', \App\Http\Controllers\CategoryController::class);
-        Route::resource('product', \App\Http\Controllers\ProductController::class);
-        Route::resource('plan', \App\Http\Controllers\PlanController::class);
+        Route::resource('category', CategoryController::class);
+        Route::resource('product', ProductController::class);
+        Route::resource('plan', PlanController::class);
 
         //rating
-        Route::apiResource('ratings', \App\Http\Controllers\RatingController::class);
+        Route::apiResource('ratings', RatingController::class);
         Route::get('ratings/given-to-me', [RatingController::class, 'ratingsGivenToMe']);
         Route::get('ratings/given-by-me', [RatingController::class, 'ratingsGivenByMe']);
 
         //swap
 
-        Route::resource('swap', \App\Http\Controllers\SwapController::class);
-        Route::resource('swap-request-details', \App\Http\Controllers\SwapRequestDetailsController::class);
-        Route::resource('swap-exchange-details', \App\Http\Controllers\SwapExchangeDetailsController::class);
+        Route::resource('swap', SwapController::class);
+        Route::resource('swap-request-details', SwapRequestDetailsController::class);
+        Route::resource('swap-exchange-details', SwapExchangeDetailsController::class);
+        Route::get('swap-approve/{id}', [SwapController::class, 'approve']);
+        Route::get('swap-decline/{id}', [SwapController::class, 'decline']);
 
 //        Broadcast::routes();
 
@@ -70,8 +78,8 @@ Route::group(['middleware' => 'auth:api'], function () {
         //Notification
         Route::get('notifications', [NotificationController::class , 'index']);
         Route::get('notification-show/{id}', [NotificationController::class , 'show']);
-        Route::get('mark-as-read', [NotificationController::class , 'markAllAsRead']);
-        Route::get('mark-as-unread', [NotificationController::class , 'markAllAsUnRead']);
+        Route::post('mark-as-read', [NotificationController::class , 'markAllAsRead']);
+        Route::post('mark-as-unread', [NotificationController::class , 'markAllAsUnRead']);
 
 
     });

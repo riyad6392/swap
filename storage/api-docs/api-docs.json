@@ -1502,13 +1502,13 @@
                 ]
             }
         },
-        "/api/mark-as-read": {
+        "/api/notification-show/{id}": {
             "get": {
                 "tags": [
                     "Notifications"
                 ],
-                "summary": "Mark As Read.",
-                "operationId": "820056bcebc37345c350547619e6676c",
+                "summary": "A Single Notification show.",
+                "operationId": "952d857138ddd1c3ade616dd295237b1",
                 "parameters": [
                     {
                         "name": "id",
@@ -1577,22 +1577,34 @@
                 ]
             }
         },
-        "/api/mark-as-unread": {
-            "get": {
+        "/api/mark-as-read": {
+            "post": {
                 "tags": [
                     "Notifications"
                 ],
-                "summary": "Mark As Un Read.",
-                "operationId": "b4d127480e2cf69c72eaa9bc79cfa7ec",
+                "summary": "Mark As Read.",
+                "operationId": "cc8e407065bccbecaafb035bc5c223d7",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "id[]",
                         "in": "query",
-                        "required": false,
+                        "description": "Notification id",
+                        "required": true,
                         "schema": {
-                            "type": "number"
-                        },
-                        "example": "1"
+                            "type": "array",
+                            "items": {
+                                "required": [
+                                    "path"
+                                ],
+                                "properties": {
+                                    "path": {
+                                        "type": "string",
+                                        "example": "[1,2,3]"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
                     }
                 ],
                 "responses": {
@@ -1611,6 +1623,93 @@
                                             "example": {
                                                 "message": [
                                                     "All notifications marked as read."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Unauthenticated"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/mark-as-unread": {
+            "post": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Mark As Unread.",
+                "operationId": "701e5db13a1ee7d457e118a540e8cacc",
+                "parameters": [
+                    {
+                        "name": "id[]",
+                        "in": "query",
+                        "description": "Notification id",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "required": [
+                                    "path"
+                                ],
+                                "properties": {
+                                    "path": {
+                                        "type": "string",
+                                        "example": "[1,2,3]"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "true": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "All notifications marked as unread."
                                                 ]
                                             }
                                         }
