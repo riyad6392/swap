@@ -386,6 +386,8 @@ class SwapController extends Controller
         try {
             DB::beginTransaction();
 
+//            $swap->
+
             $prepareData = SwapRequestService::prepareDetailsData(
                 $SwapExchangeDetailsRequest,
                 $swap,
@@ -466,6 +468,37 @@ class SwapController extends Controller
         return response()->json(['success' => true, 'message' => 'Swap and related data deleted successfully'], 200);
     }
 
+    /**
+     * Swap Approve by user.
+     *
+     * @OA\Get(
+     *     path="/api/swap-approve/{id}",
+     *     tags={"Swaps"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Approve swap by ID",
+     *         @OA\Schema(type="integer", format="int64")
+     *     ),
+     *    @OA\Response(
+     *         response=200,
+     *         description="success",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example="true"),
+     *             @OA\Property(property="errors", type="json", example={"message": {"Get swap details."}}),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Swap not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example="false"),
+     *             @OA\Property(property="message", type="string", example="Swap not found")
+     *         )
+     *     )
+     * )
+     */
     public function approve($id): \Illuminate\Http\JsonResponse
     {
        $swap = Swap::find($id);
@@ -486,6 +519,37 @@ class SwapController extends Controller
         return response()->json(['success' => true, 'message' => 'You are not allow to change the swap status'], 200);
     }
 
+    /**
+     * Swap Approve by user.
+     *
+     * @OA\Get(
+     *     path="/api/swap-decline/{id}",
+     *     tags={"Swaps"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Approve swap by ID",
+     *         @OA\Schema(type="integer", format="int64")
+     *     ),
+     *    @OA\Response(
+     *         response=200,
+     *         description="success",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example="true"),
+     *             @OA\Property(property="errors", type="json", example={"message": {"Get swap details."}}),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Swap not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example="false"),
+     *             @OA\Property(property="message", type="string", example="Swap not found")
+     *         )
+     *     )
+     * )
+     */
     public function decline($id): \Illuminate\Http\JsonResponse
     {
         $swap = Swap::find($id);

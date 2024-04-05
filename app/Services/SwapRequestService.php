@@ -22,8 +22,8 @@ class SwapRequestService
 
             if ($variation) {
 
-                $product_amount = $product['variation_quantity'] * $variation->unit_price ?? 0;
-                $product_commission = $product['variation_quantity'] * ($variation->unit_price ?? 0 * self::COMMISSION);
+                $productAmount = $product['variation_quantity'] * $variation->unit_price ?? 0;
+                $productCommission = $product['variation_quantity'] * self::COMMISSION;
 
                 $insertData[] = [
                     'uid' => uniqid(),
@@ -33,14 +33,14 @@ class SwapRequestService
                     'product_variation_id' => $product['variation_id'],
                     'quantity' => $product['variation_quantity'],
                     'unit_price' => $variation->unit_price ?? 0,
-                    'amount' => $product_amount,
-                    'commission' => $product_commission,
+                    'amount' => $productAmount,
+                    'commission' => $productCommission,
                     'created_by' => auth()->id(),
                     'updated_by' => auth()->id(),
                 ];
 
-                $wholeSaleAmount += $product_amount;
-                $totalCommission += $product_commission;
+                $wholeSaleAmount += $productAmount;
+                $totalCommission += $productCommission;
             }
         }
         return ['insertData' => $insertData, 'wholeSaleAmount' => $wholeSaleAmount, 'totalCommission' => $totalCommission];
