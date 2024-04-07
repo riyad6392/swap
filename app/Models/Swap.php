@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Swap extends Model
 {
     use HasFactory, ModelAttributeTrait;
+
     protected $fillable = [
         'uid',
         'user_id',
@@ -23,14 +24,21 @@ class Swap extends Model
         'updated_by'
     ];
 
+    public function notifications()
+    {
+        return $this->morphMany(Notification::class, 'notifiable');
+    }
+
     public function exchangeDetails()
     {
         return $this->hasMany(SwapExchangeDetails::class);
     }
+
     public function requestDetail()
     {
         return $this->hasMany(SwapRequestDetails::class);
     }
+
     public function shipments()
     {
         return $this->hasMany(Shipment::class);

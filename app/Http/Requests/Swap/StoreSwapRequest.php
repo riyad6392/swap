@@ -24,8 +24,8 @@ class StoreSwapRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'requested_user_id' => 'required|integer',
-            'exchanged_user_id' => 'required|integer',
+            'requested_user_id' => 'required|integer|exists:users,id',
+            'exchanged_user_id' => 'required|integer|exists:users,id',
             'status' => 'required|string',
 //            'requested_wholesale_amount' => 'required|integer',
 //            'exchanged_wholesale_amount' => 'required|integer',

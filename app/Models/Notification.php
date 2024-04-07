@@ -12,9 +12,7 @@ class Notification extends Model
 
     protected $fillable = [
         'id',
-        'swap_id',
-        'requester_id',
-        'exchanger_id',
+        'notifiable',
         'data',
         'read_at',
     ];
@@ -23,8 +21,13 @@ class Notification extends Model
         'data' => 'array',
     ];
 
-    public function swap(){
-        return $this->belongsTo(Swap::class , 'swap_id' , 'id');
+    public function notifiable()
+    {
+        return $this->morphTo();
+    }
+
+    public function users(){
+        return $this->belongsToMany(User::class);
     }
 
     public static function boot()
@@ -32,4 +35,6 @@ class Notification extends Model
         parent::boot();
         static::addGlobalScope(new UserNotificationScope());
     }
+
+
 }

@@ -13,22 +13,24 @@ enum SwapNotificationService: string
 {
     case MESSAGE = 'Swap request has been sent';
 
-    public static function sendNotification($swap, $id, $message): void
+    public static function sendNotification($swap, array $id, $message): void
     {
 
-        $user = User::find($id);
-
-        NotificationModel::create([
+        $insertNotification = $swap->notifications()->create([
+            'data' => [
                 'swap_id' => $swap->id,
-                'requester_id' => auth()->user()->id,
-                'exchanger_id' => $user->id,
-                'data' => [
-                    'swap_id' => $swap->id,
-                    'data' => $message,
-                ],
-            ]);
+                'data'    => $message,
+            ],
+        ]);
 
-        Notification::send($user, new SwapRequestNotification($swap, $message));
+        $users = User::whereIn('id', $id)->get();
+
+        $users->each(function ($user) use ($insertNotification, $swap, $message) {
+
+            $user->notifications()->attach($insertNotification->id);
+            Notification::send($user, new SwapRequestNotification($swap, $message));
+        });
+
     }
 
 }

@@ -3,7 +3,6 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Models\Scopes\Notification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\HasDatabaseNotifications;
@@ -14,7 +13,7 @@ use Stripe\PaymentMethod;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable,Billable,HasDatabaseNotifications;
+    use HasApiTokens, HasFactory, Notifiable,Billable;
 
     /**
      * The attributes that are mass assignable.
@@ -64,15 +63,21 @@ class User extends Authenticatable
 
     public function notifications()
     {
-        return $this->morphMany(Notification::class, 'notifiable')
-                    ->orderBy('created_at', 'desc');
+        return $this->belongsToMany(Notification::class);
+
     }
-    public function unreadNotifications()
-    {
-        return $this->notifications()->whereNull('read_at');
-    }
-    public function readNotifications()
-    {
-        return $this->notifications()->whereNotNull('read_at');
-    }
+
+//    public function notifications()
+//    {
+//        return $this->morphMany(Notification::class, 'notifiable')
+//                    ->orderBy('created_at', 'desc');
+//    }
+//    public function unreadNotifications()
+//    {
+//        return $this->notifications()->whereNull('read_at');
+//    }
+//    public function readNotifications()
+//    {
+//        return $this->notifications()->whereNotNull('read_at');
+//    }
 }

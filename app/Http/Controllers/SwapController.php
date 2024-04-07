@@ -210,7 +210,7 @@ class SwapController extends Controller
 
             SwapNotificationService::sendNotification(
                 $swap,
-                $swap->exchanged_user_id,
+                [$swap->exchanged_user_id],
                 'You have a new swap request ' . $swap->id
             );
 
@@ -515,7 +515,7 @@ class SwapController extends Controller
 
             SwapNotificationService::sendNotification(
                 $swap,
-                $swap->requested_user_id,
+                [$swap->requested_user_id],
                 'Swap request has been accepted'
             );
 
@@ -566,7 +566,7 @@ class SwapController extends Controller
 
             SwapNotificationService::sendNotification(
                 $swap,
-                $swap->requested_user_id,
+                [$swap->requested_user_id],
                 'your swap request has been declined'
             );
 

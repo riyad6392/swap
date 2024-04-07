@@ -70,6 +70,8 @@ class NotificationController extends Controller
     {
         $notification = Notification::query();
 
+        $notification = $notification->with('notifiable');
+
         $notification->orderBy('created_at', 'desc');
 
         if ($request->get('get_all')) {
