@@ -11,11 +11,9 @@ use App\Models\Notification as NotificationModel;
 
 enum SwapNotificationService: string
 {
-    case MESSAGE = 'Swap request has been sent';
 
     public static function sendNotification($swap, array $id, $message): void
     {
-
         $insertNotification = $swap->notifications()->create([
             'data' => [
                 'swap_id' => $swap->id,

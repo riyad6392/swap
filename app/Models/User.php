@@ -4,6 +4,8 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\HasDatabaseNotifications;
 use Illuminate\Notifications\Notifiable;
@@ -48,7 +50,7 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function paymentMethods()
+    public function paymentMethods(): HasMany
     {
         return $this->hasMany(PaymentMethod::class);
     }
@@ -61,7 +63,7 @@ class User extends Authenticatable
         return $this->hasMany(Rating::class, 'rated_id');
     }
 
-    public function notifications()
+    public function notifications(): BelongsToMany
     {
         return $this->belongsToMany(Notification::class);
 

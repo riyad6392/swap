@@ -127,8 +127,7 @@ class NotificationController extends Controller
 
     public function show($id): \Illuminate\Http\JsonResponse
     {
-        $notification = Notification::where('exchanger_id', auth()->id())
-            ->with('swap')->find($id);
+        $notification = Notification::find($id);
 
         if (!$notification) {
             return response()->json(['success' => false, 'message' => 'Notification not found'], 404);
