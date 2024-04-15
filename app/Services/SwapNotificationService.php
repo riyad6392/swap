@@ -11,7 +11,6 @@ use App\Models\Notification as NotificationModel;
 
 enum SwapNotificationService: string
 {
-
     public static function sendNotification($swap, array $id, $message): void
     {
         $insertNotification = $swap->notifications()->create([

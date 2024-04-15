@@ -73,7 +73,7 @@ Route::group(['middleware' => 'auth:api'], function () {
 
 //        Broadcast::routes();
 
-        Route::get('send-message', [MessageController::class , 'sendMessage']);
+        Route::post('message', [MessageController::class , 'store']);
 
         //Notification
         Route::get('notifications', [NotificationController::class , 'index']);
