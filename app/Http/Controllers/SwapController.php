@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\MessageBroadcast;
 use App\Http\Requests\Swap\StoreSwapExchangeDetailsRequest;
 use App\Http\Requests\Swap\StoreSwapRequest;
 use App\Http\Requests\Swap\StoreSwapRequestDetails;
 use App\Http\Requests\Swap\StoreSwapRequestDetailsRequest;
 use App\Http\Requests\Swap\UpdateSwapDetailsRequest;
 use App\Http\Requests\Swap\UpdateSwapRequest;
+use App\Models\Message;
 use App\Models\Swap;
 use App\Models\SwapExchangeDetails;
+use App\Services\SwapMessageService;
 use App\Services\SwapNotificationService;
 use App\Services\SwapRequestService;
 use Illuminate\Http\Request;
@@ -213,6 +216,23 @@ class SwapController extends Controller
                 [$swap->exchanged_user_id],
                 'You have a new swap request ' . $swap->id
             );
+
+            $conversation = SwapMessageService::createPrivateConversation(
+                auth()->id(),
+                $swapRequest->exchanged_user_id,
+                'private'
+            );
+
+            Message::create([
+                'message' => 'You have a new swap request ' . $swap->id,
+                'receiver_id' => $swapRequest->exchanged_user_id,
+                'swap_id' => $swap->id,
+                'sender_id' => auth()->id(),
+                'conversation_id' => $conversation->id,
+                'message_type' => 'notification',
+            ]);
+
+            event(new MessageBroadcast($conversation));
 
             DB::commit();
             return response()->json(['success' => true, 'data' => $swap], 201);

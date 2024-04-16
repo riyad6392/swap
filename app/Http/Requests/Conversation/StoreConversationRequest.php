@@ -2,16 +2,18 @@
 
 namespace App\Http\Requests\Conversation;
 
+use App\Traits\ValidationErrorMessageTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreConversationRequest extends FormRequest
 {
+    use ValidationErrorMessageTrait;
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +24,30 @@ class StoreConversationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'message' => 'required|string',
+            'receiver_id' => 'required|integer|exists:users,id',
+            'swap_id' => 'required|integer|exists:swaps,id',
+            'sender_id' => 'required|integer|exists:users,id',
+            'conversation_id' => 'nullable|integer',
+            'conversation_type' => 'required|string|in:private,group',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'message.required' => 'The message field is required.',
+            'receiver_id.required' => 'The receiver_id field is required.',
+            'receiver_id.integer' => 'The receiver_id field must be an integer.',
+            'swap_id.required' => 'The swap_id field is required.',
+            'swap_id.integer' => 'The swap_id field must be an integer.',
+            'sender_id.required' => 'The sender_id field is required.',
+            'sender_id.integer' => 'The sender_id field must be an integer.',
+            'conversation_id.required' => 'The group_id field is required.',
+            'conversation_id.integer' => 'The group_id field must be an integer.',
+            'conversation_type.required' => 'The conversation_type field is required.',
+            'conversation_type.string' => 'The conversation_type field must be a string.',
+            'conversation_type.in' => 'The selected conversation_type is invalid.',
         ];
     }
 }

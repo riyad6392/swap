@@ -15,7 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('channel_name');
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id')->comment('owner of the conversation');
+            $table->enum('conversation_type', ['private', 'group'])->default('private');
+            $table->string('composite_id')->comment('sender_id:receiver_id');
+            $table->string('reverse_composite_id')->comment('receiver_id:sender_id');
+            $table->integer('last_message_id')->nullable();
+            $table->longText('last_message')->nullable();
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users');
 

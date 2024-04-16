@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('uid');
             $table->integer('user_id');
-            $table->integer('requested_user_id')->nullable();
-            $table->integer('exchanged_user_id');
+            $table->integer('requested_user_id')->comment('User who requested the swap');
+            $table->integer('exchanged_user_id')->comment('User who accepted the swap');
             $table->enum('status', ['requested', 'accepted', 'completed', 'decline'])->default('requested');
 
             $table->integer('requested_wholesale_amount')->nullable();

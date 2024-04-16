@@ -29,7 +29,7 @@ class StoreMessageRequest extends FormRequest
             'receiver_id' => 'required|integer|exists:users,id',
             'swap_id' => 'required|integer|exists:swaps,id',
             'sender_id' => 'required|integer|exists:users,id',
-            'conversation_id' => 'required|integer',
+            'conversation_id' => 'nullable|integer|exists:conversations,id',
         ];
     }
 

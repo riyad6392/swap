@@ -16,8 +16,9 @@ return new class extends Migration {
             $table->unsignedBigInteger('conversation_id');
             $table->unsignedBigInteger('sender_id');
             $table->unsignedBigInteger('swap_id');
-            $table->enum('type', ['message', 'notification', 'image', 'video', 'audio']);
+            $table->enum('message_type', ['message', 'notification', 'image', 'video', 'audio']);
             $table->longText('message');
+            $table->json('data')->nullable();
             $table->string('file_path')->nullable();
             $table->dateTime('read_at')->nullable();
             $table->dateTime('deleted_at')->nullable();

@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\Conversation;
 use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -20,7 +21,7 @@ class MessageBroadcast implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct(User $request)
+    public function __construct(Conversation $request)
     {
         $this->request = $request;
     }
@@ -33,7 +34,7 @@ class MessageBroadcast implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel("user.2"),
+            new PrivateChannel($this->request->channel_name),
 //            new Channel('testing-channel'),
         ];
     }
