@@ -123,6 +123,8 @@ class MessageController extends Controller
             'sender_id')
         );
 
+        $message = $message->load('sender', 'receiver','swap');
+
         event(new MessageBroadcast($conversation, $message));
 
         return response()->json(['success' => true, 'message' => 'Message sent successfully', 'data' => $message]);

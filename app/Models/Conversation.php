@@ -20,11 +20,6 @@ class Conversation extends Model
         'last_message_id',
     ];
 
-    public function participents()
-    {
-        return $this->hasMany(Participant::class);
-    }
-
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -39,4 +34,6 @@ class Conversation extends Model
     {
         return $this->hasMany(Participant::class);
     }
+
+
 }

@@ -39,14 +39,14 @@ class Message extends Model
         return $this->belongsTo(Swap::class);
     }
 
-    public function group()
-    {
-        return $this->belongsTo(Group::class);
-    }
-
     public function images()
     {
         return $this->morphMany(Image::class, 'imageable');
+    }
+
+    public function conversation()
+    {
+        return $this->belongsTo(Conversation::class);
     }
 
 

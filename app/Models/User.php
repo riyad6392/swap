@@ -74,12 +74,13 @@ class User extends Authenticatable
 //        return $this->morphMany(Notification::class, 'notifiable')
 //                    ->orderBy('created_at', 'desc');
 //    }
-//    public function unreadNotifications()
-//    {
-//        return $this->notifications()->whereNull('read_at');
-//    }
-//    public function readNotifications()
-//    {
-//        return $this->notifications()->whereNotNull('read_at');
-//    }
+    public function unreadNotifications()
+    {
+        return $this->notifications()->whereNull('read_at');
+    }
+
+    public function readNotifications()
+    {
+        return $this->notifications()->whereNotNull('read_at');
+    }
 }

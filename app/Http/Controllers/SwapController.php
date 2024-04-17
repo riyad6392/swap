@@ -214,16 +214,18 @@ class SwapController extends Controller
             SwapNotificationService::sendNotification(
                 $swap,
                 [$swap->exchanged_user_id],
-                'You have a new swap request ' . $swap->id
+                'You have a new swap request ' . $swap->uid
             );
 
             $conversation = SwapMessageService::createPrivateConversation(
                 auth()->id(),
                 $swapRequest->exchanged_user_id,
-                'private'
+                'private',
+                auth()->id(),
+                'You have a new swap request ' . $swap->uid
             );
 
-            Message::create([
+            $message = Message::create([
                 'message' => 'You have a new swap request ' . $swap->id,
                 'receiver_id' => $swapRequest->exchanged_user_id,
                 'swap_id' => $swap->id,
@@ -232,7 +234,9 @@ class SwapController extends Controller
                 'message_type' => 'notification',
             ]);
 
-            event(new MessageBroadcast($conversation));
+            $message = $message->load('sender', 'receiver','swap');
+
+            event(new MessageBroadcast($conversation, $message));
 
             DB::commit();
             return response()->json(['success' => true, 'data' => $swap], 201);

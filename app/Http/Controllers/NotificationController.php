@@ -68,20 +68,27 @@ class NotificationController extends Controller
 
     public function index(Request $request): \Illuminate\Http\JsonResponse
     {
-        $notification = Notification::query();
+        $notificationQuery = Notification::query()->with('notifiable');
 
-        $notification = $notification->with('notifiable');
+        $unreadNotificationsCount = Notification::getReadNotification()->count();
+        $readNotificationsCount = Notification::getUnreadNotification()->count();
 
-        $notification->orderBy('created_at', 'desc');
+        $notificationQuery->orderByDesc('created_at');
 
         if ($request->get('get_all')) {
-
-            return response()->json(['success' => true, 'data' => $notification->get()]);
+            $notificationList = $notificationQuery->get();
+        } else {
+            $notificationList = $notificationQuery->paginate(10);
         }
 
-        $notification = $notification->paginate(10);
-
-        return response()->json(['success' => true, 'data' => $notification], 200);
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'notifications' => $notificationList,
+                'unreadNotifications' => $unreadNotificationsCount,
+                'readNotifications' => $readNotificationsCount
+            ]
+        ], 200);
     }
 
     /**
@@ -189,7 +196,6 @@ class NotificationController extends Controller
         $notification = Notification::query();
 
         $notification->whereIn('id', $readAndUnreadNotificationRequest->id);
-
 
         $notification->update(['read_at' => now()]);
 

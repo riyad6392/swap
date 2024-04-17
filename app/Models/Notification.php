@@ -21,6 +21,8 @@ class Notification extends Model
         'data' => 'array',
     ];
 
+//    protected $appends = ['read_notification','unread_notification'];
+
     public function notifiable()
     {
         return $this->morphTo();
@@ -28,6 +30,14 @@ class Notification extends Model
 
     public function users(){
         return $this->belongsToMany(User::class);
+    }
+
+    public static function getReadNotification(){
+        return static::where('read_at', null);
+    }
+
+    public static function getUnreadNotification(){
+        return static::whereNotNull('read_at');
     }
 
     public static function boot()
