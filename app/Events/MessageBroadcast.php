@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use App\Models\Conversation;
+use App\Models\Message;
 use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -17,13 +18,15 @@ class MessageBroadcast implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $request;
+    public $message;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(Conversation $request)
+    public function __construct(Conversation $request, Message $message)
     {
         $this->request = $request;
+        $this->message = $message;
     }
 
     /**
@@ -34,8 +37,7 @@ class MessageBroadcast implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel($this->request->channel_name),
-//            new Channel('testing-channel'),
+            new PrivateChannel('conversation.'.$this->request->channel_name),
         ];
     }
 
@@ -46,9 +48,8 @@ class MessageBroadcast implements ShouldBroadcast
 
     public function broadcastWith()
     {
-// this is what we are sending
         return [
-            'message' => 'You have a Request',
+            'message' => $this->message,
             'request' => $this->request
         ];
     }

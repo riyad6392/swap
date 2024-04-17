@@ -123,7 +123,7 @@ class MessageController extends Controller
             'sender_id')
         );
 
-        event(new MessageBroadcast($conversation));
+        event(new MessageBroadcast($conversation, $message));
 
         return response()->json(['success' => true, 'message' => 'Message sent successfully', 'data' => $message]);
     }
