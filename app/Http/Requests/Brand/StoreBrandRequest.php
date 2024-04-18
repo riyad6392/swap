@@ -1,14 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Category;
+namespace App\Http\Requests\Brand;
 
 use App\Traits\ValidationErrorMessageTrait;
-use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
 
-
-class StoreCategoryRequest extends FormRequest
+class StoreBrandRequest extends FormRequest
 {
     use ValidationErrorMessageTrait;
     /**
@@ -27,15 +24,17 @@ class StoreCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|unique:categories,name'
+            'name' => 'required|string|max:255|unique:brands,name'
         ];
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
-            'name.required' => 'Category name is required',
-            'name.unique' => 'Category name already exists',
+            'name.required' => 'Name is required',
+            'name.string' => 'Name must be a string',
+            'name.max' => 'Name must not be greater than 255 characters',
+            'name.unique' => 'Name already exists',
         ];
     }
 }

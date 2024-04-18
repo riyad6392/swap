@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\RegistrationController;
+use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
@@ -54,6 +55,7 @@ Route::group(['middleware' => 'auth:api'], function () {
 
         //Inventory
         Route::resource('category', CategoryController::class);
+        Route::resource('brand', BrandController::class);
         Route::resource('product', ProductController::class);
         Route::resource('plan', PlanController::class);
 

@@ -2,23 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Category\StoreCategoryRequest;
-use App\Http\Requests\Category\UpdateCategoryRequest;
-use App\Models\Category;
+use App\Http\Requests\Brand\StoreBrandRequest;
+use App\Http\Requests\Brand\UpdateBrandRequest;
+use App\Models\Brand;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
-
-class CategoryController extends Controller
+class BrandController extends Controller
 {
     const PER_PAGE = 10;
-
     /**
-     * Category List.
+     * Brand List.
      *
      * @OA\Get(
-     *     path="/api/category",
-     *     tags={"Category"},
+     *     path="/api/brand",
+     *     tags={"Brand"},
      *     security={{ "apiAuth": {} }},
      *
      *     @OA\MediaType(mediaType="multipart/form-data"),
@@ -63,16 +60,20 @@ class CategoryController extends Controller
      *       )
      * )
      */
-    public function index(Request $request)
+    public function index(Request $request): \Illuminate\Http\JsonResponse
     {
-        $categories = Category::query();
+        $brands = Brand::query();
+
+        if (request()->has('search')) {
+            $brands->where('name', 'like', '%' . request('search') . '%');
+        }
 
         if ($request->get('get_all')) {
 
-            return response()->json(['success' => true, 'data' => $categories->get()]);
+            return response()->json(['success' => true, 'data' => $brands->get()]);
         }
 
-        $categories = $categories->paginate($request->pagination ?? self::PER_PAGE);
+        $categories = $brands->paginate($request->pagination ?? self::PER_PAGE);
 
         return response()->json(['success' => true, 'data' => $categories]);
     }
@@ -82,15 +83,15 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        //
+
     }
 
     /**
-     * Create a new Category.
+     * Create a new Brand.
      *
      *
-     * @OA\Post (path="/api/category",
-     *     tags={"Category"},
+     * @OA\Post (path="/api/brand",
+     *     tags={"Brand"},
      *     security={{ "apiAuth": {} }},
      *
      *
@@ -110,7 +111,7 @@ class CategoryController extends Controller
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="success", type="boolean", example="true"),
-     *               @OA\Property(property="errors", type="json", example={"message": {"Category created successfully."}}),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Brand created successfully."}}),
      *          ),
      *      ),
      *
@@ -126,47 +127,18 @@ class CategoryController extends Controller
      *      )
      * )
      */
-    public function store(StoreCategoryRequest $request)
+    public function store(StoreBrandRequest $brandRequest)
     {
-        Category::create($request->only('name'));
-        return response()->json(['success' => true, 'message' => 'Category created successfully.']);
+        $brand = Brand::create($brandRequest->all());
+        return response()->json(['success' => true, 'message' => 'Brand created successfully', 'data' => $brand]);
     }
 
     /**
-     * Category Show.
-     *
-     * @OA\Get(
-     *     path="/api/category/{id}",
-     *     tags={"Category"},
-     *     security={{ "apiAuth": {} }},
-     *
-     *      @OA\Response(
-     *          response=200,
-     *          description="success",
-     *
-     *          @OA\JsonContent(
-     *
-     *              @OA\Property(property="data", type="json", example={"id": 1,"name": "Category 1","description": "Description", "created_at": "2022-11-02T12:25:16.000000Z","updated_at": "2022-11-02T12:25:16.000000Z"},),
-     *          )
-     *      ),
-     *
-     *       @OA\Response(
-     *           response=401,
-     *           description="Invalid user",
-     *
-     *           @OA\JsonContent(
-     *
-     *               @OA\Property(property="success", type="boolean", example="false"),
-     *               @OA\Property(property="errors", type="json", example={"message": {"Unauthenticated"}}),
-     *           )
-     *       )
-     * )
+     * Display the specified resource.
      */
-
     public function show(string $id)
     {
-        $category = Category::findOrFail($id);
-        return response()->json(['success' => true, 'data' => $category]);
+        //
     }
 
     /**
@@ -178,11 +150,11 @@ class CategoryController extends Controller
     }
 
     /**
-     * Update Category.
+     * Update Brand
      *
      * @OA\Put (
-     *     path="/api/category/{id}",
-     *     tags={"Category"},
+     *     path="/api/brand/{id}",
+     *     tags={"Brand"},
      *     security={{ "apiAuth": {} }},
      *
      *     @OA\Parameter(
@@ -201,7 +173,7 @@ class CategoryController extends Controller
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="success", type="boolean", example="true"),
-     *               @OA\Property(property="errors", type="json", example={"message": {"Category updated successfully."}}),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Brand updated successfully."}}),
      *          ),
      *      ),
      *
@@ -217,24 +189,19 @@ class CategoryController extends Controller
      *      )
      * )
      */
-    public function update(UpdateCategoryRequest $updateCategory, string $id): \Illuminate\Http\JsonResponse
+    public function update(UpdateBrandRequest $brandRequest, string $id)
     {
-        $category = Category::findOrFail($id);
-        if ($category) {
-
-            $category->update($updateCategory->only('name'));
-            return response()->json(['success' => true, 'message' => 'Category updated successfully.']);
-
-        }
-        return response()->json(['success' => false, 'message' => 'Category not found.'], 404);
+        $brand = Brand::find($id);
+        $brand->update($brandRequest->all());
+        return response()->json(['success' => true, 'message' => 'Brand updated successfully', 'data' => $brand]);
     }
 
     /**
-     * Remove the specified Category from storage.
+     * Delete Brand
      *
      * @OA\Delete (
-     *     path="/api/category/{id}",
-     *     tags={"Category"},
+     *     path="/api/brand/{id}",
+     *     tags={"Brand"},
      *     security={{ "apiAuth": {} }},
      *
      *      @OA\Response(
@@ -244,7 +211,7 @@ class CategoryController extends Controller
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="success", type="boolean", example="true"),
-     *               @OA\Property(property="errors", type="json", example={"message": {"Category deleted successfully."}}),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Brand deleted successfully."}}),
      *          ),
      *      ),
      *
@@ -261,11 +228,8 @@ class CategoryController extends Controller
      */
     public function destroy(string $id)
     {
-        $category = Category::findOrFail($id);
-        if ($category) {
-            $category->delete();
-            return response()->json(['success' => true, 'message' => 'Category deleted successfully.']);
-        }
-        return response()->json(['success' => false, 'message' => 'Category not found.'], 404);
+        $brand = Brand::find($id);
+        $brand->delete();
+        return response()->json(['success' => true, 'message' => 'Brand deleted successfully']);
     }
 }
