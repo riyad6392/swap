@@ -53,7 +53,6 @@ Route::group(['middleware' => 'auth:api'], function () {
         });
 
         //Inventory
-
         Route::resource('category', CategoryController::class);
         Route::resource('product', ProductController::class);
         Route::resource('plan', PlanController::class);
@@ -64,7 +63,6 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::get('ratings/given-by-me', [RatingController::class, 'ratingsGivenByMe']);
 
         //swap
-
         Route::resource('swap', SwapController::class);
         Route::resource('swap-request-details', SwapRequestDetailsController::class);
         Route::resource('swap-exchange-details', SwapExchangeDetailsController::class);
@@ -73,9 +71,12 @@ Route::group(['middleware' => 'auth:api'], function () {
 
 //        Broadcast::routes();
 
+        //Message
         Route::get('messages', [MessageController::class , 'index']);
         Route::post('prepare-conversation', [MessageController::class , 'prepareConversation']);
         Route::post('send-messages', [MessageController::class , 'sendMessages']);
+        Route::put('update-message/{id}', [MessageController::class , 'updateMessage']);
+        Route::delete('delete-message/{id}', [MessageController::class , 'deleteMessage']);
 
         //Notification
         Route::get('notifications', [NotificationController::class , 'index']);

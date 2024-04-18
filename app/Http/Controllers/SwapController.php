@@ -9,6 +9,7 @@ use App\Http\Requests\Swap\StoreSwapRequestDetails;
 use App\Http\Requests\Swap\StoreSwapRequestDetailsRequest;
 use App\Http\Requests\Swap\UpdateSwapDetailsRequest;
 use App\Http\Requests\Swap\UpdateSwapRequest;
+use App\Jobs\SwapJob;
 use App\Models\Message;
 use App\Models\Swap;
 use App\Models\SwapExchangeDetails;
@@ -211,12 +212,6 @@ class SwapController extends Controller
                 ]
             );
 
-            SwapNotificationService::sendNotification(
-                $swap,
-                [$swap->exchanged_user_id],
-                'You have a new swap request ' . $swap->uid
-            );
-
             $conversation = SwapMessageService::createPrivateConversation(
                 auth()->id(),
                 $swapRequest->exchanged_user_id,
@@ -234,9 +229,9 @@ class SwapController extends Controller
                 'message_type' => 'notification',
             ]);
 
-            $message = $message->load('sender', 'receiver','swap');
+            $message = $message->load('sender', 'receiver', 'swap');
 
-            event(new MessageBroadcast($conversation, $message));
+            dispatch(new SwapJob($swap, $conversation, $message));
 
             DB::commit();
             return response()->json(['success' => true, 'data' => $swap], 201);
