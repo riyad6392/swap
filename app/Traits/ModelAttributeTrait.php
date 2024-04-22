@@ -40,5 +40,22 @@ trait ModelAttributeTrait
                 $model->slug = Str::slug($model->name);
             }
         });
+
+        static::updating(function ($model) {
+            if (!$model->isDirty('slug')) {
+                $model->slug = Str::slug($model->name);
+            }
+        });
     }
+
+    public static function bootUserId()
+    {
+        static::creating(function ($model) {
+            if (!$model->isDirty('user_id')) {
+                $model->user_id = auth()->id();
+            }
+        });
+    }
+
+
 }

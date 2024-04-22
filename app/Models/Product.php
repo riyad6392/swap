@@ -40,6 +40,7 @@ class Product extends Model
         parent::boot();
         self::bootCreatedUpdatedBy();
 
+        self::bootUserId();
         static::addGlobalScope(new UserSpecificDataScope());
     }
 

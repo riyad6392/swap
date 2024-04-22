@@ -54,9 +54,11 @@ class RatingController extends Controller
     public function index(Request $request)
     {
         $rating = Rating::query();
+
         if ($request->get('get_all')) {
             return response()->json(['success' => true, 'data' => $rating->get()]);
         }
+
         $rating = $rating->paginate($request->pagination ?? self::PER_PAGE);
 
         return response()->json(['success' => true, 'data' => $rating]);

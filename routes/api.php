@@ -10,6 +10,7 @@ use App\Http\Controllers\PlanController;
 use App\Http\Controllers\PlanSubscriptionController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RatingController;
+use App\Http\Controllers\SizeController;
 use App\Http\Controllers\SwapController;
 use App\Http\Controllers\SwapExchangeDetailsController;
 use App\Http\Controllers\SwapRequestDetailsController;
@@ -57,10 +58,12 @@ Route::group(['middleware' => 'auth:api'], function () {
         //User
         Route::get('user-list', [UserController::class, 'userList']);
         Route::get('user-inventory/{id}', [UserController::class, 'userInventory']);
+        Route::post('update-profile', [UserController::class, 'updateProfile']);
 
         //Inventory
         Route::resource('category', CategoryController::class);
         Route::resource('brand', BrandController::class);
+        Route::resource('size', SizeController::class);
         Route::resource('product', ProductController::class);
         Route::resource('plan', PlanController::class);
 

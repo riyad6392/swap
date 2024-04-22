@@ -50,6 +50,10 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    protected $appends = [
+        'average_rating'
+    ];
+
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
@@ -66,6 +70,11 @@ class User extends Authenticatable
     public function receivedRatings(): HasMany
     {
         return $this->hasMany(Rating::class, 'rated_id');
+    }
+
+    public function getAverageRatingAttribute()
+    {
+        return round($this->receivedRatings()->avg('rating'),1);
     }
 
     public function notifications(): BelongsToMany
@@ -87,5 +96,10 @@ class User extends Authenticatable
     public function readNotifications()
     {
         return $this->notifications()->whereNotNull('read_at');
+    }
+
+    public function image()
+    {
+        return $this->morphOne(Image::class, 'imageable');
     }
 }
