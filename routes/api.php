@@ -13,6 +13,7 @@ use App\Http\Controllers\RatingController;
 use App\Http\Controllers\SwapController;
 use App\Http\Controllers\SwapExchangeDetailsController;
 use App\Http\Controllers\SwapRequestDetailsController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
@@ -53,6 +54,9 @@ Route::group(['middleware' => 'auth:api'], function () {
             return response()->json(['success' => true, 'message' => 'You are subscribed to a plan.'], 200);
         });
 
+        //User
+        Route::resource('user', UserController::class);
+        Route::get('user-inventory/{id}', [UserController::class, 'userInventory']);
         //Inventory
         Route::resource('category', CategoryController::class);
         Route::resource('brand', BrandController::class);
