@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\RegistrationController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ColorController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentMethodController;
@@ -64,6 +65,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::resource('category', CategoryController::class);
         Route::resource('brand', BrandController::class);
         Route::resource('size', SizeController::class);
+        Route::resource('color', ColorController::class);
         Route::resource('product', ProductController::class);
         Route::resource('plan', PlanController::class);
 

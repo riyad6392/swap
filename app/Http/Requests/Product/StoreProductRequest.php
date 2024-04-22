@@ -30,6 +30,7 @@ class StoreProductRequest extends FormRequest
             'name' => 'required',
             'description' => 'required',
             'category_id' => 'required|exists:categories,id',
+            'brand_id'=>'required|exists:brands,id',
             'product_images' => 'required|array'
         ];
     }

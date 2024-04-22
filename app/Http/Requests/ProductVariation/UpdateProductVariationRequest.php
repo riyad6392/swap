@@ -27,8 +27,8 @@ class UpdateProductVariationRequest extends FormRequest
     {
         return [
             'variations' => 'sometimes|array',
-            'variations.*.size' => 'required|string',
-            'variations.*.color' => 'required|string',
+            'variations.*.size_id' => 'required|integer|exists:sizes,id',
+            'variations.*.color_id' => 'required|integer|exists:colors,id',
             'variations.*.unit_price' => 'required|numeric',
             'variations.*.stock' => 'required|integer',
             'variations.*.discount' => 'nullable|numeric',
@@ -45,8 +45,10 @@ class UpdateProductVariationRequest extends FormRequest
         return [
             'variations.required' => 'Variations are required',
             'variations.array' => 'Variations must be an array',
-            'variations.*.size.string' => 'Size must be a string',
-            'variations.*.color.string' => 'Color must be a string',
+            'variations.*.size_id.integer' => 'Size must be an integer',
+            'variations.*.size_id.exists' => 'Size does not exist',
+            'variations.*.color_id.integer' => 'Color must be an integer',
+            'variations.*.color_id.exists' => 'Color does not exist',
             'variations.*.unit_price.required' => 'Unit Price is required',
             'variations.*.unit_price.numeric' => 'Unit Price must be a number',
             'variations.*.stock.required' => 'Stock is required',

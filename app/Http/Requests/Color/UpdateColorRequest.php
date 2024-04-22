@@ -25,7 +25,7 @@ class UpdateColorRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255|unique:colors,name,' . $this->color,
-            'code' => 'required|string|max:255',
+            'color_code' => 'required|string|max:255',
         ];
     }
 

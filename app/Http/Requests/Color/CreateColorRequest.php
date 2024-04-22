@@ -25,7 +25,7 @@ class CreateColorRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255|unique:colors,name',
-            'code' => 'required|string|max:255',
+            'color_code' => 'required|string|max:255',
         ];
     }
 

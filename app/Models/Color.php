@@ -12,7 +12,7 @@ class Color extends Model
 
     protected $fillable = [
         'name',
-        'code',
+        'color_code',
         'created_by',
         'updated_by',
     ];

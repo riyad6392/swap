@@ -151,7 +151,7 @@ class ColorController extends Controller
     {
         $color = Color::create([
             'name' => $coloLRequest->name,
-            'code' => $coloLRequest->code,
+            'color_code' => $coloLRequest->color_code,
         ]);
 
         return response()->json(['success' => true, 'message'=>'Color created successfully', 'data' => $color]);
@@ -227,7 +227,7 @@ class ColorController extends Controller
 
         $color->update([
             'name' => $coloLRequest->name,
-            'code' => $coloLRequest->code,
+            'color_code' => $coloLRequest->color_code,
         ]);
 
         return response()->json(['success' => true, 'message' => 'Color updated successfully', 'data' => $color]);
