@@ -22,7 +22,7 @@ class UpdateSizeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255|unique:sizes,name,' . $this->size->id . ',id',
+            'name' => 'required|string|max:255|unique:sizes,name,' . $this->size,
             'description' => 'nullable|string|max:255',
         ];
     }

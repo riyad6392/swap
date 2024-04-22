@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\ModelAttributeTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Brand extends Model
 {
-    use HasFactory;
+    use HasFactory,ModelAttributeTrait;
 
     protected $fillable = [
         'name',
@@ -17,4 +19,17 @@ class Brand extends Model
         'created_by',
         'updated_by',
     ];
+
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    public static function boot(): void
+    {
+        parent::boot();
+        self::bootCreatedUpdatedBy();
+
+        self::bootSlug();
+    }
 }

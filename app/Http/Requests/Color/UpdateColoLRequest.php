@@ -22,7 +22,7 @@ class UpdateColoLRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255|unique:colors,name,' . $this->color->id . ',id',
+            'name' => 'required|string|max:255|unique:colors,name,' . $this->color,
             'code' => 'required|string|max:255',
         ];
     }

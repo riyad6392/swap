@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Traits\ModelAttributeTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Swap extends Model
 {
@@ -24,28 +26,28 @@ class Swap extends Model
         'updated_by'
     ];
 
-    public function notifications()
+    public function notifications(): MorphMany
     {
         return $this->morphMany(Notification::class, 'notifiable');
     }
 
-    public function exchangeDetails()
+    public function exchangeDetails(): HasMany
     {
         return $this->hasMany(SwapExchangeDetails::class);
     }
 
-    public function requestDetail()
+    public function requestDetail(): HasMany
     {
         return $this->hasMany(SwapRequestDetails::class);
     }
 
-    public function shipments()
+    public function shipments(): HasMany
     {
         return $this->hasMany(Shipment::class);
     }
 
 
-    protected static function boot()
+    protected static function boot(): void
     {
         parent::boot();
         self::bootCreatedUpdatedBy();
