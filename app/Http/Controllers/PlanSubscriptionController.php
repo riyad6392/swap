@@ -101,7 +101,10 @@ class PlanSubscriptionController extends Controller
                 'payment_method_id' => $paymentMethods->id,
             ]);
 
-            auth()->user()->update(['subscription_is_active' => true]);
+            auth()->user()->update([
+                'subscription_is_active' => true,
+                'is_super_swapper' => $plan->interval == 'month' ? false : true
+            ]);
 
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Subscription created successfully!'], 200);
