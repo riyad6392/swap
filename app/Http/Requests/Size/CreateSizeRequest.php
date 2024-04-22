@@ -2,16 +2,18 @@
 
 namespace App\Http\Requests\Size;
 
+use App\Traits\ValidationErrorMessageTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateSizeRequest extends FormRequest
 {
+    use ValidationErrorMessageTrait;
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,6 +26,16 @@ class CreateSizeRequest extends FormRequest
         return [
             'name' => 'required|string|max:255|unique:sizes,name',
             'description' => 'nullable|string|max:255',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'Name is required',
+            'name.string' => 'Name must be a string',
+            'name.max' => 'Name must not be greater than 255 characters',
+            'name.unique' => 'Name already exists',
         ];
     }
 }

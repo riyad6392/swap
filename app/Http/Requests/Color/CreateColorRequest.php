@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Size;
+namespace App\Http\Requests\Color;
 
 use App\Traits\ValidationErrorMessageTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateSizeRequest extends FormRequest
+class CreateColorRequest extends FormRequest
 {
     use ValidationErrorMessageTrait;
     /**
@@ -24,8 +24,8 @@ class UpdateSizeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255|unique:sizes,name,' . $this->size,
-            'description' => 'nullable|string|max:255',
+            'name' => 'required|string|max:255|unique:colors,name',
+            'code' => 'required|string|max:255',
         ];
     }
 
@@ -36,6 +36,9 @@ class UpdateSizeRequest extends FormRequest
             'name.string' => 'Name must be a string',
             'name.max' => 'Name must not be greater than 255 characters',
             'name.unique' => 'Name already exists',
+            'code.required' => 'Code is required',
+            'code.string' => 'Code must be a string',
+            'code.max' => 'Code must not be greater than 255 characters',
         ];
     }
 }

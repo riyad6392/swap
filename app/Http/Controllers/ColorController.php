@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Brand\UpdateBrandRequest;
-use App\Http\Requests\Color\CreateColoLRequest;
-use App\Http\Requests\Color\UpdateColoLRequest;
+use App\Http\Requests\Color\CreateColorRequest;
+use App\Http\Requests\Color\UpdateColorRequest;
 use App\Models\Color;
 use Illuminate\Http\Request;
 
@@ -147,7 +147,7 @@ class ColorController extends Controller
      *      )
      * )
      */
-    public function store(CreateColoLRequest $coloLRequest)
+    public function store(CreateColorRequest $coloLRequest)
     {
         $color = Color::create([
             'name' => $coloLRequest->name,
@@ -221,7 +221,7 @@ class ColorController extends Controller
      *      )
      * )
      */
-    public function update(UpdateColoLRequest $coloLRequest, string $id)
+    public function update(UpdateColorRequest $coloLRequest, string $id)
     {
         $color = Color::find($id);
 

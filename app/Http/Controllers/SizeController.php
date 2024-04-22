@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Color\UpdateColoLRequest;
+use App\Http\Requests\Color\UpdateColorRequest;
 use App\Http\Requests\Size\CreateSizeRequest;
 use App\Http\Requests\Size\UpdateSizeRequest;
 use App\Models\Size;
