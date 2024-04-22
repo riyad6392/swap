@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\Admins\ForgetPasswordController;
 use App\Http\Controllers\Auth\Admins\LoginController;
 use App\Http\Controllers\Auth\Admins\RegistrationController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -25,6 +26,10 @@ Route::group(['middleware' => 'auth:admin-api'], function () {
 
     Route::post('admin/logout', [LoginController::class, 'logout']);
     Route::post('admin/approve-user/{user}', 'AdminController@approveUser')->name('admin.approve-user');
+
+    //User
+    Route::resource('user', UserController::class);
+
 
 //    Route::resource('product', \App\Http\Controllers\ProductController::class);
 

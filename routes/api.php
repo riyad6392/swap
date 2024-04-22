@@ -55,8 +55,9 @@ Route::group(['middleware' => 'auth:api'], function () {
         });
 
         //User
-        Route::resource('user', UserController::class);
+        Route::get('user-list', [UserController::class, 'userList']);
         Route::get('user-inventory/{id}', [UserController::class, 'userInventory']);
+
         //Inventory
         Route::resource('category', CategoryController::class);
         Route::resource('brand', BrandController::class);
