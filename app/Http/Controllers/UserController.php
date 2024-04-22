@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 class UserController extends Controller
 {
     const PER_PAGE = 10;
+
     /**
      * User List.
      *
@@ -120,16 +121,70 @@ class UserController extends Controller
         //
     }
 
-    public function userInventory(Request $request, $id){
+    /**
+     * User Inventory List.
+     *
+     * @OA\Get(
+     *     path="/api/user/{id}",
+     *     tags={"User"},
+     *     security={{ "apiAuth": {} }},
+     *
+     *     @OA\MediaType(mediaType="multipart/form-data"),
+     *
+     *     @OA\Parameter(
+     *          in="query",
+     *          name="pagination",
+     *          required=true,
+     *
+     *          @OA\Schema(type="number"),
+     *          example="10"
+     *      ),
+     *
+     *      @OA\Parameter(
+     *          in="query",
+     *          name="get_all",
+     *          required=false,
+     *
+     *          @OA\Schema(type="boolean"),
+     *          example="1"
+     *
+     *      ),
+     *     @OA\Response(
+     *           response=200,
+     *           description="success",
+     *
+     *           @OA\JsonContent(
+     *               @OA\Property(property="data", type="json", example={}),
+     *               @OA\Property(property="links", type="json", example={}),
+     *               @OA\Property(property="meta", type="json", example={}),
+     *           )
+     *       ),
+     *
+     *       @OA\Response(
+     *           response=401,
+     *           description="Invalid user",
+     *
+     *           @OA\JsonContent(
+     *               @OA\Property(property="success", type="boolean", example="false"),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Unauthenticated"}}),
+     *           )
+     *       )
+     * )
+     */
+    public function userInventory(Request $request, $id)
+    {
         $user = User::find($id);
+
         if (!$user) {
             return response()->json(['success' => false, 'message' => 'User not found'], 404);
         }
 
         if ($request->get('get_all')) {
-            return response()->json(['success' => true, 'data' => $user->inventory]);
+            return response()->json(['success' => true, 'data' => $user->products()->get()]);
         }
-        $inventory = $user->inventory;
+
+        $inventory = $user->products()->paginate($request->pagination ?? self::PER_PAGE);
+
         return response()->json(['success' => true, 'data' => $inventory]);
     }
 }
