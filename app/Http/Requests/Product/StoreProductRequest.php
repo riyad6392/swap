@@ -50,12 +50,4 @@ class StoreProductRequest extends FormRequest
             'product_images.array' => 'Product image must be an array'
         ];
     }
-    public function all($keys = null)
-    {
-        $data = parent::all($keys);
-        $data['user_id'] = Auth::id() ?? 1;
-
-        return $data;
-    }
-
 }

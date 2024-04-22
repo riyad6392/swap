@@ -7339,6 +7339,24 @@
                 "operationId": "3e00f7929f707b2dbfb8553cf0f78889",
                 "parameters": [
                     {
+                        "name": "search",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Imtiaz Ur Rahman"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "asc,desc"
+                    },
+                    {
                         "name": "pagination",
                         "in": "query",
                         "required": true,

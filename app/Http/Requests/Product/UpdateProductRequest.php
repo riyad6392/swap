@@ -34,6 +34,7 @@ class UpdateProductRequest extends FormRequest
             'deleted_image_ids' => 'sometimes|array',
         ];
     }
+
     public function messages(): array
     {
         return [
@@ -49,12 +50,5 @@ class UpdateProductRequest extends FormRequest
             'images.required' => 'Product image is required',
             'images.array' => 'Product image must be an array'
         ];
-    }
-    public function all($keys = null)
-    {
-        $data = parent::all($keys);
-        $data['user_id'] = Auth::id() ?? 1;
-
-        return $data;
     }
 }

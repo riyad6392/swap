@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\User\ListUserRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -132,6 +133,24 @@ class UserController extends Controller
      *     @OA\MediaType(mediaType="multipart/form-data"),
      *
      *     @OA\Parameter(
+     *           in="query",
+     *           name="search",
+     *           required=false,
+     *
+     *           @OA\Schema(type="string"),
+     *           example="Imtiaz Ur Rahman",
+     *       ),
+     *
+     *     @OA\Parameter(
+     *            in="query",
+     *            name="sort",
+     *            required=false,
+     *
+     *            @OA\Schema(type="string"),
+     *            example="asc,desc",
+     *        ),
+     *
+     *     @OA\Parameter(
      *          in="query",
      *          name="pagination",
      *          required=true,
@@ -171,15 +190,25 @@ class UserController extends Controller
      *       )
      * )
      */
-    public function userList(Request $request){
+    public function userList(ListUserRequest $listUserRequest){
         $users = User::query();
 
-        if ($request->get('get_all')) {
+        if ($listUserRequest->has('search')) {
+
+            $users->where('name', 'like', '%' . request('search') . '%');
+        }
+
+        if ($listUserRequest->has('sort')){
+
+            $users->orderBy('name', $listUserRequest->sort);
+        }
+
+        if ($listUserRequest->get('get_all')) {
 
             return response()->json(['success' => true, 'data' => $users->get()]);
         }
 
-        $categories = $users->paginate($request->pagination ?? self::PER_PAGE);
+        $categories = $users->paginate($listUserRequest->pagination ?? self::PER_PAGE);
 
         return response()->json(['success' => true, 'data' => $categories]);
     }
