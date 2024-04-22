@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Brand\StoreBrandRequest;
 use App\Http\Requests\Brand\UpdateBrandRequest;
 use App\Models\Brand;
+use App\Services\FileUploadService;
 use Illuminate\Http\Request;
 
 class BrandController extends Controller
@@ -64,7 +65,7 @@ class BrandController extends Controller
     {
         $brands = Brand::query();
 
-        if (request()->has('search')) {
+        if ($request->has('search')) {
             $brands->where('name', 'like', '%' . request('search') . '%');
         }
 
@@ -129,7 +130,15 @@ class BrandController extends Controller
      */
     public function store(StoreBrandRequest $brandRequest)
     {
-        $brand = Brand::create($brandRequest->all());
+        $brand = Brand::create([
+            'name' => $brandRequest->name,
+            'description' => $brandRequest->description ?? '',
+        ]);
+
+        if ($brandRequest->has('logo')){
+            FileUploadService::uploadFile($brandRequest->logo, $brand);
+        }
+
         return response()->json(['success' => true, 'message' => 'Brand created successfully', 'data' => $brand]);
     }
 
@@ -192,7 +201,20 @@ class BrandController extends Controller
     public function update(UpdateBrandRequest $brandRequest, string $id)
     {
         $brand = Brand::find($id);
-        $brand->update($brandRequest->all());
+
+        if (!$brand) {
+            return response()->json(['success' => false, 'message' => 'Brand not found']);
+        }
+
+        if ($brandRequest->has('logo')){
+            FileUploadService::uploadFile($brandRequest->logo, $brand);
+        }
+
+        $brand->update([
+            'name' => $brandRequest->name,
+            'description' => $brandRequest->description ?? '',
+        ]);
+
         return response()->json(['success' => true, 'message' => 'Brand updated successfully', 'data' => $brand]);
     }
 

@@ -2,6 +2,8 @@
 
 namespace App\Traits;
 
+use Illuminate\Support\Str;
+
 trait ModelAttributeTrait
 {
     public static function bootCreatedUpdatedBy()
@@ -27,6 +29,15 @@ trait ModelAttributeTrait
         static::creating(function ($model) {
             if (!$model->isDirty('uid')) {
                 $model->uid = uniqid();
+            }
+        });
+    }
+
+    public static function bootSlug()
+    {
+        static::creating(function ($model) {
+            if (!$model->isDirty('slug')) {
+                $model->slug = Str::slug($model->name);
             }
         });
     }
