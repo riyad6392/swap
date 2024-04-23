@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->integer('category_id');
+            $table->integer('brand_id');
             $table->integer('user_id');
             $table->longText('description')->nullable();
             $table->integer('created_by');

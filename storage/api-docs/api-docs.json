@@ -3352,6 +3352,15 @@
                         "example": "This is just description"
                     },
                     {
+                        "name": "short_description",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "This is just description"
+                    },
+                    {
                         "name": "price",
                         "in": "query",
                         "required": true,
@@ -3359,6 +3368,24 @@
                             "type": "string"
                         },
                         "example": "100"
+                    },
+                    {
+                        "name": "is_active",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "example": "1"
+                    },
+                    {
+                        "name": "plan_type",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "enum"
+                        },
+                        "example": "basic/premium"
                     },
                     {
                         "name": "currency",
@@ -3386,6 +3413,33 @@
                             "type": "string"
                         },
                         "example": "1"
+                    },
+                    {
+                        "name": "plan_details[0][feature]",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Feature"
+                    },
+                    {
+                        "name": "plan_details[0][value]",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Value"
+                    },
+                    {
+                        "name": "plan_details[0][features_count]",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": "2"
                     }
                 ],
                 "responses": {
@@ -3502,6 +3556,133 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Plan not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Plan"
+                ],
+                "summary": "Update this plan.",
+                "operationId": "6603194848979a9c2563867097783704",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Doel Rana"
+                    },
+                    {
+                        "name": "description",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "This is just description"
+                    },
+                    {
+                        "name": "short_description",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "This is just short description"
+                    },
+                    {
+                        "name": "is_active",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "example": "1"
+                    },
+                    {
+                        "name": "plan_details[0][feature]",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Feature"
+                    },
+                    {
+                        "name": "plan_details[0][value]",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Value"
+                    },
+                    {
+                        "name": "plan_details[0][features_count]",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": "2"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Category created successfully."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "The given data was invalid."
+                                                ]
+                                            }
                                         }
                                     },
                                     "type": "object"

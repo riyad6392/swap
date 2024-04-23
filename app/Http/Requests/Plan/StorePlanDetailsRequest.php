@@ -26,19 +26,22 @@ class StorePlanDetailsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'feature' => 'required',
-            'features_count' => 'required|numeric',
-            'value' => 'required|string',
+            'plan_details.*.feature' => 'required|string',
+            'plan_details.*.features_count' => 'required|numeric',
+            'plan_details.*.value' => 'required|string',
         ];
     }
     public function messages(): array
     {
         return [
-            'feature.required' => 'Feature is required',
-            'features_count.required' => 'Features count is required',
-            'features_count.numeric' => 'Features count must be a number',
-            'value.required' => 'Value is required',
-            'value.string' => 'Value must be a string'
+            'plan_details.required' => 'Plan details are required',
+            'plan_details.array' => 'Plan details must be an array',
+            'plan_details.*.feature.required' => 'Feature is required',
+            'plan_details.*.feature.string' => 'Feature must be a string',
+            'plan_details.*.features_count.required' => 'Features count is required',
+            'plan_details.*.features_count.numeric' => 'Features count must be a number',
+            'plan_details.*.value.required' => 'Value is required',
+            'plan_details.*.value.string' => 'Value must be a string',
         ];
     }
 }

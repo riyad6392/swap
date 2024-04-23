@@ -69,7 +69,8 @@ class PlanController extends Controller
     {
         $plans = Plan::query();
 
-        $plans = $plans->with('planDetails');
+        $plans = $plans->where('is_active', 1)
+            ->with('planDetails');
 
         if ($request->get('get_all')) {
             return response()->json(['success' => true, 'data' => $plans->get()]);
@@ -115,12 +116,36 @@ class PlanController extends Controller
      *         example="This is just description",
      *     ),
      *     @OA\Parameter(
+     *          in="query",
+     *          name="short_description",
+     *          required=true,
+     *
+     *          @OA\Schema(type="string"),
+     *          example="This is just description",
+     *      ),
+     *     @OA\Parameter(
      *     in="query",
      *     name="price",
      *     required=true,
      *     @OA\Schema(type="string"),
      *     example="100",
      *     ),
+     *
+     *      @OA\Parameter(
+     *      in="query",
+     *      name="is_active",
+     *      required=true,
+     *      @OA\Schema(type="boolean"),
+     *      example="1",
+     *      ),
+     *
+     *      @OA\Parameter(
+     *       in="query",
+     *       name="plan_type",
+     *       required=true,
+     *       @OA\Schema(type="enum"),
+     *       example="basic/premium",
+     *       ),
      *
      *     @OA\Parameter(
      *     in="query",
@@ -146,10 +171,33 @@ class PlanController extends Controller
      *     example="1",
      *     ),
      *
+     *      @OA\Parameter(
+     *      in="query",
+     *      name="plan_details[0][feature]",
+     *      required=true,
+     *      @OA\Schema(type="string"),
+     *      example="Feature",
+     *      ),
+     *
+     *       @OA\Parameter(
+     *       in="query",
+     *       name="plan_details[0][value]",
+     *       required=true,
+     *       @OA\Schema(type="string"),
+     *       example="Value",
+     *       ),
+     *
+     *        @OA\Parameter(
+     *        in="query",
+     *        name="plan_details[0][features_count]",
+     *        required=true,
+     *        @OA\Schema(type="integer"),
+     *        example="2",
+     *        ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="success",
-     *
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="success", type="boolean", example="true"),
@@ -173,22 +221,41 @@ class PlanController extends Controller
     {
         try {
             DB::beginTransaction();
+
+//            dd(Plan::where('is_active', 1)->count());
+            if (Plan::where('is_active', 1)->count() >= 2) {
+                return response()->json(['success' => false, 'message' => 'you can not active more then 2 plan at a time'], 422);
+            }
+
             $plan = Plan::create($planRequest->only([
                 'name',
                 'description',
+                'short_description',
                 'amount',
                 'currency',
                 'interval',
                 'interval_duration',
+                'is_active',
+                'plan_type'
             ]));
 
-            $plan->planDetails()->create($planDetailsRequest->only([
-                'feature',
-                'features_count',
-                'value',
-            ]));
+            $planDetailArray = [];
+            foreach ($planDetailsRequest->plan_details as $planDetail) {
+
+                $planDetailArray[] = [
+                    'created_by' => auth()->id(),
+                    'updated_by' => auth()->id(),
+                    'plan_id' => $plan->id,
+                    'feature' => $planDetail['feature'],
+                    'features_count' => $planDetail['features_count'],
+                    'value' => $planDetail['value'],
+                ];
+            }
+
+            $plan->planDetails()->insert($planDetailArray);
 
             $response = StripePaymentFacade::createPrice($plan);
+
             $plan->update(['stripe_price_id' => $response->id]);
 
             DB::commit();
@@ -257,120 +324,158 @@ class PlanController extends Controller
         //
     }
 
-//    /**
-//     * Update this plan.
-//     *
-//     *
-//     * @OA\Post (path="/api/plan/{id}",
-//     *     tags={"Plan"},
-//     *     security={{ "apiAuth": {} }},
-//     *
-//     *
-//     *     @OA\Parameter(
-//     *         in="query",
-//     *         name="name",
-//     *         required=true,
-//     *
-//     *         @OA\Schema(type="string"),
-//     *         example="Doel Rana",
-//     *     ),
-//     *
-//     *     @OA\Parameter(
-//     *         in="query",
-//     *         name="description",
-//     *         required=true,
-//     *
-//     *         @OA\Schema(type="string"),
-//     *         example="This is just description",
-//     *     ),
-//     *     @OA\Parameter(
-//     *     in="query",
-//     *     name="price",
-//     *     required=true,
-//     *     @OA\Schema(type="string"),
-//     *     example="100",
-//     *     ),
-//     *
-//     *     @OA\Parameter(
-//     *     in="query",
-//     *     name="currency",
-//     *     required=true,
-//     *     @OA\Schema(type="string"),
-//     *     example="USD",
-//     *     ),
-//     *
-//     *     @OA\Parameter(
-//     *     in="query",
-//     *     name="interval",
-//     *     required=true,
-//     *     @OA\Schema(type="string"),
-//     *     example="month",
-//     *     ),
-//     *
-//     *     @OA\Parameter(
-//     *     in="query",
-//     *     name="interval_duration",
-//     *     required=true,
-//     *     @OA\Schema(type="string"),
-//     *     example="1",
-//     *     ),
-//     *
-//     *      @OA\Response(
-//     *          response=200,
-//     *          description="success",
-//     *
-//     *          @OA\JsonContent(
-//     *
-//     *              @OA\Property(property="success", type="boolean", example="true"),
-//     *               @OA\Property(property="errors", type="json", example={"message": {"Category created successfully."}}),
-//     *          ),
-//     *      ),
-//     *
-//     *      @OA\Response(
-//     *          response=422,
-//     *          description="Invalid data",
-//     *
-//     *          @OA\JsonContent(
-//     *
-//     *              @OA\Property(property="success", type="boolean", example="false"),
-//     *              @OA\Property(property="errors", type="json", example={"message": {"The given data was invalid."}}),
-//     *          )
-//     *      )
-//     * )
-//     */
+    /**
+     * Update this plan.
+     *
+     *
+     * @OA\Post (path="/api/plan/{id}",
+     *     tags={"Plan"},
+     *     security={{ "apiAuth": {} }},
+     *
+     *
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="name",
+     *         required=true,
+     *
+     *         @OA\Schema(type="string"),
+     *         example="Doel Rana",
+     *     ),
+     *
+     *          @OA\Parameter(
+     *          in="query",
+     *          name="description",
+     *          required=true,
+     *
+     *          @OA\Schema(type="string"),
+     *          example="This is just description",
+     *      ),
+     *
+     *      @OA\Parameter(
+     *         in="query",
+     *         name="short_description",
+     *         required=true,
+     *
+     *         @OA\Schema(type="string"),
+     *         example="This is just short description",
+     *     ),
+     *       @OA\Parameter(
+     *          in="query",
+     *          name="is_active",
+     *          required=true,
+     *          @OA\Schema(type="boolean"),
+     *          example="1",
+     *      ),
+     *
+     *      @OA\Parameter(
+     *        in="query",
+     *        name="plan_type",
+     *        required=true,
+     *        @OA\Schema(type="enum"),
+     *        example="basic/premium",
+     *        ),
+     *
+     *      @OA\Parameter(
+     *       in="query",
+     *       name="plan_details[0][feature]",
+     *       required=true,
+     *       @OA\Schema(type="string"),
+     *       example="Feature",
+     *       ),
+     *
+     *      @OA\Parameter(
+     *        in="query",
+     *        name="plan_details[0][value]",
+     *        required=true,
+     *        @OA\Schema(type="string"),
+     *        example="Value",
+     *        ),
+     *
+     *      @OA\Parameter(
+     *         in="query",
+     *         name="plan_details[0][features_count]",
+     *         required=true,
+     *         @OA\Schema(type="integer"),
+     *         example="2",
+     *         ),
+     * @OA\Response(
+     *          response=200,
+     *          description="success",
+     *
+     *          @OA\JsonContent(
+     *
+     *              @OA\Property(property="success", type="boolean", example="true"),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Category created successfully."}}),
+     *          ),
+     *      ),
+     *
+     * @OA\Response(
+     *          response=422,
+     *          description="Invalid data",
+     *
+     *          @OA\JsonContent(
+     *
+     *              @OA\Property(property="success", type="boolean", example="false"),
+     *              @OA\Property(property="errors", type="json", example={"message": {"The given data was invalid."}}),
+     *          )
+     *      )
+     * )
+     */
     public function update(UpdatePlanRequest $updatePlanRequest, UpdatePlanDetailsRequest $updatePlanDetailsRequest, string $id)
     {
-//        $plan = Plan::find($id);
-//        if (empty($plan)) {
-//            return response()->json(['success' => false, 'message' => 'Plan does not exist'], 500);
-//        }
-//        try {
-//            DB::beginTransaction();
-//
-//            $plan->update($updatePlanRequest->only(['name',
-//                'description',
-//                'amount',
-//                'currency',
-//                'interval',
-//                'interval_duration',
-//            ]));
-//
-//            PlanDetails::where('plan_id', $plan->id)->update([
-//                'plan_id' => $plan->id,
-//                'feature' => $updatePlanDetailsRequest->feature,
-//                'features_count' => $updatePlanDetailsRequest->features_count,
-//                'value' => $updatePlanDetailsRequest->value,
-//
-//            ]);
+        $plan = Plan::find($id);
+
+        if (empty($plan)) {
+            return response()->json(['success' => false, 'message' => 'Plan does not exist'], 500);
+        }
+
+        if (Plan::where('is_active', 1)->count() >= 2) {
+            return response()->json(['success' => false, 'message' => 'you can not active more then 2 plan at a time'], 422);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $plan->update($updatePlanRequest->only([
+                'name',
+                'description',
+                'short_description',
+                'is_active',
+                'plan_type'
+            ]));
+
+            if (count($updatePlanDetailsRequest->plan_details)) {
+                $planDetailArray = [];
+                foreach ($updatePlanDetailsRequest->plan_details as $planDetail) {
+
+                    $planDetailArray[] = [
+                        'created_by' => auth()->id(),
+                        'updated_by' => auth()->id(),
+                        'plan_id' => $plan->id,
+                        'feature' => $planDetail['feature'],
+                        'features_count' => $planDetail['features_count'],
+                        'value' => $planDetail['value'],
+                        'created_at' => date('Y-m-d H:i:s'),
+                        'updated_at' => date('Y-m-d H:i:s'),
+                    ];
+                }
+                $plan->planDetails()->insert($planDetailArray);
+            }
+
+            if ($updatePlanDetailsRequest->delete_feature_id) {
+                PlanDetails::where('plan_id', $plan->id)
+                    ->whereIn('id', $updatePlanDetailsRequest->delete_feature_id)->delete();
+            }
+
 //            $response = StripePaymentFacade::updatePrice($plan);
 //            // $plan->update(['stripe_price_id' => $response->id]);
-//            DB::commit();
-//            return response()->json(['success' => true, 'message' => 'Plan updated successfully!'], 200);
-//
-//        } catch (\Exception $e) {
-//            DB::rollBack();
-//            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-//        }
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Plan updated successfully!'], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
     }
 
     /**

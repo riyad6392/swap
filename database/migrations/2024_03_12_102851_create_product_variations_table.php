@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('product_variations', function (Blueprint $table) {
             $table->id();
             $table->integer('product_id');
-            $table->string('size');
-            $table->string('color');
+            $table->integer('size_id');
+            $table->integer('color_id');
             $table->decimal('unit_price', 10, 2);
             $table->integer('stock');
             $table->double('discount', 10, 2)->nullable();

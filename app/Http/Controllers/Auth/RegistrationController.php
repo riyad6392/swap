@@ -67,10 +67,11 @@ class RegistrationController extends Controller
      *      )
      * )
      */
-    public function register(Request $request): \Illuminate\Http\JsonResponse
+    public function register(Request $request)
     {
         $validateData = Validator::make($request->all(), [
-            'name' => 'required|max:255',
+            'first_name' => 'required|max:255',
+            'last_name' => 'required|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required'
         ]);
@@ -82,7 +83,8 @@ class RegistrationController extends Controller
             try {
                 DB::beginTransaction();
                 User::create([
-                    'name' => $request->name,
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
                     'email' => $request->email,
                     'is_approved_by_admin' => 1, // This is for admin approval, if you want to approve user by admin then set 0 otherwise set 1
                     'password' => bcrypt($request->password),

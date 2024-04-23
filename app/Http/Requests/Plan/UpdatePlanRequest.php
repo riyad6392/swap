@@ -27,10 +27,12 @@ class UpdatePlanRequest extends FormRequest
         return [
             'name'              => 'required|unique:plans,name,' . $this->plan . ',id',
             'description'       => 'required',
+            'short_description'       => 'required',
             'currency'          => 'required',
             'amount'            => 'required|numeric',
             'interval'          => 'required|in:month,year',
             'interval_duration' => 'required|numeric',
+            'is_active'         => 'required|boolean'
         ];
     }
     public function messages(): array

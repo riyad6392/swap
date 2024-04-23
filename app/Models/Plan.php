@@ -14,10 +14,13 @@ class Plan extends Model
         'uid',
         'stripe_price_id',
         'description',
+        'short_description',
         'amount',
         'currency',
         'interval',
         'interval_duration',
+        'is_active',
+        'plan_type',
         'created_by',
         'updated_by'
     ];

@@ -17,11 +17,14 @@ return new class extends Migration
             $table->string('uid')->unique();
             $table->string('stripe_price_id')->nullable();
             $table->string('description');
+            $table->string('short_description');
             $table->double('amount', 8, 2);
             $table->string('currency');
             $table->enum('interval', ['month', 'yearly']);
             $table->string('interval_duration');
             $table->string('is_super_swapper')->nullable();
+            $table->boolean('is_active')->default(0);
+            $table->enum('plan_type',['basic','premium']);
             $table->string('created_by');
             $table->string('updated_by');
             $table->timestamps();
