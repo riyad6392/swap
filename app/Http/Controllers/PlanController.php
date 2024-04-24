@@ -306,11 +306,13 @@ class PlanController extends Controller
         try {
             $plan = Plan::find($id);
             if ($plan) {
+
                 $plan->load('planDetails');
                 return response()->json(['success' => true, 'data' => $plan], 200);
-            } else {
-                return response()->json(['success' => false, 'message' => 'Plan not exist'], 422);
             }
+
+            return response()->json(['success' => false, 'message' => 'Plan not exist'], 422);
+
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Failed to retrieve plan'], 500);
         }

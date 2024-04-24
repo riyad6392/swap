@@ -40,6 +40,9 @@ Route::post('forget-password', [ForgetPasswordController::class, 'forgetPassword
 Route::post('reset-password', [ForgetPasswordController::class, 'resetPassword']);
 Route::post('refresh-token', [LoginController::class, 'getRefreshToken']);
 
+Route::resource('plan', PlanController::class)->only(['index', 'show']);
+
+
 
 
 Route::group(['middleware' => 'auth:api'], function () {
@@ -100,7 +103,6 @@ Route::group(['middleware' => 'auth:api'], function () {
     });
 
     //plan
-    Route::resource('plan', PlanController::class);
 
 
     //Subscription
