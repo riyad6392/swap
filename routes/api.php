@@ -40,6 +40,9 @@ Route::post('forget-password', [ForgetPasswordController::class, 'forgetPassword
 Route::post('reset-password', [ForgetPasswordController::class, 'resetPassword']);
 Route::post('refresh-token', [LoginController::class, 'getRefreshToken']);
 
+Route::resource('plan', PlanController::class)->only(['index', 'show']);
+
+
 
 
 Route::group(['middleware' => 'auth:api'], function () {
@@ -67,7 +70,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::resource('size', SizeController::class);
         Route::resource('color', ColorController::class);
         Route::resource('product', ProductController::class);
-        Route::resource('plan', PlanController::class);
+//        Route::resource('plan', PlanController::class);
 
         //rating
         Route::apiResource('ratings', RatingController::class);
@@ -98,6 +101,9 @@ Route::group(['middleware' => 'auth:api'], function () {
 
 
     });
+
+    //plan
+
 
     //Subscription
 

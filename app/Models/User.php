@@ -28,7 +28,18 @@ class User extends Authenticatable
         'email',
         'password',
         'subscription_is_active',
-        'is_approved_by_admin'
+        'is_approved_by_admin',
+        'business_name',
+        'phone',
+        'business_address',
+        'online_store_url',
+        'ein',
+        'resale_license',
+        'photo_of_id',
+        'stripe_customer_id',
+        'is_super_swapper',
+        'photo_of_id',
+        'stripe_customer_id',
     ];
 
     /**

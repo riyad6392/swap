@@ -7,6 +7,8 @@ use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\User;
 use App\Services\FileUploadService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -71,7 +73,7 @@ class UserController extends Controller
             $users->where('name', 'like', '%' . request('search') . '%');
         }
 
-        if ($listUserRequest->has('sort')){
+        if ($listUserRequest->has('sort')) {
 
             $users->orderBy('name', $listUserRequest->sort);
         }
@@ -214,7 +216,8 @@ class UserController extends Controller
      *       )
      * )
      */
-    public function userList(ListUserRequest $listUserRequest){
+    public function userList(ListUserRequest $listUserRequest)
+    {
 
         $users = User::query()->with('image');
 
@@ -223,7 +226,7 @@ class UserController extends Controller
             $users->where('name', 'like', '%' . request('search') . '%');
         }
 
-        if ($listUserRequest->has('sort')){
+        if ($listUserRequest->has('sort')) {
 
             $users->orderBy('name', $listUserRequest->sort);
         }
@@ -307,30 +310,46 @@ class UserController extends Controller
 
     public function updateProfile(UpdateUserRequest $userRequest)
     {
-        $user = User::find(auth()->id());
+        try {
+            DB::beginTransaction();
 
-        $resaleLicense = '';
+            $user = User::find(auth()->id());
 
-        if ($userRequest->has('image')) {
-            FileUploadService::uploadImage($userRequest->image, $user, 'image');
+            $resaleLicense = '';
+            $photoOfId = '';
+
+            if ($userRequest->has('image')) {
+                if ($user->image) Storage::delete($user->image);
+                FileUploadService::uploadImage($userRequest->image, $user, 'image');
+            }
+
+            if ($userRequest->has('resale_license')) {
+                if ($user->resale_license) Storage::delete($user->resale_license);
+                $resaleLicense = FileUploadService::uploadFile($userRequest->resale_license, $user, 'resale_license');
+            }
+
+            if ($userRequest->has('photo_of_id')) {
+                if ($user->photo_of_id) Storage::delete($user->photo_of_id);
+                $photoOfId = FileUploadService::uploadFile($userRequest->photo_of_id, $user, 'photo_of_id');
+            }
+
+            $user->update([
+                'first_name' => $userRequest->first_name,
+                'last_name' => $userRequest->last_name,
+                'phone' => $userRequest->phone,
+                'business_name' => $userRequest->business_name,
+                'business_address' => $userRequest->business_address,
+                'resale_license' => $resaleLicense,
+                'photo_of_id' => $photoOfId,
+                'online_store_url' => $userRequest->online_store_url,
+                'ein' => $userRequest->ein,
+            ]);
+
+            DB::commit();
+            return response()->json(['success' => true, 'data' => $user]);
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $exception->getMessage()], 500);
         }
-
-        if ($userRequest->has('resale_license')) {
-            $resaleLicense = FileUploadService::uploadFile($userRequest->resale_license, $user, 'resale_license');
-        }
-
-        dd($resaleLicense);
-        $user->update([
-            'first_name' => $userRequest->first_name,
-            'last_name' => $userRequest->last_name,
-            'email' => $userRequest->email,
-            'phone' => $userRequest->phone,
-            'business_name' => $userRequest->business_name,
-            'business_address' => $userRequest->business_address,
-            'online_store_url' => $userRequest->online_store_url,
-            'ein' => $userRequest->ein,
-        ]);
-
-        return response()->json(['success' => true, 'data' => $user]);
     }
 }

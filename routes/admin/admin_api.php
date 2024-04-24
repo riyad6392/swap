@@ -30,6 +30,9 @@ Route::group(['middleware' => 'auth:admin-api'], function () {
     //User
     Route::resource('user', UserController::class);
 
+    //Plan
+    Route::resource('plan', \App\Http\Controllers\PlanController::class)->only(['create', 'store', 'edit', 'update', 'destroy']);
+
 
 //    Route::resource('product', \App\Http\Controllers\ProductController::class);
 

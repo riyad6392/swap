@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie', 'http://127.0.0.1:8000', 'http://localhost:3000/' ,'broadcasting/auth'],
+    'paths' => ['api/*', 'sanctum/csrf-cookie', 'http://127.0.0.1:8000', 'http://localhost:3000/' ,'broadcasting/auth','https://staging.swapshopnow.com/','https://api.staging.swapshopnow.com/'],
 
     'allowed_methods' => ['*'],
 
