@@ -19,7 +19,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('phone')->nullable();
-            $table->string('subscription_is_active')->default(0);
+            $table->boolean('subscription_is_active')->default(0);
             $table->string('stripe_customer_id')->nullable();
             $table->boolean('is_approved_by_admin')->default(0);
             $table->boolean('is_super_swapper')->default(0);
