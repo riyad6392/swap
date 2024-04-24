@@ -138,8 +138,8 @@ class PlanSubscriptionController extends Controller
                 'last_name' => $planSubscriptionRequest->last_name,
                 'business_name' => $planSubscriptionRequest->business_name,
                 'business_address' => $planSubscriptionRequest->business_address,
-                'subscription_is_active' => true,
-                'is_super_swapper' => $plan->interval == 'month' ? true : false
+                'subscription_is_active' => 1,
+                'is_super_swapper' => $plan->interval == 'month' ? 1 : 0
             ]);
 
             DB::commit();
