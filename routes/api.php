@@ -67,7 +67,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::resource('size', SizeController::class);
         Route::resource('color', ColorController::class);
         Route::resource('product', ProductController::class);
-        Route::resource('plan', PlanController::class);
+//        Route::resource('plan', PlanController::class);
 
         //rating
         Route::apiResource('ratings', RatingController::class);
@@ -98,6 +98,10 @@ Route::group(['middleware' => 'auth:api'], function () {
 
 
     });
+
+    //plan
+    Route::resource('plan', PlanController::class);
+
 
     //Subscription
 
