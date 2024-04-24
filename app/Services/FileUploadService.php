@@ -14,7 +14,15 @@ class FileUploadService
     public const IMAGE_UPLOAD_PATH = 'images';
     public const FILE_STORAGE = 'public';
 
-    public static function uploadFile($requestImages, Product|ProductVariation|User $model, string $relation = null, string $upload_path = null,): array|string
+
+    public static function uploadFile($requestFile, Product|ProductVariation|User $model, string $upload_path = null,): string
+    {
+        $upload_path = $upload_path ?? strtolower(class_basename($model));
+        $filename = time() . '-' . uniqid() . '.' . $requestFile->getClientOriginalExtension();
+        return Storage::disk(self::FILE_STORAGE)->putFileAs($upload_path, $requestFile, $filename);
+    }
+
+    public static function uploadImage($requestImages, Product|ProductVariation|User $model, string $relation = null, string $upload_path = null,): array|string
     {
         $upload_path = $upload_path ?? strtolower(class_basename($model));
         $relation = $relation ?? 'images';

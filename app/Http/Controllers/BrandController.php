@@ -135,9 +135,9 @@ class BrandController extends Controller
             'description' => $brandRequest->description ?? '',
         ]);
 
-        if ($brandRequest->has('logo')){
-            FileUploadService::uploadFile($brandRequest->logo, $brand);
-        }
+//        if ($brandRequest->has('logo')){
+//            FileUploadService::uploadFile($brandRequest->logo, $brand);
+//        }
 
         return response()->json(['success' => true, 'message' => 'Brand created successfully', 'data' => $brand]);
     }
@@ -206,9 +206,9 @@ class BrandController extends Controller
             return response()->json(['success' => false, 'message' => 'Brand not found']);
         }
 
-        if ($brandRequest->has('logo')){
-            FileUploadService::uploadFile($brandRequest->logo, $brand);
-        }
+//        if ($brandRequest->has('logo')){
+//            FileUploadService::uploadFile($brandRequest->logo, $brand);
+//        }
 
         $brand->update([
             'name' => $brandRequest->name,

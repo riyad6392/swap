@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\User\ListUserRequest;
+use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\User;
 use App\Services\FileUploadService;
 use Illuminate\Http\Request;
@@ -304,15 +305,31 @@ class UserController extends Controller
         return response()->json(['success' => true, 'data' => $inventory]);
     }
 
-    public function updateProfile(Request $request)
+    public function updateProfile(UpdateUserRequest $userRequest)
     {
         $user = User::find(auth()->id());
 
-        if ($request->has('image')) {
-            FileUploadService::uploadFile($request->image, $user, 'image');
+        $resaleLicense = '';
+
+        if ($userRequest->has('image')) {
+            FileUploadService::uploadImage($userRequest->image, $user, 'image');
         }
 
-        $user->update($request->all());
+        if ($userRequest->has('resale_license')) {
+            $resaleLicense = FileUploadService::uploadFile($userRequest->resale_license, $user, 'resale_license');
+        }
+
+        dd($resaleLicense);
+        $user->update([
+            'first_name' => $userRequest->first_name,
+            'last_name' => $userRequest->last_name,
+            'email' => $userRequest->email,
+            'phone' => $userRequest->phone,
+            'business_name' => $userRequest->business_name,
+            'business_address' => $userRequest->business_address,
+            'online_store_url' => $userRequest->online_store_url,
+            'ein' => $userRequest->ein,
+        ]);
 
         return response()->json(['success' => true, 'data' => $user]);
     }
