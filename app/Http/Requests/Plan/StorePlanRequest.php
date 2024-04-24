@@ -32,7 +32,7 @@ class StorePlanRequest extends FormRequest
             'short_description' => 'required',
             'currency' => 'required',
             'amount' => 'required|numeric',
-            'interval' => 'required|in:month,yearly',
+            'interval' => 'required|in:month,year',
             'interval_duration' => 'required|numeric',
             'is_active' => 'required|boolean',
             'plan_type' => 'required|in:basic,premium'
