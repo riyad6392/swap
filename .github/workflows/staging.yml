@@ -1,0 +1,23 @@
+name: Deploy staging server
+on:
+  push:
+    branches:
+      - staging
+jobs:
+  build:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USERNAME }}
+          key: ${{ secrets.STAGING_REMOTE_SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/swap-backend
+            git reset --hard
+            git pull origin staging
+            composer install
+            php artisan migrate
+            php artisan o:c
