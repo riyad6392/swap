@@ -3614,6 +3614,15 @@
                         "example": "1"
                     },
                     {
+                        "name": "plan_type",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "enum"
+                        },
+                        "example": "basic/premium"
+                    },
+                    {
                         "name": "plan_details[0][feature]",
                         "in": "query",
                         "required": true,
@@ -3780,6 +3789,42 @@
                             "type": "integer"
                         },
                         "example": "100"
+                    },
+                    {
+                        "name": "first_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Imtiaz Ur Rehman"
+                    },
+                    {
+                        "name": "last_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Khan"
+                    },
+                    {
+                        "name": "business_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Business"
+                    },
+                    {
+                        "name": "business_address",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Dhaka, Bangladesh"
                     }
                 ],
                 "responses": {

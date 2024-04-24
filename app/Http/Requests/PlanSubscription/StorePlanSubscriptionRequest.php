@@ -28,14 +28,10 @@ class StorePlanSubscriptionRequest extends FormRequest
     {
         return [
             'plan_id' => 'required|exists:plans,id',
-//            'user_id' => 'required|exists:users,id',
-//            'start_date' => 'required|date',
-//            'end_date' => 'required|date',
-//            'price' => 'required|numeric',
-//            'payment_type' => 'required|in:monthly,yearly',
-//            'status' => 'required|in:active,inactive',
-//            'payment_method' => 'required|in:stripe',
-//            'payment_token' => 'required',
+            'first_name' => 'required|string',
+            'last_name' => 'required|string',
+            'business_name' => 'required|string',
+            'business_address' => 'required|string',
         ];
     }
 
@@ -44,21 +40,14 @@ class StorePlanSubscriptionRequest extends FormRequest
         return [
             'plan_id.required' => 'Plan is required',
             'plan_id.exists' => 'Plan does not exist',
-//            'user_id.required' => 'User is required',
-//            'user_id.exists' => 'User does not exist',
-//            'start_date.required' => 'Start date is required',
-//            'start_date.date' => 'Start date must be a date',
-//            'end_date.required' => 'End date is required',
-//            'end_date.date' => 'End date must be a date',
-//            'price.required' => 'Price is required',
-//            'price.numeric' => 'Price must be a number',
-//            'payment_type.required' => 'Payment type is required',
-//            'payment_type.in' => 'Payment type must be one-time, monthly or yearly',
-//            'status.required' => 'Status is required',
-//            'status.in' => 'Status must be active or inactive',
-//            'payment_method.required' => 'Payment method is required',
-//            'payment_method.in' => 'Payment method must be paypal or stripe',
-//            'payment_token.required' => 'Payment token is required',
+            'first_name.required' => 'First name is required',
+            'first_name.string' => 'First name must be a string',
+            'last_name.required' => 'Last name is required',
+            'last_name.string' => 'Last name must be a string',
+            'business_name.required' => 'Business name is required',
+            'business_name.string' => 'Business name must be a string',
+            'business_address.required' => 'Business address is required',
+            'business_address.string' => 'Business address must be a string',
         ];
     }
 }

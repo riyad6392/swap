@@ -37,6 +37,38 @@ class PlanSubscriptionController extends Controller
      *     example="100",
      *     ),
      *
+     *     @OA\Parameter(
+     *      in="query",
+     *      name="first_name",
+     *      required=true,
+     *      @OA\Schema(type="string"),
+     *      example="Imtiaz Ur Rehman",
+     *      ),
+     *
+     *      @OA\Parameter(
+     *       in="query",
+     *       name="last_name",
+     *       required=true,
+     *       @OA\Schema(type="string"),
+     *       example="Khan",
+     *       ),
+     *
+     *       @OA\Parameter(
+     *       in="query",
+     *       name="business_name",
+     *       required=true,
+     *       @OA\Schema(type="string"),
+     *       example="Business",
+     *       ),
+     *
+     *     @OA\Parameter(
+     *        in="query",
+     *        name="business_address",
+     *        required=true,
+     *        @OA\Schema(type="string"),
+     *        example="Dhaka, Bangladesh",
+     *        ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="success",
@@ -102,8 +134,12 @@ class PlanSubscriptionController extends Controller
             ]);
 
             auth()->user()->update([
+                'first_name' => $planSubscriptionRequest->first_name,
+                'last_name' => $planSubscriptionRequest->last_name,
+                'business_name' => $planSubscriptionRequest->business_name,
+                'business_address' => $planSubscriptionRequest->business_address,
                 'subscription_is_active' => true,
-                'is_super_swapper' => $plan->interval == 'month' ? false : true
+                'is_super_swapper' => $plan->interval == 'month' ? true : false
             ]);
 
             DB::commit();
