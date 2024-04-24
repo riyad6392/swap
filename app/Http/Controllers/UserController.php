@@ -73,7 +73,7 @@ class UserController extends Controller
             $users->where('name', 'like', '%' . request('search') . '%');
         }
 
-        if ($listUserRequest->has('sort')){
+        if ($listUserRequest->has('sort')) {
 
             $users->orderBy('name', $listUserRequest->sort);
         }
@@ -216,7 +216,8 @@ class UserController extends Controller
      *       )
      * )
      */
-    public function userList(ListUserRequest $listUserRequest){
+    public function userList(ListUserRequest $listUserRequest)
+    {
 
         $users = User::query()->with('image');
 
@@ -225,7 +226,7 @@ class UserController extends Controller
             $users->where('name', 'like', '%' . request('search') . '%');
         }
 
-        if ($listUserRequest->has('sort')){
+        if ($listUserRequest->has('sort')) {
 
             $users->orderBy('name', $listUserRequest->sort);
         }
@@ -318,17 +319,17 @@ class UserController extends Controller
             $photoOfId = '';
 
             if ($userRequest->has('image')) {
-                Storage::delete($user->image);
+                if ($user->image) Storage::delete($user->image);
                 FileUploadService::uploadImage($userRequest->image, $user, 'image');
             }
 
             if ($userRequest->has('resale_license')) {
-                Storage::delete($user->resale_license);
+                if ($user->resale_license) Storage::delete($user->resale_license);
                 $resaleLicense = FileUploadService::uploadFile($userRequest->resale_license, $user, 'resale_license');
             }
 
             if ($userRequest->has('photo_of_id')) {
-                Storage::delete($user->photo_of_id);
+                if ($user->photo_of_id) Storage::delete($user->photo_of_id);
                 $photoOfId = FileUploadService::uploadFile($userRequest->photo_of_id, $user, 'photo_of_id');
             }
 
@@ -346,7 +347,7 @@ class UserController extends Controller
 
             DB::commit();
             return response()->json(['success' => true, 'data' => $user]);
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $exception->getMessage()], 500);
         }
