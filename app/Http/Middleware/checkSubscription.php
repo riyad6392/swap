@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Subscription;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,17 +18,19 @@ class checkSubscription
     {
         if (auth()->guard('api')->check()) {
             $user = auth()->guard('api')->user();
-            $userSubscriptions = $user->subscriptions()->where('status', 'active')->get();
+            $userSubscriptions = $user->activeSubscriptions;
 
-            if ($userSubscriptions->isEmpty()) {
+            if (!$userSubscriptions) {
                 $user->subscription_is_active = 0;
+
                 return response()->json([
                     'success' => false,
                     'message' => 'You are not subscribed to any plan.'
                 ], 403);
             }
-            elseif ( $userSubscriptions->isNotEmpty() && $userSubscriptions->last()->end_date < now()) {
+            elseif ( $userSubscriptions && $userSubscriptions->end_date < now()) {
                 $user->subscription_is_active = 0;
+
                 return response()->json([
                     'success' => false,
                     'message' => 'Your subscription has expired.'
@@ -35,6 +38,7 @@ class checkSubscription
             }
             else {
                 $user->subscription_is_active = 1;
+
                 return $next($request);
             }
         }

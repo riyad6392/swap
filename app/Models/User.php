@@ -116,7 +116,7 @@ class User extends Authenticatable
         return $this->morphOne(Image::class, 'imageable');
     }
 
-    public function subscriptions(): HasOne
+    public function activeSubscriptions(): HasOne
     {
         return $this->hasOne(Subscription::class)->where('status', 'active');
     }
