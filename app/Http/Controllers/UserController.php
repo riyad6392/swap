@@ -465,8 +465,7 @@ class UserController extends Controller
 
             if ($userRequest->has('image')) {
                 if ($user->image->path) {
-                    Storage::delete($user->image->path);
-                    $user->image->delete();
+                   FileUploadService::deleteImages([$user->image->id], $user, 'image');
                 }
                 FileUploadService::uploadImage($userRequest->image, $user, 'image');
             }

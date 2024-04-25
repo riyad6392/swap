@@ -555,6 +555,7 @@ class ProductController extends Controller
 
     protected function storeVariations($request, Product $product): void
     {
+        FileUploadService::deleteImages($request->deleted_product_variation_image_ids, $product, 'productVariations.images');
         foreach ($request->variations as $key => $variationData) {
             $variation = $product->productVariations()
                 ->updateOrCreate(

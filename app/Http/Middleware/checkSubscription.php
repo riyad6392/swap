@@ -16,32 +16,32 @@ class checkSubscription
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->guard('api')->check()) {
-            $user = auth()->guard('api')->user();
-            $userSubscriptions = $user->activeSubscriptions;
-
-            if (!$userSubscriptions) {
-                $user->subscription_is_active = 0;
-
-                return response()->json([
-                    'success' => false,
-                    'message' => 'You are not subscribed to any plan.'
-                ], 403);
-            }
-            elseif ( $userSubscriptions && $userSubscriptions->end_date < now()) {
-                $user->subscription_is_active = 0;
-
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Your subscription has expired.'
-                ], 403);
-            }
-            else {
-                $user->subscription_is_active = 1;
-
-                return $next($request);
-            }
-        }
+//        if (auth()->guard('api')->check()) {
+//            $user = auth()->guard('api')->user();
+//            $userSubscriptions = $user->activeSubscriptions;
+//
+//            if (!$userSubscriptions) {
+//                $user->subscription_is_active = 0;
+//
+//                return response()->json([
+//                    'success' => false,
+//                    'message' => 'You are not subscribed to any plan.'
+//                ], 403);
+//            }
+//            elseif ( $userSubscriptions && $userSubscriptions->end_date < now()) {
+//                $user->subscription_is_active = 0;
+//
+//                return response()->json([
+//                    'success' => false,
+//                    'message' => 'Your subscription has expired.'
+//                ], 403);
+//            }
+//            else {
+//                $user->subscription_is_active = 1;
+//
+//                return $next($request);
+//            }
+//        }
 
         return $next($request);
     }
