@@ -4648,6 +4648,69 @@
                 }
             }
         },
+        "/api/change-product-status/{id}": {
+            "delete": {
+                "tags": [
+                    "Inventory"
+                ],
+                "summary": "Change status to a product.",
+                "operationId": "bead1b198060840d1b1983222ac78444",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the product to change the status",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Product status updated successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Product not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/ratings": {
             "get": {
                 "tags": [
@@ -7674,6 +7737,189 @@
                             "type": "number"
                         },
                         "example": "10"
+                    },
+                    {
+                        "name": "get_all",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "example": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "json",
+                                            "example": []
+                                        },
+                                        "links": {
+                                            "type": "json",
+                                            "example": []
+                                        },
+                                        "meta": {
+                                            "type": "json",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Unauthenticated"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/update-profile/{id}": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "User update profile.",
+                "operationId": "ad5b4db3132c00564bd7eede30c3e23a",
+                "parameters": [
+                    {
+                        "name": "first_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Imtiaz"
+                    },
+                    {
+                        "name": "last_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Khan"
+                    },
+                    {
+                        "name": "phone",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Khan"
+                    },
+                    {
+                        "name": "image",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "file"
+                        },
+                        "example": "file"
+                    },
+                    {
+                        "name": "resale_license",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "file"
+                        },
+                        "example": "file"
+                    },
+                    {
+                        "name": "photo_of_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "file"
+                        },
+                        "example": "file"
+                    },
+                    {
+                        "name": "photo_of_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "file"
+                        },
+                        "example": "file"
+                    },
+                    {
+                        "name": "business_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Business name"
+                    },
+                    {
+                        "name": "business_address",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Business address"
+                    },
+                    {
+                        "name": "online_store_url",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "http://127.0.0.1:8000/api/documentation#/User/ad5b4db3132c00564bd7eede30c3e23a"
+                    },
+                    {
+                        "name": "ein",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "ein"
+                    },
+                    {
+                        "name": "about_me",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "this is a description about me"
                     },
                     {
                         "name": "get_all",

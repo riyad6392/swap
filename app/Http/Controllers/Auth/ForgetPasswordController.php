@@ -160,7 +160,7 @@ class ForgetPasswordController extends Controller
 
 
         $validateData = Validator::make($request->all(), [
-            'email' => 'required|email|exists:users',
+//            'email' => 'required|email|exists:users',
             'password' => 'required|string|min:6|confirmed',
             'password_confirmation' => 'required|same:password',
             'token' => 'required'
@@ -180,7 +180,7 @@ class ForgetPasswordController extends Controller
             try{
 
                 $updatePassword = DB::table('password_reset_tokens')
-                    ->where('email', $request->email)
+//                    ->where('email', $request->email)
                     ->where('token', $request->token)
                     ->first();
 
@@ -192,10 +192,10 @@ class ForgetPasswordController extends Controller
                     ]);
                 }
 
-                User::where('email', $request->email)
+                User::where('email', $updatePassword->email)
                     ->update(['password' => Hash::make($request->password)]);
 
-                DB::table('password_reset_tokens')->where(['email'=> $request->email])->delete();
+                DB::table('password_reset_tokens')->where(['email'=> $updatePassword->email])->delete();
                 DB::commit();
 
                 return response()->json(['success' => true, 'message' => 'Password reset successfully.']);

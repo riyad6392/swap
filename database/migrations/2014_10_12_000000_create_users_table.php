@@ -29,6 +29,7 @@ return new class extends Migration
             $table->string('ein')->nullable();
             $table->string('resale_license')->nullable();
             $table->string('photo_of_id')->nullable();
+            $table->longText('about_me')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
