@@ -483,13 +483,14 @@ class ProductController extends Controller
                 'is_publish' => $updateProductRequest->is_publish
             ]);
 
+            if ($updateProductRequest->has('deleted_product_image_ids')) {
+                FileUploadService::deleteImages($this->deleted_product_image_ids, $product, 'images');
+            }
+
             if ($updateProductRequest->has('product_images')) {
                 FileUploadService::uploadImage($updateProductRequest->product_images, $product);
             }
 
-            if ($updateProductRequest->has('deleted_image_ids')) {
-                FileUploadService::deleteImages($this->deleted_image_ids);
-            }
 
             if ($updateProductVariationRequest->has('variations')) {
                 $this->storeVariations($updateProductVariationRequest, $product);
@@ -542,7 +543,7 @@ class ProductController extends Controller
         $imageIds = array_merge($productImgIds, $variationImgIds);
 
         if ($imageIds) {
-            FileUploadService::deleteImages($productImgIds);
+            FileUploadService::deleteImages($productImgIds, $product);
         }
 
         $product->images()->delete();

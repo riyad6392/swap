@@ -77,7 +77,7 @@ class ForgetPasswordController extends Controller
                 DB::table('password_reset_tokens')
                     ->updateOrInsert(
                         ['email' => $request->email],
-                        ['token' => $token, 'created_at' => now()]
+                        ['token' => $token, 'created_at' => now() , 'table' => 'users']
                     );
 
                 DB::commit();
@@ -182,6 +182,7 @@ class ForgetPasswordController extends Controller
                 $updatePassword = DB::table('password_reset_tokens')
 //                    ->where('email', $request->email)
                     ->where('token', $request->token)
+                    ->where('table', 'users')
                     ->first();
 
                 if(!$updatePassword){
@@ -195,7 +196,8 @@ class ForgetPasswordController extends Controller
                 User::where('email', $updatePassword->email)
                     ->update(['password' => Hash::make($request->password)]);
 
-                DB::table('password_reset_tokens')->where(['email'=> $updatePassword->email])->delete();
+                DB::table('password_reset_tokens')->where(['email'=> $updatePassword->email ,'table' => 'users'])->delete();
+
                 DB::commit();
 
                 return response()->json(['success' => true, 'message' => 'Password reset successfully.']);

@@ -293,7 +293,7 @@ class UserController extends Controller
      */
     public function userInventory(Request $request, $id)
     {
-        $user = User::find($id);
+        $user = User::with('image')->withCount('receivedRatings')->find($id);
 
         if (!$user) {
             return response()->json(['success' => false, 'message' => 'User not found'], 404);
@@ -303,7 +303,7 @@ class UserController extends Controller
             return response()->json(['success' => true, 'data' => $user->products()->get()]);
         }
 
-        $inventory = $user->products()->paginate($request->pagination ?? self::PER_PAGE);
+        $inventory = $user->products()->with('images')->paginate($request->pagination ?? self::PER_PAGE);
 
         return response()->json(['success' => true, 'data' => ['user'=> $user, 'inventory' => $inventory]]);
     }
@@ -464,7 +464,10 @@ class UserController extends Controller
             $photoOfId = null;
 
             if ($userRequest->has('image')) {
-                if ($user->image) Storage::delete($user->image);
+                if ($user->image->path) {
+                    Storage::delete($user->image->path);
+                    $user->image->delete();
+                }
                 FileUploadService::uploadImage($userRequest->image, $user, 'image');
             }
 
