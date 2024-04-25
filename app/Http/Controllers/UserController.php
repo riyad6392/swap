@@ -219,7 +219,7 @@ class UserController extends Controller
     public function userList(ListUserRequest $listUserRequest)
     {
 
-        $users = User::query()->with('image');
+        $users = User::query()->with('image')->withCount('receivedRatings');
 
         if ($listUserRequest->has('search')) {
 
@@ -305,8 +305,153 @@ class UserController extends Controller
 
         $inventory = $user->products()->paginate($request->pagination ?? self::PER_PAGE);
 
-        return response()->json(['success' => true, 'data' => $inventory]);
+        return response()->json(['success' => true, 'data' => ['user'=> $user, 'inventory' => $inventory]]);
     }
+
+    /**
+     * User update profile.
+     *
+     * @OA\Post(
+     *     path="/api/update-profile/{id}",
+     *     tags={"User"},
+     *     security={{ "apiAuth": {} }},
+     *
+     *     @OA\MediaType(mediaType="multipart/form-data"),
+     *
+     *     @OA\Parameter(
+     *          in="query",
+     *          name="first_name",
+     *          required=true,
+     *
+     *          @OA\Schema(type="string"),
+     *          example="Imtiaz"
+     *      ),
+     *
+     *       @OA\Parameter(
+     *           in="query",
+     *           name="last_name",
+     *           required=true,
+     *
+     *           @OA\Schema(type="string"),
+     *           example="Khan"
+     *       ),
+     *
+     *       @OA\Parameter(
+     *            in="query",
+     *            name="phone",
+     *            required=true,
+     *
+     *            @OA\Schema(type="string"),
+     *            example="Khan"
+     *        ),
+     *
+     *       @OA\Parameter(
+     *             in="query",
+     *             name="image",
+     *             required=true,
+     *
+     *             @OA\Schema(type="file"),
+     *             example="file"
+     *         ),
+     *
+     *            @OA\Parameter(
+     *              in="query",
+     *              name="resale_license",
+     *              required=true,
+     *
+     *              @OA\Schema(type="file"),
+     *              example="file"
+     *          ),
+     *
+     *         @OA\Parameter(
+     *               in="query",
+     *               name="photo_of_id",
+     *               required=true,
+     *
+     *               @OA\Schema(type="file"),
+     *               example="file"
+     *           ),
+     *              @OA\Parameter(
+     *                in="query",
+     *                name="photo_of_id",
+     *                required=true,
+     *
+     *                @OA\Schema(type="file"),
+     *                example="file"
+     *            ),
+     *          @OA\Parameter(
+     *                 in="query",
+     *                 name="business_name",
+     *                 required=true,
+     *
+     *                 @OA\Schema(type="string"),
+     *                 example="Business name"
+     *             ),
+     *          @OA\Parameter(
+     *                  in="query",
+     *                  name="business_address",
+     *                  required=true,
+     *
+     *                  @OA\Schema(type="string"),
+     *                  example="Business address"
+     *              ),
+     *          @OA\Parameter(
+     *                  in="query",
+     *                  name="online_store_url",
+     *                  required=true,
+     *
+     *                  @OA\Schema(type="string"),
+     *                  example="http://127.0.0.1:8000/api/documentation#/User/ad5b4db3132c00564bd7eede30c3e23a"
+     *              ),
+     *
+     *          @OA\Parameter(
+     *                   in="query",
+     *                   name="ein",
+     *                   required=true,
+     *
+     *                   @OA\Schema(type="string"),
+     *                   example="ein"
+     *               ),
+     *          @OA\Parameter(
+     *                   in="query",
+     *                   name="about_me",
+     *                   required=true,
+     *
+     *                   @OA\Schema(type="string"),
+     *                   example="this is a description about me"
+     *               ),
+     *
+     *      @OA\Parameter(
+     *          in="query",
+     *          name="get_all",
+     *          required=false,
+     *
+     *          @OA\Schema(type="boolean"),
+     *          example="1"
+     *
+     *      ),
+     *     @OA\Response(
+     *           response=200,
+     *           description="success",
+     *
+     *           @OA\JsonContent(
+     *               @OA\Property(property="data", type="json", example={}),
+     *               @OA\Property(property="links", type="json", example={}),
+     *               @OA\Property(property="meta", type="json", example={}),
+     *           )
+     *       ),
+     *
+     *       @OA\Response(
+     *           response=401,
+     *           description="Invalid user",
+     *
+     *           @OA\JsonContent(
+     *               @OA\Property(property="success", type="boolean", example="false"),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Unauthenticated"}}),
+     *           )
+     *       )
+     * )
+     */
 
     public function updateProfile(UpdateUserRequest $userRequest)
     {
@@ -315,8 +460,8 @@ class UserController extends Controller
 
             $user = User::find(auth()->id());
 
-            $resaleLicense = '';
-            $photoOfId = '';
+            $resaleLicense = null;
+            $photoOfId = null;
 
             if ($userRequest->has('image')) {
                 if ($user->image) Storage::delete($user->image);
@@ -334,16 +479,19 @@ class UserController extends Controller
             }
 
             $user->update([
-                'first_name' => $userRequest->first_name,
-                'last_name' => $userRequest->last_name,
-                'phone' => $userRequest->phone,
-                'business_name' => $userRequest->business_name,
-                'business_address' => $userRequest->business_address,
-                'resale_license' => $resaleLicense,
-                'photo_of_id' => $photoOfId,
-                'online_store_url' => $userRequest->online_store_url,
-                'ein' => $userRequest->ein,
+                'first_name' => $userRequest->first_name ?? $user->first_name,
+                'last_name' => $userRequest->last_name ?? $user->last_name,
+                'phone' => $userRequest->phone ?? $user->phone,
+                'business_name' => $userRequest->business_name ?? $user->business_name,
+                'business_address' => $userRequest->business_address ?? $user->business_address,
+                'resale_license' => $resaleLicense ?? $user->resale_license,
+                'photo_of_id' => $photoOfId ?? $user->photo_of_id,
+                'online_store_url' => $userRequest->online_store_url ?? $user->online_store_url,
+                'ein' => $userRequest->ein ?? $user->ein,
+                'about_me' => $userRequest->about_me ?? $user->about_me,
             ]);
+
+            $user = $user->load('image');
 
             DB::commit();
             return response()->json(['success' => true, 'data' => $user]);

@@ -70,6 +70,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::resource('size', SizeController::class);
         Route::resource('color', ColorController::class);
         Route::resource('product', ProductController::class);
+        Route::get('change-product-status/{id}', [ProductController::class, 'changeStatus']);
 //        Route::resource('plan', PlanController::class);
 
         //rating

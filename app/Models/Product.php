@@ -16,6 +16,8 @@ class Product extends Model
         'category_id',
         'user_id',
         'description',
+        'brand_id',
+        'is_publish',
         'created_by',
         'updated_by'
     ];
