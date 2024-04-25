@@ -143,7 +143,7 @@ class PlanSubscriptionController extends Controller
             ]);
 
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Subscription created successfully!'], 200);
+            return response()->json(['success' => true, 'message' => 'Subscription created successfully!', 'data'=> auth()->user()], 200);
 
         } catch (\Exception $exception) {
             DB::rollBack();
