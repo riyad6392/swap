@@ -73,7 +73,7 @@ class ProductController extends Controller
             $inventories = $inventories->where('name', 'like', '%' . $request->name . '%');
         }
 
-        $inventories = $inventories->with('productVariations.images', 'images');
+        $inventories = $inventories->with('productVariations.images', 'image');
 
         if ($request->get('get_all')) {
             return response()->json(['success' => true, 'data' => $inventories->get()]);
