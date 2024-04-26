@@ -6,20 +6,22 @@ use App\Facades\StripePaymentFacade;
 use App\Http\Requests\paymentMethod\StorePaymentMethodRequest;
 use App\Http\Requests\paymentMethod\UpdatePaymentMethodRequest;
 use App\Models\PaymentMethods;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class PaymentMethodController extends Controller
 {
-    const STATUS_ACTIVE = 'active';
-    const STATUS_INACTIVE = 'inactive';
+    const STATUS_ACTIVE = 1;
+    const STATUS_INACTIVE = 0;
 
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        $paymentMethods = PaymentMethods::where('user_id', auth()->id())->get();
+        return response()->json(['success' => true, 'message' => $paymentMethods], 200);
     }
 
     /**
@@ -71,7 +73,7 @@ class PaymentMethodController extends Controller
      *     ),
      *     @OA\Parameter(
      *         in="query",
-     *         name="status",
+     *         name="is_active",
      *         required=false,
      *         description="Status of the payment method",
      *         @OA\Schema(type="string", enum={"active", "inactive"}, default="active"),
@@ -88,7 +90,7 @@ class PaymentMethodController extends Controller
      *                 @OA\Property(property="master_key", type="string", example="123456789"),
      *                 @OA\Property(property="master_value", type="string", example="123"),
      *                 @OA\Property(property="stripe_payment_method_id", type="string", example="pm_123456789"),
-     *                 @OA\Property(property="status", type="string", example="active"),
+     *                 @OA\Property(property="is_active", type="string", example="active"),
      *             ),
      *         ),
      *     ),
@@ -114,10 +116,14 @@ class PaymentMethodController extends Controller
      *     ),
      * )
      */
-    public function store(StorePaymentMethodRequest $paymentMethodRequest)
+    public function store(StorePaymentMethodRequest $paymentMethodRequest): JsonResponse
     {
         try {
             DB::beginTransaction();
+
+            PaymentMethods::where('user_id', auth()->id())
+                ->where('is_active', self::STATUS_ACTIVE)
+                ->update(['is_active' => self::STATUS_INACTIVE]);
 
             $paymentMethod = PaymentMethods::create([
                 'method_name' => $paymentMethodRequest->method_name,
@@ -125,7 +131,7 @@ class PaymentMethodController extends Controller
                 'master_key' => $paymentMethodRequest->master_key,
                 'master_value' => $paymentMethodRequest->master_value,
                 'stripe_payment_method_id' => $paymentMethodRequest->stripe_payment_method_id,
-                'status' => $paymentMethodRequest->status ?? 'active',
+                'is_active' => $paymentMethodRequest->is_active ?? 1,
             ]);
 
             $paymentMethod = StripePaymentFacade::attachPaymentMethodToCustomer(
@@ -206,7 +212,7 @@ class PaymentMethodController extends Controller
      *     ),
      * )
      */
-    public function update(UpdatePaymentMethodRequest $updatePaymentMethodRequest)
+    public function update(UpdatePaymentMethodRequest $updatePaymentMethodRequest): JsonResponse
     {
         $user = auth()->user();
         $paymentId = trim($updatePaymentMethodRequest->stripe_payment_method_id);
@@ -218,7 +224,7 @@ class PaymentMethodController extends Controller
             );
 
             PaymentMethods::where('user_id', auth()->id())
-                ->update(['status' =>
+                ->update(['is_active' =>
                     \DB::raw("CASE WHEN stripe_payment_method_id =
                     '{$paymentId}' THEN '" . self::STATUS_ACTIVE .
                         "' ELSE '" .
@@ -289,11 +295,64 @@ class PaymentMethodController extends Controller
                     ['user_id', auth()->id()],
                     ['stripe_payment_method_id', $payment_method_id]
                 ])
-                ->update(['status', PaymentMethods::STATUS_INACTIVE]);
+                ->update(['is_active', PaymentMethods::STATUS_INACTIVE]);
             return response()->json(['success' => true, 'message' => $paymentMethod], 201);
         } catch (\Exception $exception) {
             DB::rollBack();
             return response()->json(['success' => false, 'errors' => ['message' => [$exception->getMessage()]]], 500);
         }
+    }
+
+    /**
+     * Default payment method.
+     *
+     * @OA\get(
+     *     path="/api/default-payment-method",
+     *     tags={"Payment Methods"},
+     *     security={{ "apiAuth": {} }},
+     *     summary="Delete a payment method",
+     *     description="Change default payment method.",
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Payment method change successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Payment method change successfully"),
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *           response=401,
+     *           description="Invalid user",
+     *           @OA\JsonContent(
+     *               @OA\Property(property="success", type="boolean", example="false"),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Unauthenticated"}}),
+     *           )
+     *       ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error occurred while change payment method",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="errors", type="object",
+     *                 @OA\Property(property="message", type="array",
+     *                     @OA\Items(type="string", example="Error message goes here")
+     *                 ),
+     *             ),
+     *         ),
+     *     ),
+     * )
+     */
+    public function defaultPaymentMethod(): JsonResponse
+    {
+        $paymentMethod = PaymentMethods::where('user_id', auth()->id())
+            ->where('is_active', self::STATUS_ACTIVE)
+            ->first();
+
+        $paymentMethod = StripePaymentFacade::attachPaymentMethodToCustomer(
+            trim($paymentMethod->stripe_payment_method_id),
+            auth()->user()
+        );
+        return response()->json(['success' => true, 'message' => $paymentMethod], 200);
     }
 }

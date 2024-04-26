@@ -20,7 +20,7 @@ class PaymentMethods extends Model
         'master_key',
         'master_value',
         'stripe_payment_method_id',
-        'status',
+        'is_active',
         'created_by',
         'updated_by',
     ];
