@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('brand_id');
             $table->integer('user_id');
             $table->longText('description')->nullable();
+            $table->boolean('is_publish')->default(0);
             $table->integer('created_by');
             $table->integer('updated_by');
             $table->timestamps();

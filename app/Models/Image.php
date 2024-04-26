@@ -18,20 +18,12 @@ class Image extends Model
         'path'
     ];
     protected $appends = [
-        'imagePath'
+        'image_path'
     ];
 
-//    protected $hidden = [
-//        'created_at',
-//        'updated_at',
-//        'imageable_type',
-//        'imageable_id',
-//        'created_by',
-//        'updated_by'
-//    ];
     public function getImagePathAttribute()
     {
-        return asset($this->path);
+        return asset('storage/'.$this->path);
     }
 
     protected static function boot()

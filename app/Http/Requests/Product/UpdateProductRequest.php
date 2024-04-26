@@ -32,7 +32,10 @@ class UpdateProductRequest extends FormRequest
             'category_id' => 'required|exists:categories,id',
             'brand_id'=>'required|exists:brands,id',
             'product_images' => 'sometimes|array',
+            'deleted_product_image_ids' => 'sometimes|array',
+            'deleted_product_variation_image_ids' => 'sometimes|array',
             'deleted_image_ids' => 'sometimes|array',
+            'is_publish' => 'required|boolean',
         ];
     }
 

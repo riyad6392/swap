@@ -49,9 +49,13 @@ class FileUploadService
         return $path;
     }
 
-    public static function deleteImages(array $deleted_image_ids)
+    public static function deleteImages(array $deleted_image_ids, $model, string $relation = null,): array
     {
-        $images = Image::whereIn('id', $deleted_image_ids)->get();
+        $relation = $relation ?? 'images';
+        $images = $model->$relation()
+            ->whereIn('id', $deleted_image_ids)
+            ->get();
+
         foreach ($images as $image) {
             Storage::disk(self::FILE_STORAGE)->delete($image->path);
             $image->delete();

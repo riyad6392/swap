@@ -98,7 +98,7 @@ class PlanSubscriptionController extends Controller
             DB::beginTransaction();
 
             $paymentMethods = PaymentMethods::where('user_id', auth()->user()->id)
-                ->where('status','=', 'active')
+                ->where('is_active', 1)
                 ->first();
 
             if (!$paymentMethods) {
@@ -143,7 +143,7 @@ class PlanSubscriptionController extends Controller
             ]);
 
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Subscription created successfully!'], 200);
+            return response()->json(['success' => true, 'message' => 'Subscription created successfully!', 'data'=> auth()->user()], 200);
 
         } catch (\Exception $exception) {
             DB::rollBack();

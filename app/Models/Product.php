@@ -16,13 +16,15 @@ class Product extends Model
         'category_id',
         'user_id',
         'description',
+        'brand_id',
+        'is_publish',
         'created_by',
         'updated_by'
     ];
 
-    public function images()
+    public function image()
     {
-        return $this->morphMany(Image::class, 'imageable');
+        return $this->morphOne(Image::class, 'imageable');
     }
 
     public function category()

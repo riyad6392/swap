@@ -73,7 +73,7 @@ class ProductController extends Controller
             $inventories = $inventories->where('name', 'like', '%' . $request->name . '%');
         }
 
-        $inventories = $inventories->with('productVariations.images', 'images');
+        $inventories = $inventories->with('productVariations.images', 'image');
 
         if ($request->get('get_all')) {
             return response()->json(['success' => true, 'data' => $inventories->get()]);
@@ -245,10 +245,12 @@ class ProductController extends Controller
                 'category_id',
                 'user_id',
                 'description',
+                'brand_id',
+                'is_publish'
             ]));
 
             if ($productRequest->has('product_images')) {
-                FileUploadService::uploadImage($productRequest->product_images, $product);
+                FileUploadService::uploadImage($productRequest->product_images, $product, 'image');
             }
 
             $this->storeVariations($productVariantRequest, $product);
@@ -472,15 +474,23 @@ class ProductController extends Controller
         try {
             DB::beginTransaction();
 
-            $product->update($updateProductRequest->only(['name', 'category_id', 'user_id', 'description']));
+            $product->update([
+                'name' => $updateProductRequest->name,
+                'category_id' => $updateProductRequest->category_id,
+                'user_id' => $updateProductRequest->user_id,
+                'description' => $updateProductRequest->description,
+                'brand_id' => $updateProductRequest->brand_id,
+                'is_publish' => $updateProductRequest->is_publish
+            ]);
+
+            if ($updateProductRequest->has('deleted_product_image_ids')) {
+                FileUploadService::deleteImages($this->deleted_product_image_ids, $product, 'image');
+            }
 
             if ($updateProductRequest->has('product_images')) {
-                FileUploadService::uploadImage($updateProductRequest->product_images, $product);
+                FileUploadService::uploadImage($updateProductRequest->product_images, $product, 'image');
             }
 
-            if ($updateProductRequest->has('deleted_image_ids')) {
-                FileUploadService::deleteImages($this->deleted_image_ids);
-            }
 
             if ($updateProductVariationRequest->has('variations')) {
                 $this->storeVariations($updateProductVariationRequest, $product);
@@ -533,7 +543,7 @@ class ProductController extends Controller
         $imageIds = array_merge($productImgIds, $variationImgIds);
 
         if ($imageIds) {
-            FileUploadService::deleteImages($productImgIds);
+            FileUploadService::deleteImages($productImgIds, $product);
         }
 
         $product->images()->delete();
@@ -545,6 +555,9 @@ class ProductController extends Controller
 
     protected function storeVariations($request, Product $product): void
     {
+        if ($request->has('deleted_product_variation_image_ids')) {
+            FileUploadService::deleteImages($request->deleted_product_variation_image_ids, $product, 'productVariations.images');
+        }
         foreach ($request->variations as $key => $variationData) {
             $variation = $product->productVariations()
                 ->updateOrCreate(
@@ -556,5 +569,49 @@ class ProductController extends Controller
                 FileUploadService::uploadImage($variationData['variant_images'], $variation);
             }
         }
+    }
+
+    /**
+     *Change status to a product.
+     *
+     * @OA\Delete (
+     *     path="/api/change-product-status/{id}",
+     *     tags={"Inventory"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the product to change the status",
+     *         @OA\Schema(type="integer", format="int64")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="success",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example="true"),
+     *             @OA\Property(property="message", type="string", example="Product status updated successfully")
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example="false"),
+     *             @OA\Property(property="message", type="string", example="Product not found")
+     *         ),
+     *     )
+     * )
+     */
+    public function changeStatus($id): \Illuminate\Http\JsonResponse
+    {
+        $product = Product::find($id);
+
+        if (!$product) {
+            return response()->json(['success' => false, 'message' => 'Product not found'], 404);
+        }
+
+        $product->update(['is_publish' => !$product->is_publish]);
+
+        return response()->json(['success' => true, 'message' => 'Product status updated successfully'], 200);
     }
 }

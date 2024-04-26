@@ -41,6 +41,7 @@ class User extends Authenticatable
         'is_super_swapper',
         'photo_of_id',
         'stripe_customer_id',
+        'about_me',
     ];
 
     /**
@@ -64,8 +65,13 @@ class User extends Authenticatable
     ];
 
     protected $appends = [
-        'average_rating'
+        'average_rating', 'resale_license_path', 'photo_of_id_path'
     ];
+
+//    public function getImagePathAttribute()
+//    {
+//        return asset($this->image);
+//    }
 
     public function products(): HasMany
     {
@@ -90,17 +96,22 @@ class User extends Authenticatable
         return round($this->receivedRatings()->avg('rating'),1);
     }
 
+    public function getResaleLicensePathAttribute()
+    {
+        return asset('storage/'.$this->resale_license);
+    }
+
+    public function getPhotoOfIdPathAttribute()
+    {
+        return asset('storage/'.$this->photo_of_id);
+    }
+
     public function notifications(): BelongsToMany
     {
         return $this->belongsToMany(Notification::class);
 
     }
 
-//    public function notifications()
-//    {
-//        return $this->morphMany(Notification::class, 'notifiable')
-//                    ->orderBy('created_at', 'desc');
-//    }
     public function unreadNotifications()
     {
         return $this->notifications()->whereNull('read_at');
