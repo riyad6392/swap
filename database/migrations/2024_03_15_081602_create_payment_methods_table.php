@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('master_key')->nullable();
             $table->string('master_value')->nullable();
             $table->string('stripe_payment_method_id');
-            $table->string('status');
+            $table->boolean('is_active')->default(false);
             $table->string('created_by');
             $table->string('updated_by');
             $table->timestamps();

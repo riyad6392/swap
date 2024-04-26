@@ -20,7 +20,7 @@ class SwapObserver
                 'type' => 'App\Notifications\SwapRequestNotification',
                 'notififor_id'=> $swap->requested_user_id,
                 'data' => 'Swap request has been sent successfully',
-                'notififor_id' => $swap->exchanged_user_id,
+//                'notififor_id' => $swap->exchanged_user_id,
             ]);
 
 //        return $notification;

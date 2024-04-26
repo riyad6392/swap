@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('short_description');
             $table->double('amount', 8, 2);
             $table->string('currency');
-            $table->enum('interval', ['month', 'yearly']);
+            $table->enum('interval', ['month', 'year']);
             $table->string('interval_duration');
             $table->string('is_super_swapper')->nullable();
             $table->boolean('is_active')->default(0);

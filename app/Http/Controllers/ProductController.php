@@ -73,7 +73,7 @@ class ProductController extends Controller
             $inventories = $inventories->where('name', 'like', '%' . $request->name . '%');
         }
 
-        $inventories = $inventories->with('productVariations.images', 'images');
+        $inventories = $inventories->with('productVariations.images', 'image');
 
         if ($request->get('get_all')) {
             return response()->json(['success' => true, 'data' => $inventories->get()]);
@@ -250,7 +250,7 @@ class ProductController extends Controller
             ]));
 
             if ($productRequest->has('product_images')) {
-                FileUploadService::uploadImage($productRequest->product_images, $product);
+                FileUploadService::uploadImage($productRequest->product_images, $product, 'image');
             }
 
             $this->storeVariations($productVariantRequest, $product);
@@ -483,13 +483,14 @@ class ProductController extends Controller
                 'is_publish' => $updateProductRequest->is_publish
             ]);
 
-            if ($updateProductRequest->has('product_images')) {
-                FileUploadService::uploadImage($updateProductRequest->product_images, $product);
+            if ($updateProductRequest->has('deleted_product_image_ids')) {
+                FileUploadService::deleteImages($this->deleted_product_image_ids, $product, 'image');
             }
 
-            if ($updateProductRequest->has('deleted_image_ids')) {
-                FileUploadService::deleteImages($this->deleted_image_ids);
+            if ($updateProductRequest->has('product_images')) {
+                FileUploadService::uploadImage($updateProductRequest->product_images, $product, 'image');
             }
+
 
             if ($updateProductVariationRequest->has('variations')) {
                 $this->storeVariations($updateProductVariationRequest, $product);
@@ -542,7 +543,7 @@ class ProductController extends Controller
         $imageIds = array_merge($productImgIds, $variationImgIds);
 
         if ($imageIds) {
-            FileUploadService::deleteImages($productImgIds);
+            FileUploadService::deleteImages($productImgIds, $product);
         }
 
         $product->images()->delete();
@@ -554,6 +555,9 @@ class ProductController extends Controller
 
     protected function storeVariations($request, Product $product): void
     {
+        if ($request->has('deleted_product_variation_image_ids')) {
+            FileUploadService::deleteImages($request->deleted_product_variation_image_ids, $product, 'productVariations.images');
+        }
         foreach ($request->variations as $key => $variationData) {
             $variation = $product->productVariations()
                 ->updateOrCreate(

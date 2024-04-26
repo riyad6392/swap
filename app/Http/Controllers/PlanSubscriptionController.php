@@ -98,7 +98,7 @@ class PlanSubscriptionController extends Controller
             DB::beginTransaction();
 
             $paymentMethods = PaymentMethods::where('user_id', auth()->user()->id)
-                ->where('status','=', 'active')
+                ->where('is_active', 1)
                 ->first();
 
             if (!$paymentMethods) {
