@@ -250,7 +250,7 @@ class ProductController extends Controller
             ]));
 
             if ($productRequest->has('product_images')) {
-                FileUploadService::uploadImage($productRequest->product_images, $product);
+                FileUploadService::uploadImage($productRequest->product_images, $product, 'image');
             }
 
             $this->storeVariations($productVariantRequest, $product);
@@ -484,11 +484,11 @@ class ProductController extends Controller
             ]);
 
             if ($updateProductRequest->has('deleted_product_image_ids')) {
-                FileUploadService::deleteImages($this->deleted_product_image_ids, $product, 'images');
+                FileUploadService::deleteImages($this->deleted_product_image_ids, $product, 'image');
             }
 
             if ($updateProductRequest->has('product_images')) {
-                FileUploadService::uploadImage($updateProductRequest->product_images, $product);
+                FileUploadService::uploadImage($updateProductRequest->product_images, $product, 'image');
             }
 
 

@@ -303,7 +303,7 @@ class UserController extends Controller
             return response()->json(['success' => true, 'data' => $user->products()->get()]);
         }
 
-        $inventory = $user->products()->with('images')->paginate($request->pagination ?? self::PER_PAGE);
+        $inventory = $user->products()->with('image')->paginate($request->pagination ?? self::PER_PAGE);
 
         return response()->json(['success' => true, 'data' => ['user'=> $user, 'inventory' => $inventory]]);
     }
