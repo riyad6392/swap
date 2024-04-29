@@ -25,8 +25,8 @@ class StoreProductVariationRequest extends FormRequest
     {
         return [
             'variations' => 'required|array',
-            'variations.*.size_id' => 'nullable|integer|exists:sizes,id',
-            'variations.*.color_id' => 'nullable|integer|exists:colors,id',
+            'variations.*.size_id' => 'required|integer|exists:sizes,id',
+            'variations.*.color_id' => 'required|integer|exists:colors,id',
             'variations.*.unit_price' => 'required|numeric',
             'variations.*.stock' => 'required|integer',
             'variations.*.discount' => 'nullable|numeric',

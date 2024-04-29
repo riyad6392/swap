@@ -343,16 +343,27 @@ class PaymentMethodController extends Controller
      *     ),
      * )
      */
-    public function defaultPaymentMethod(): JsonResponse
+    public function defaultPaymentMethod(Request $request): JsonResponse
     {
-        $paymentMethod = PaymentMethods::where('user_id', auth()->id())
+        $auth = auth()->id();
+
+        $paymentMethod = PaymentMethods::where('user_id', $auth)
+            ->update(['is_active' =>
+                DB::raw("CASE WHEN id = {$request->payment_method_id} THEN '" . self::STATUS_ACTIVE .
+                    "' ELSE '" .
+                    self::STATUS_INACTIVE . " WHERE user_id = {$auth} AND is_active = " . self::STATUS_ACTIVE . " END")]);
+
+
+        dd($paymentMethod);
+
+        $paymentMethod = PaymentMethods::where('user_id', $auth)
             ->where('is_active', self::STATUS_ACTIVE)
             ->first();
 
-        $paymentMethod = StripePaymentFacade::attachPaymentMethodToCustomer(
+        StripePaymentFacade::attachPaymentMethodToCustomer(
             trim($paymentMethod->stripe_payment_method_id),
             auth()->user()
         );
-        return response()->json(['success' => true, 'message' => $paymentMethod], 200);
+        return response()->json(['success' => true, 'message' => 'Payment method update successfully'], 200);
     }
 }
