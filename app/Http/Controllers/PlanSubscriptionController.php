@@ -196,17 +196,29 @@ class PlanSubscriptionController extends Controller
                 return response()->json(['success' => false, 'message' => 'Subscription already cancelled!'], 422);
             }
 
-            StripePaymentFacade::cancelSubscription($subscription->stripe_subscription_id);
+            $subscription->paymentMethod->update(['is_active' => 0]);
 
             $subscription->update(['status' => 'cancelled']);
 
             auth()->user()->update(['subscription_is_active' => false]);
+
+            StripePaymentFacade::cancelSubscription($subscription->stripe_subscription_id);
 
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Subscription cancelled successfully!'], 200);
 
         } catch (\Exception $exception) {
             DB::rollBack();
+            return response()->json(['success' => false, 'message' => $exception->getMessage()], 422);
+        }
+    }
+
+    public function invoiceList()
+    {
+        try {
+            $invoices = StripePaymentFacade::invoiceList();
+            return response()->json(['success' => true, 'data' => $invoices], 200);
+        } catch (\Exception $exception) {
             return response()->json(['success' => false, 'message' => $exception->getMessage()], 422);
         }
     }

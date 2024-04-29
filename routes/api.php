@@ -62,6 +62,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         //User
         Route::get('user-list', [UserController::class, 'userList']);
         Route::get('user-inventory/{id}', [UserController::class, 'userInventory']);
+        Route::get('user-profile', [UserController::class, 'userProfile']);
         Route::post('update-profile', [UserController::class, 'updateProfile']);
 
         //Inventory
@@ -84,6 +85,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::resource('swap-exchange-details', SwapExchangeDetailsController::class);
         Route::get('swap-approve/{id}', [SwapController::class, 'approve']);
         Route::get('swap-decline/{id}', [SwapController::class, 'decline']);
+        Route::get('swap-complete/{id}', [SwapController::class, 'complete']);
 
 //        Broadcast::routes();
 
@@ -104,6 +106,11 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::post('default-payment-method', [PaymentMethodController::class, 'defaultPaymentMethod']);
         Route::put('update-payment-method', [PaymentMethodController::class, 'update']);
         Route::delete('delete-payment-method/{payment_method_id}', [PaymentMethodController::class, 'destroy']);
+
+        //Subscription
+        Route::delete('cancel-subscription/{id}', [PlanSubscriptionController::class , 'cancelSubscription']);
+        Route::get('invoice-list', [PlanSubscriptionController::class , 'invoiceList']);
+
     });
 
     //plan
@@ -112,7 +119,6 @@ Route::group(['middleware' => 'auth:api'], function () {
     //Subscription
 
     Route::post('plan-subscription', [PlanSubscriptionController::class , 'subscribe']);
-    Route::delete('cancel-subscription/{id}', [PlanSubscriptionController::class , 'cancelSubscription']);
 
     //Payment Method
 

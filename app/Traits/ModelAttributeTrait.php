@@ -28,7 +28,7 @@ trait ModelAttributeTrait
     {
         static::creating(function ($model) {
             if (!$model->isDirty('uid')) {
-                $model->uid = uniqid();
+                $model->uid = strtolower(class_basename($model)) .'-'. uniqid();
             }
         });
     }

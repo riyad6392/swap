@@ -12,7 +12,6 @@ use Illuminate\Notifications\HasDatabaseNotifications;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Cashier\Billable;
 use Laravel\Passport\HasApiTokens;
-use Stripe\PaymentMethod;
 
 class User extends Authenticatable
 {
@@ -80,7 +79,12 @@ class User extends Authenticatable
 
     public function paymentMethods(): HasMany
     {
-        return $this->hasMany(PaymentMethod::class);
+        return $this->hasMany(PaymentMethods::class);
+    }
+
+    public function activePaymentMethod(): HasOne
+    {
+        return $this->hasOne(PaymentMethods::class)->where('is_active', 1);
     }
     public function givenRatings(): HasMany
     {

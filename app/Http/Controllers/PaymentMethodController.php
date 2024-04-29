@@ -347,14 +347,12 @@ class PaymentMethodController extends Controller
     {
         $auth = auth()->id();
 
-        $paymentMethod = PaymentMethods::where('user_id', $auth)
+        PaymentMethods::where('user_id', $auth)
             ->update(['is_active' =>
-                DB::raw("CASE WHEN id = {$request->payment_method_id} THEN '" . self::STATUS_ACTIVE .
+                DB::raw("CASE WHEN id =
+                    '{$request->payment_method_id}' THEN '" . self::STATUS_ACTIVE .
                     "' ELSE '" .
-                    self::STATUS_INACTIVE . " WHERE user_id = {$auth} AND is_active = " . self::STATUS_ACTIVE . " END")]);
-
-
-        dd($paymentMethod);
+                    self::STATUS_INACTIVE . "' END")]);
 
         $paymentMethod = PaymentMethods::where('user_id', $auth)
             ->where('is_active', self::STATUS_ACTIVE)

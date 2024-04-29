@@ -308,6 +308,11 @@ class UserController extends Controller
         return response()->json(['success' => true, 'data' => ['user'=> $user, 'inventory' => $inventory]]);
     }
 
+    public function userProfile(){
+        $user = User::find(auth()->id());
+        return response()->json(['success' => true, 'data' => $user]);
+    }
+
     /**
      * User update profile.
      *
