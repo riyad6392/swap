@@ -101,7 +101,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::post('mark-as-unread', [NotificationController::class , 'markAllAsUnRead']);
 
         //Payment Method
-        Route::get('default-payment-method', [PaymentMethodController::class, 'defaultPaymentMethod']);
+        Route::post('default-payment-method', [PaymentMethodController::class, 'defaultPaymentMethod']);
         Route::put('update-payment-method', [PaymentMethodController::class, 'update']);
         Route::delete('delete-payment-method/{payment_method_id}', [PaymentMethodController::class, 'destroy']);
     });

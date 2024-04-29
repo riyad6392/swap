@@ -142,14 +142,14 @@ class ProductController extends Controller
      *     ),
      *     @OA\Parameter(
      *         in="query",
-     *         name="variations[0][size]",
+     *         name="variations[0][size_id]",
      *         required=true,
      *         description="Size of the product variation at index 0",
      *         @OA\Schema(type="string", example="XL"),
      *     ),
      *     @OA\Parameter(
      *         in="query",
-     *         name="variations[0][color]",
+     *         name="variations[0][color_id]",
      *         required=true,
      *         description="Color of the product variation at index 0",
      *         @OA\Schema(type="string", example="Red"),
