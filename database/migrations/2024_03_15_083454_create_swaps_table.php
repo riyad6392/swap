@@ -20,10 +20,10 @@ return new class extends Migration
             $table->enum('status', ['requested', 'accepted', 'completed', 'decline'])->default('requested');
 
             $table->integer('requested_wholesale_amount')->nullable();
-            $table->double('requested_total_commission',8, 2)->nullable();
+            $table->double('requested_total_commission',8, 2)->default(0);
 
             $table->integer('exchanged_wholesale_amount')->nullable();
-            $table->double('exchanged_total_commission',8, 2)->nullable();
+            $table->double('exchanged_total_commission',8, 2)->default(0);
 
             $table->boolean('is_approved_by_requester')->default(false);
             $table->boolean('is_approved_by_exchanger')->default(false);
