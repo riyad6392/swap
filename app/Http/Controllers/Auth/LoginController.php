@@ -116,7 +116,11 @@ class LoginController extends Controller
 
     public function getTokenAndRefreshToken($email, $password, $scope = 'user')
     {
-        $oClient = OClient::where('password_client', 1)->where('provider', 'users')->first();;
+        $oClient = OClient::where('password_client', 1)->where('provider', 'users')->first();
+
+//        if (!$oClient) {
+//            return response()->json(['success' => false, 'message' => 'Oauth client not found. Please follow the project installation instruction!'], 404);
+//        }
 
         $response = request()->create('/oauth/token', 'post', [
             'grant_type' => 'password',
@@ -131,6 +135,7 @@ class LoginController extends Controller
         $result = app()->handle($response);
 
         return json_decode((string)$result->getContent(), true);
+
 
     }
 
