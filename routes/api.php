@@ -62,6 +62,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         //User
         Route::get('user-list', [UserController::class, 'userList']);
         Route::get('user-inventory/{id}', [UserController::class, 'userInventory']);
+        Route::get('user-store/{id}', [UserController::class, 'userStore']);
         Route::get('user-profile', [UserController::class, 'userProfile']);
         Route::post('update-profile', [UserController::class, 'updateProfile']);
 
@@ -123,9 +124,6 @@ Route::group(['middleware' => 'auth:api'], function () {
     //Payment Method
 
     Route::post('payment-method', [PaymentMethodController::class, 'store']);
-
-
-
 
 });
 
