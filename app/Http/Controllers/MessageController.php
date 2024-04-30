@@ -8,6 +8,7 @@ use App\Http\Requests\Message\StoreMessageRequest;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Services\SwapMessageService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 
@@ -96,14 +97,14 @@ class MessageController extends Controller
      *      )
      * )
      */
-    public function prepareConversation(StoreConversationRequest $conversationRequest)
+    public function prepareConversation(StoreConversationRequest $conversationRequest): JsonResponse
     {
-        SwapMessageService::createPrivateConversation(
+        $conversation = SwapMessageService::createPrivateConversation(
             $conversationRequest->sender_id,
             $conversationRequest->receiver_id,
             $conversationRequest->conversation_type
         );
-        return response()->json(['success' => true, 'message' => 'Conversation started successfully']);
+        return response()->json(['success' => true, 'data' => $conversation, 'message' => 'Conversation started successfully']);
     }
 
     /**
@@ -187,7 +188,7 @@ class MessageController extends Controller
      *      )
      * )
      */
-    public function sendMessages(StoreMessageRequest $messageRequest)
+    public function sendMessages(StoreMessageRequest $messageRequest): JsonResponse
     {
         $conversation = Conversation::whereHas('participants', function ($query) use ($messageRequest) {
             $query->where('user_id', $messageRequest->sender_id);
@@ -205,7 +206,7 @@ class MessageController extends Controller
             'sender_id')
         );
 
-        $message = $message->load('sender', 'receiver','swap');
+        $message = $message->load('sender', 'receiver', 'swap');
 
         event(new MessageBroadcast($conversation, $message));
 
@@ -288,7 +289,6 @@ class MessageController extends Controller
      * @OA\Put  (path="/api/update-message/{id}",
      *     tags={"Message"},
      *     security={{ "apiAuth": {} }},
-
      *          @OA\Parameter(
      *          in="query",
      *          name="sender_id",
@@ -357,7 +357,6 @@ class MessageController extends Controller
      * @OA\Delete (path="/api/delete-message/{id}",
      *     tags={"Message"},
      *     security={{ "apiAuth": {} }},
-
      *          @OA\Parameter(
      *          in="query",
      *          name="sender_id",

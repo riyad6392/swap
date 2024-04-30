@@ -112,6 +112,10 @@ class LoginController extends Controller
     {
         $oClient = OClient::where('password_client', 1)->where('provider', 'admins')->first();
 
+        if (!$oClient) {
+            return response()->json(['success' => false, 'message' => 'Oauth client not found. Please follow the project installation instruction!'], 404);
+        }
+
         $response = request()->create('/oauth/token', 'post', [
             'grant_type' => 'password',
             'client_id' => $oClient->id,
