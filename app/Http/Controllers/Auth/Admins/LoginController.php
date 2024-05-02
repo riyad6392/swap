@@ -95,13 +95,17 @@ class LoginController extends Controller
 
             $user = auth()->guard('admin')->user();
             config(['auth.guards.api.provider' => 'admin']);
-            $refresh_token = $this->getTokenAndRefreshToken($request->email, $request->password, 'admin');
+            $token = $this->getTokenAndRefreshToken($request->email, $request->password, 'admin');
+
+            if (!$token) {
+                return response()->json(['success' => false, 'errors' => ['message' => 'Authentication failed']], 422);
+            }
 
             return response()->json([
                 'success' => true,
                 'message' => 'User successfully login!',
                 'user' => $user,
-                'token' => $refresh_token
+                'token' => $token
             ], 200);
         }
         return response()->json(['success' => false, 'errors' => ['message' => 'Authentication failed']], 422);
@@ -113,7 +117,7 @@ class LoginController extends Controller
         $oClient = OClient::where('password_client', 1)->where('provider', 'admins')->first();
 
         if (!$oClient) {
-            return response()->json(['success' => false, 'message' => 'Oauth client not found. Please follow the project installation instruction!'], 404);
+            return false;
         }
 
         $response = request()->create('/oauth/token', 'post', [
