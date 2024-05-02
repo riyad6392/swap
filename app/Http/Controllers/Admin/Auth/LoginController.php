@@ -1,15 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Auth\Admins;
+namespace App\Http\Controllers\Admin\Auth;
 
 use App\Http\Controllers\Controller;
-use Carbon\Carbon;
+use App\Support\Auth\Facade\PassportService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use App\Support\Auth\Facade\PassportService;
-use Laravel\Passport\Passport;
 use Laravel\Passport\Client as OClient;
 
 

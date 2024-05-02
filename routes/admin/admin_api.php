@@ -1,11 +1,10 @@
 <?php
 
-use App\Http\Controllers\Auth\Admins\ForgetPasswordController;
-use App\Http\Controllers\Auth\Admins\LoginController;
-use App\Http\Controllers\Auth\Admins\RegistrationController;
+use App\Http\Controllers\Admin\Auth\ForgetPasswordController;
+use App\Http\Controllers\Admin\Auth\LoginController;
+use App\Http\Controllers\Admin\Auth\RegistrationController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-
 
 
 Route::post('admin/register', [RegistrationController::class, 'register']);

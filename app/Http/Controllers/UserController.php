@@ -378,7 +378,7 @@ class UserController extends Controller
     }
 
     public function userProfile(){
-        $user = User::find(auth()->id());
+        $user = User::with('image')->find(auth()->id());
         return response()->json(['success' => true, 'data' => $user]);
     }
 
@@ -538,7 +538,7 @@ class UserController extends Controller
             $photoOfId = null;
 
             if ($userRequest->has('image')) {
-                if ($user->image->path) {
+                if ($user->image) {
                    FileUploadService::deleteImages([$user->image->id], $user, 'image');
                 }
                 FileUploadService::uploadImage($userRequest->image, $user, 'image');

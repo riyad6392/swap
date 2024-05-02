@@ -1,35 +1,26 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\Brand\UpdateBrandRequest;
-use App\Http\Requests\Color\CreateColorRequest;
-use App\Http\Requests\Color\UpdateColorRequest;
-use App\Models\Color;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Size\CreateSizeRequest;
+use App\Http\Requests\Size\UpdateSizeRequest;
+use App\Models\Size;
 use Illuminate\Http\Request;
 
-class ColorController extends Controller
+class SizeController extends Controller
 {
     const PER_PAGE = 10;
 
     /**
-     * Color List.
+     * Size List.
      *
      * @OA\Get(
-     *     path="/api/color",
-     *     tags={"Color"},
+     *     path="/api/size",
+     *     tags={"Size"},
      *     security={{ "apiAuth": {} }},
      *
      *     @OA\MediaType(mediaType="multipart/form-data"),
-     *
-     *          @OA\Parameter(
-     *           in="query",
-     *           name="search",
-     *           required=true,
-     *
-     *           @OA\Schema(type="string"),
-     *           example="red"
-     *       ),
      *
      *     @OA\Parameter(
      *          in="query",
@@ -39,6 +30,15 @@ class ColorController extends Controller
      *          @OA\Schema(type="number"),
      *          example="10"
      *      ),
+     *
+     *     @OA\Parameter(
+     *           in="query",
+     *           name="description",
+     *           required=false,
+     *
+     *           @OA\Schema(type="string"),
+     *           example="This is just example description."
+     *       ),
      *
      *      @OA\Parameter(
      *          in="query",
@@ -73,20 +73,20 @@ class ColorController extends Controller
      */
     public function index(Request $request)
     {
-        $colors = Color::query();
+        $size = Size::query();
 
         if ($request->has('search')) {
-            $colors->where('name', 'like', '%' . $request->search . '%');
+            $size->where('name', 'like', '%' . request('search') . '%');
         }
 
         if ($request->get('get_all')) {
-            return response()->json(['success' => true, 'data' => $colors->get()]);
+
+            return response()->json(['success' => true, 'data' => $size->get()]);
         }
 
-        $colors = $colors->paginate($request->pagination ?? self::PER_PAGE);
+        $categories = $size->paginate($request->pagination ?? self::PER_PAGE);
 
-        return response()->json(['success' => true, 'data' => $colors]);
-
+        return response()->json(['success' => true, 'data' => $categories]);
     }
 
     /**
@@ -98,11 +98,11 @@ class ColorController extends Controller
     }
 
     /**
-     * Create a new Brand.
+     * Create a new Color.
      *
      *
-     * @OA\Post (path="/api/color",
-     *     tags={"Color"},
+     * @OA\Post (path="/api/size",
+     *     tags={"Size"},
      *     security={{ "apiAuth": {} }},
      *
      *
@@ -115,13 +115,13 @@ class ColorController extends Controller
      *         example="Doel Rana",
      *     ),
      *
-     *      @OA\Parameter(
+     *     @OA\Parameter(
      *          in="query",
-     *          name="color_code",
+     *          name="description",
      *          required=true,
      *
      *          @OA\Schema(type="string"),
-     *          example="#fff",
+     *          example="This is just example description.",
      *      ),
      *
      *      @OA\Response(
@@ -131,7 +131,7 @@ class ColorController extends Controller
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="success", type="boolean", example="true"),
-     *               @OA\Property(property="errors", type="json", example={"message": {"Color created successfully."}}),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Brand created successfully."}}),
      *          ),
      *      ),
      *
@@ -147,14 +147,14 @@ class ColorController extends Controller
      *      )
      * )
      */
-    public function store(CreateColorRequest $coloLRequest)
+    public function store(CreateSizeRequest $sizeRequest)
     {
-        $color = Color::create([
-            'name' => $coloLRequest->name,
-            'color_code' => $coloLRequest->color_code,
+        $size = Size::create([
+            'name' => $sizeRequest->name,
+            'description' => $sizeRequest->description,
         ]);
 
-        return response()->json(['success' => true, 'message'=>'Color created successfully', 'data' => $color]);
+        return response()->json(['success' => true, 'message' => 'Size created successfully', 'data' => $size]);
     }
 
     /**
@@ -174,11 +174,11 @@ class ColorController extends Controller
     }
 
     /**
-     * Update Color
+     * Update Size
      *
      * @OA\Put (
-     *     path="/api/color/{id}",
-     *     tags={"Color"},
+     *     path="/api/size/{id}",
+     *     tags={"Size"},
      *     security={{ "apiAuth": {} }},
      *
      *     @OA\Parameter(
@@ -189,15 +189,15 @@ class ColorController extends Controller
      *         @OA\Schema(type="string"),
      *         example="Doel Rana",
      *     ),
-     *
      *     @OA\Parameter(
      *          in="query",
-     *          name="color_code",
-     *          required=true,
+     *          name="description",
+     *          required=false,
      *
      *          @OA\Schema(type="string"),
-     *          example="#fff",
+     *          example="This is just example description.",
      *      ),
+     *
      *      @OA\Response(
      *          response=200,
      *          description="success",
@@ -205,7 +205,7 @@ class ColorController extends Controller
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="success", type="boolean", example="true"),
-     *               @OA\Property(property="errors", type="json", example={"message": {"Brand updated successfully."}}),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Size updated successfully."}}),
      *          ),
      *      ),
      *
@@ -221,24 +221,28 @@ class ColorController extends Controller
      *      )
      * )
      */
-    public function update(UpdateColorRequest $coloLRequest, string $id)
+    public function update(UpdateSizeRequest $sizeRequest, string $id)
     {
-        $color = Color::find($id);
+        $size = Size::find($id);
 
-        $color->update([
-            'name' => $coloLRequest->name,
-            'color_code' => $coloLRequest->color_code,
+        if (!$size) {
+            return response()->json(['success' => false, 'message' => 'Size not found']);
+        }
+
+        $size->update([
+            'name' => $sizeRequest->name,
+            'description' => $sizeRequest->description,
         ]);
 
-        return response()->json(['success' => true, 'message' => 'Color updated successfully', 'data' => $color]);
+        return response()->json(['success' => true, 'message' => 'Size updated successfully', 'data' => $size]);
     }
 
     /**
-     * Delete Color
+     * Delete Size
      *
      * @OA\Delete (
-     *     path="/api/color/{id}",
-     *     tags={"Color"},
+     *     path="/api/size/{id}",
+     *     tags={"Size"},
      *     security={{ "apiAuth": {} }},
      *
      *      @OA\Response(
@@ -248,7 +252,7 @@ class ColorController extends Controller
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="success", type="boolean", example="true"),
-     *               @OA\Property(property="errors", type="json", example={"message": {"Color deleted successfully."}}),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Brand deleted successfully."}}),
      *          ),
      *      ),
      *
@@ -265,14 +269,14 @@ class ColorController extends Controller
      */
     public function destroy(string $id)
     {
-        $color = Color::find($id);
+        $size = Size::find($id);
 
-        if (!$color) {
-            return response()->json(['success' => false, 'message' => 'Color not found']);
+        if (!$size) {
+            return response()->json(['success' => false, 'message' => 'Size not found']);
         }
 
-        $color->delete();
+        $size->delete();
 
-        return response()->json(['success' => true, 'message' => 'Color deleted successfully']);
+        return response()->json(['success' => true, 'message' => 'Size deleted successfully']);
     }
 }

@@ -1,9 +1,12 @@
 <?php
 
+use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ColorController;
+use App\Http\Controllers\Admin\SizeController;
+use App\Http\Controllers\Auth\ForgetPasswordController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegistrationController;
-use App\Http\Controllers\BrandController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\ColorController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentMethodController;
@@ -11,16 +14,12 @@ use App\Http\Controllers\PlanController;
 use App\Http\Controllers\PlanSubscriptionController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RatingController;
-use App\Http\Controllers\SizeController;
+use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\SwapController;
 use App\Http\Controllers\SwapExchangeDetailsController;
 use App\Http\Controllers\SwapRequestDetailsController;
 use App\Http\Controllers\UserController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\ForgetPasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -110,6 +109,10 @@ Route::group(['middleware' => 'auth:api'], function () {
         //Subscription
         Route::delete('cancel-subscription/{id}', [PlanSubscriptionController::class , 'cancelSubscription']);
         Route::get('invoice-list', [PlanSubscriptionController::class , 'invoiceList']);
+
+
+        //shipping
+        Route::resource('shipment', ShipmentController::class);
 
     });
 

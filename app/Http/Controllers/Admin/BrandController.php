@@ -1,23 +1,22 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\Color\UpdateColorRequest;
-use App\Http\Requests\Size\CreateSizeRequest;
-use App\Http\Requests\Size\UpdateSizeRequest;
-use App\Models\Size;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Brand\StoreBrandRequest;
+use App\Http\Requests\Brand\UpdateBrandRequest;
+use App\Models\Brand;
 use Illuminate\Http\Request;
 
-class SizeController extends Controller
+class BrandController extends Controller
 {
     const PER_PAGE = 10;
-
     /**
-     * Size List.
+     * Brand List.
      *
      * @OA\Get(
-     *     path="/api/size",
-     *     tags={"Size"},
+     *     path="/api/brand",
+     *     tags={"Brand"},
      *     security={{ "apiAuth": {} }},
      *
      *     @OA\MediaType(mediaType="multipart/form-data"),
@@ -30,15 +29,6 @@ class SizeController extends Controller
      *          @OA\Schema(type="number"),
      *          example="10"
      *      ),
-     *
-     *     @OA\Parameter(
-     *           in="query",
-     *           name="description",
-     *           required=false,
-     *
-     *           @OA\Schema(type="string"),
-     *           example="This is just example description."
-     *       ),
      *
      *      @OA\Parameter(
      *          in="query",
@@ -71,20 +61,20 @@ class SizeController extends Controller
      *       )
      * )
      */
-    public function index(Request $request)
+    public function index(Request $request): \Illuminate\Http\JsonResponse
     {
-        $size = Size::query();
+        $brands = Brand::query();
 
         if ($request->has('search')) {
-            $size->where('name', 'like', '%' . request('search') . '%');
+            $brands->where('name', 'like', '%' . request('search') . '%');
         }
 
         if ($request->get('get_all')) {
 
-            return response()->json(['success' => true, 'data' => $size->get()]);
+            return response()->json(['success' => true, 'data' => $brands->get()]);
         }
 
-        $categories = $size->paginate($request->pagination ?? self::PER_PAGE);
+        $categories = $brands->paginate($request->pagination ?? self::PER_PAGE);
 
         return response()->json(['success' => true, 'data' => $categories]);
     }
@@ -94,15 +84,15 @@ class SizeController extends Controller
      */
     public function create()
     {
-        //
+
     }
 
     /**
-     * Create a new Color.
+     * Create a new Brand.
      *
      *
-     * @OA\Post (path="/api/size",
-     *     tags={"Size"},
+     * @OA\Post (path="/api/brand",
+     *     tags={"Brand"},
      *     security={{ "apiAuth": {} }},
      *
      *
@@ -114,15 +104,6 @@ class SizeController extends Controller
      *         @OA\Schema(type="string"),
      *         example="Doel Rana",
      *     ),
-     *
-     *     @OA\Parameter(
-     *          in="query",
-     *          name="description",
-     *          required=true,
-     *
-     *          @OA\Schema(type="string"),
-     *          example="This is just example description.",
-     *      ),
      *
      *      @OA\Response(
      *          response=200,
@@ -147,14 +128,18 @@ class SizeController extends Controller
      *      )
      * )
      */
-    public function store(CreateSizeRequest $sizeRequest)
+    public function store(StoreBrandRequest $brandRequest)
     {
-        $size = Size::create([
-            'name' => $sizeRequest->name,
-            'description' => $sizeRequest->description,
+        $brand = Brand::create([
+            'name' => $brandRequest->name,
+            'description' => $brandRequest->description ?? '',
         ]);
 
-        return response()->json(['success' => true, 'message' => 'Size created successfully', 'data' => $size]);
+//        if ($brandRequest->has('logo')){
+//            FileUploadService::uploadFile($brandRequest->logo, $brand);
+//        }
+
+        return response()->json(['success' => true, 'message' => 'Brand created successfully', 'data' => $brand]);
     }
 
     /**
@@ -174,11 +159,11 @@ class SizeController extends Controller
     }
 
     /**
-     * Update Size
+     * Update Brand
      *
      * @OA\Put (
-     *     path="/api/size/{id}",
-     *     tags={"Size"},
+     *     path="/api/brand/{id}",
+     *     tags={"Brand"},
      *     security={{ "apiAuth": {} }},
      *
      *     @OA\Parameter(
@@ -189,14 +174,6 @@ class SizeController extends Controller
      *         @OA\Schema(type="string"),
      *         example="Doel Rana",
      *     ),
-     *     @OA\Parameter(
-     *          in="query",
-     *          name="description",
-     *          required=false,
-     *
-     *          @OA\Schema(type="string"),
-     *          example="This is just example description.",
-     *      ),
      *
      *      @OA\Response(
      *          response=200,
@@ -205,7 +182,7 @@ class SizeController extends Controller
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="success", type="boolean", example="true"),
-     *               @OA\Property(property="errors", type="json", example={"message": {"Size updated successfully."}}),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Brand updated successfully."}}),
      *          ),
      *      ),
      *
@@ -221,28 +198,32 @@ class SizeController extends Controller
      *      )
      * )
      */
-    public function update(UpdateSizeRequest $sizeRequest, string $id)
+    public function update(UpdateBrandRequest $brandRequest, string $id)
     {
-        $size = Size::find($id);
+        $brand = Brand::find($id);
 
-        if (!$size) {
-            return response()->json(['success' => false, 'message' => 'Size not found']);
+        if (!$brand) {
+            return response()->json(['success' => false, 'message' => 'Brand not found']);
         }
 
-        $size->update([
-            'name' => $sizeRequest->name,
-            'description' => $sizeRequest->description,
+//        if ($brandRequest->has('logo')){
+//            FileUploadService::uploadFile($brandRequest->logo, $brand);
+//        }
+
+        $brand->update([
+            'name' => $brandRequest->name,
+            'description' => $brandRequest->description ?? '',
         ]);
 
-        return response()->json(['success' => true, 'message' => 'Size updated successfully', 'data' => $size]);
+        return response()->json(['success' => true, 'message' => 'Brand updated successfully', 'data' => $brand]);
     }
 
     /**
-     * Delete Size
+     * Delete Brand
      *
      * @OA\Delete (
-     *     path="/api/size/{id}",
-     *     tags={"Size"},
+     *     path="/api/brand/{id}",
+     *     tags={"Brand"},
      *     security={{ "apiAuth": {} }},
      *
      *      @OA\Response(
@@ -269,14 +250,8 @@ class SizeController extends Controller
      */
     public function destroy(string $id)
     {
-        $size = Size::find($id);
-
-        if (!$size) {
-            return response()->json(['success' => false, 'message' => 'Size not found']);
-        }
-
-        $size->delete();
-
-        return response()->json(['success' => true, 'message' => 'Size deleted successfully']);
+        $brand = Brand::find($id);
+        $brand->delete();
+        return response()->json(['success' => true, 'message' => 'Brand deleted successfully']);
     }
 }
