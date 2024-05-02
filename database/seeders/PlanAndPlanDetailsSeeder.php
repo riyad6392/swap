@@ -17,7 +17,7 @@ class PlanAndPlanDetailsSeeder extends Seeder
             'uid' => uniqid(),
             'name' => 'Basic Plan',
             'description' => 'This is a basic plan',
-            'amount' => 100,
+            'amount' => 10,
             'currency' => 'USD',
             'interval' => 'month',
             'stripe_price_id' => 'price_1P9mkCIZ9zy7k2DvUnvuBlhb',
@@ -49,7 +49,7 @@ class PlanAndPlanDetailsSeeder extends Seeder
 
             'name' => 'Premium Plan',
             'description' => 'This is a Premium plan',
-            'amount' => 800,
+            'amount' => 69.99,
             'currency' => 'USD',
             'interval' => 'year',
             'stripe_price_id' => 'price_1P9mnTIZ9zy7k2DvARlafmH9',
