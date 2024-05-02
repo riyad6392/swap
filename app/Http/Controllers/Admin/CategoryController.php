@@ -1,22 +1,24 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\Brand\StoreBrandRequest;
-use App\Http\Requests\Brand\UpdateBrandRequest;
-use App\Models\Brand;
-use App\Services\FileUploadService;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Category\StoreCategoryRequest;
+use App\Http\Requests\Category\UpdateCategoryRequest;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
-class BrandController extends Controller
+
+class CategoryController extends Controller
 {
     const PER_PAGE = 10;
+
     /**
-     * Brand List.
+     * Category List.
      *
      * @OA\Get(
-     *     path="/api/brand",
-     *     tags={"Brand"},
+     *     path="/api/category",
+     *     tags={"Category"},
      *     security={{ "apiAuth": {} }},
      *
      *     @OA\MediaType(mediaType="multipart/form-data"),
@@ -61,20 +63,16 @@ class BrandController extends Controller
      *       )
      * )
      */
-    public function index(Request $request): \Illuminate\Http\JsonResponse
+    public function index(Request $request)
     {
-        $brands = Brand::query();
-
-        if ($request->has('search')) {
-            $brands->where('name', 'like', '%' . request('search') . '%');
-        }
+        $categories = Category::query();
 
         if ($request->get('get_all')) {
 
-            return response()->json(['success' => true, 'data' => $brands->get()]);
+            return response()->json(['success' => true, 'data' => $categories->get()]);
         }
 
-        $categories = $brands->paginate($request->pagination ?? self::PER_PAGE);
+        $categories = $categories->paginate($request->pagination ?? self::PER_PAGE);
 
         return response()->json(['success' => true, 'data' => $categories]);
     }
@@ -84,15 +82,15 @@ class BrandController extends Controller
      */
     public function create()
     {
-
+        //
     }
 
     /**
-     * Create a new Brand.
+     * Create a new Category.
      *
      *
-     * @OA\Post (path="/api/brand",
-     *     tags={"Brand"},
+     * @OA\Post (path="/api/category",
+     *     tags={"Category"},
      *     security={{ "apiAuth": {} }},
      *
      *
@@ -112,7 +110,7 @@ class BrandController extends Controller
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="success", type="boolean", example="true"),
-     *               @OA\Property(property="errors", type="json", example={"message": {"Brand created successfully."}}),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Category created successfully."}}),
      *          ),
      *      ),
      *
@@ -128,26 +126,47 @@ class BrandController extends Controller
      *      )
      * )
      */
-    public function store(StoreBrandRequest $brandRequest)
+    public function store(StoreCategoryRequest $request)
     {
-        $brand = Brand::create([
-            'name' => $brandRequest->name,
-            'description' => $brandRequest->description ?? '',
-        ]);
-
-//        if ($brandRequest->has('logo')){
-//            FileUploadService::uploadFile($brandRequest->logo, $brand);
-//        }
-
-        return response()->json(['success' => true, 'message' => 'Brand created successfully', 'data' => $brand]);
+        Category::create($request->only('name'));
+        return response()->json(['success' => true, 'message' => 'Category created successfully.']);
     }
 
     /**
-     * Display the specified resource.
+     * Category Show.
+     *
+     * @OA\Get(
+     *     path="/api/category/{id}",
+     *     tags={"Category"},
+     *     security={{ "apiAuth": {} }},
+     *
+     *      @OA\Response(
+     *          response=200,
+     *          description="success",
+     *
+     *          @OA\JsonContent(
+     *
+     *              @OA\Property(property="data", type="json", example={"id": 1,"name": "Category 1","description": "Description", "created_at": "2022-11-02T12:25:16.000000Z","updated_at": "2022-11-02T12:25:16.000000Z"},),
+     *          )
+     *      ),
+     *
+     *       @OA\Response(
+     *           response=401,
+     *           description="Invalid user",
+     *
+     *           @OA\JsonContent(
+     *
+     *               @OA\Property(property="success", type="boolean", example="false"),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Unauthenticated"}}),
+     *           )
+     *       )
+     * )
      */
+
     public function show(string $id)
     {
-        //
+        $category = Category::findOrFail($id);
+        return response()->json(['success' => true, 'data' => $category]);
     }
 
     /**
@@ -159,11 +178,11 @@ class BrandController extends Controller
     }
 
     /**
-     * Update Brand
+     * Update Category.
      *
      * @OA\Put (
-     *     path="/api/brand/{id}",
-     *     tags={"Brand"},
+     *     path="/api/category/{id}",
+     *     tags={"Category"},
      *     security={{ "apiAuth": {} }},
      *
      *     @OA\Parameter(
@@ -182,7 +201,7 @@ class BrandController extends Controller
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="success", type="boolean", example="true"),
-     *               @OA\Property(property="errors", type="json", example={"message": {"Brand updated successfully."}}),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Category updated successfully."}}),
      *          ),
      *      ),
      *
@@ -198,32 +217,24 @@ class BrandController extends Controller
      *      )
      * )
      */
-    public function update(UpdateBrandRequest $brandRequest, string $id)
+    public function update(UpdateCategoryRequest $updateCategory, string $id): \Illuminate\Http\JsonResponse
     {
-        $brand = Brand::find($id);
+        $category = Category::findOrFail($id);
+        if ($category) {
 
-        if (!$brand) {
-            return response()->json(['success' => false, 'message' => 'Brand not found']);
+            $category->update($updateCategory->only('name'));
+            return response()->json(['success' => true, 'message' => 'Category updated successfully.']);
+
         }
-
-//        if ($brandRequest->has('logo')){
-//            FileUploadService::uploadFile($brandRequest->logo, $brand);
-//        }
-
-        $brand->update([
-            'name' => $brandRequest->name,
-            'description' => $brandRequest->description ?? '',
-        ]);
-
-        return response()->json(['success' => true, 'message' => 'Brand updated successfully', 'data' => $brand]);
+        return response()->json(['success' => false, 'message' => 'Category not found.'], 404);
     }
 
     /**
-     * Delete Brand
+     * Remove the specified Category from storage.
      *
      * @OA\Delete (
-     *     path="/api/brand/{id}",
-     *     tags={"Brand"},
+     *     path="/api/category/{id}",
+     *     tags={"Category"},
      *     security={{ "apiAuth": {} }},
      *
      *      @OA\Response(
@@ -233,7 +244,7 @@ class BrandController extends Controller
      *          @OA\JsonContent(
      *
      *              @OA\Property(property="success", type="boolean", example="true"),
-     *               @OA\Property(property="errors", type="json", example={"message": {"Brand deleted successfully."}}),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Category deleted successfully."}}),
      *          ),
      *      ),
      *
@@ -250,8 +261,11 @@ class BrandController extends Controller
      */
     public function destroy(string $id)
     {
-        $brand = Brand::find($id);
-        $brand->delete();
-        return response()->json(['success' => true, 'message' => 'Brand deleted successfully']);
+        $category = Category::findOrFail($id);
+        if ($category) {
+            $category->delete();
+            return response()->json(['success' => true, 'message' => 'Category deleted successfully.']);
+        }
+        return response()->json(['success' => false, 'message' => 'Category not found.'], 404);
     }
 }

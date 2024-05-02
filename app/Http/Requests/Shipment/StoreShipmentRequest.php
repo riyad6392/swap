@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Shipment;
 
+use App\Models\Swap;
 use App\Traits\ValidationErrorMessageTrait;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -23,20 +24,32 @@ class StoreShipmentRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'swap_id' => 'required|string',
-            'requested_address' => 'required|date',
-            'requested_tracking_number' => 'required|string',
-            'requested_carrier_name' => 'required|string',
-            'requested_carrier_contact' => 'required|string',
-            'requested_expected_delivery_date' => 'required|string',
-
-            'exchanged_address' => 'required|string',
-            'exchanged_tracking_number' => 'required|numeric',
-            'exchanged_carrier_name' => 'required|numeric',
-            'exchanged_carrier_contact' => 'required|string',
-            'exchanged_expected_delivery_date' => 'required|string',
-        ];
+        $swap = Swap::find($this->swap_id);
+        if ($swap) {
+            if ($swap->requested_user_id == auth()->id()) {
+                return [
+                    'swap_id' => 'required|string|exists:swaps,id',
+                    'requested_address' => 'required|string',
+                    'requested_tracking_number' => 'required|string',
+                    'requested_carrier_name' => 'required|string',
+                    'requested_carrier_contact' => 'required|string',
+                    'requested_expected_delivery_date' => 'required|string',
+                ];
+            }elseif ($swap->exchanged_user_id == auth()->id()) {
+                return [
+                    'swap_id' => 'required|string|exists:swaps,id',
+                    'exchanged_address' => 'required|string',
+                    'exchanged_tracking_number' => 'required|numeric',
+                    'exchanged_carrier_name' => 'required|numeric',
+                    'exchanged_carrier_contact' => 'required|string',
+                    'exchanged_expected_delivery_date' => 'required|string',
+                ];
+            }
+        }else{
+            return [
+                'swap_id' => 'required|string|exists:swaps,id',
+            ];
+        }
     }
     public function messages(): array
     {
