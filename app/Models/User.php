@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Services\FileUploadService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\HasDatabaseNotifications;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\File;
 use Laravel\Cashier\Billable;
 use Laravel\Passport\HasApiTokens;
 
@@ -64,7 +66,7 @@ class User extends Authenticatable
     ];
 
     protected $appends = [
-        'average_rating', 'resale_license_path', 'photo_of_id_path'
+        'average_rating', 'resale_license_info', 'photo_of_id_info'
     ];
 
 //    public function getImagePathAttribute()
@@ -100,14 +102,25 @@ class User extends Authenticatable
         return round($this->receivedRatings()->avg('rating'),1);
     }
 
-    public function getResaleLicensePathAttribute()
+    public function getResaleLicenseInfoAttribute()
     {
-        return asset('storage/'.$this->resale_license);
+        return [
+            'size' => FileUploadService::formatSizeUnits(File::size(public_path('storage/'.$this->resale_license))),
+            'extension' => File::extension($this->resale_license),
+            'basename' => File::basename($this->resale_license),
+            'path' => asset('storage/'.$this->resale_license)];
     }
 
-    public function getPhotoOfIdPathAttribute()
+
+
+    public function getPhotoOfIdInfoAttribute()
     {
-        return asset('storage/'.$this->photo_of_id);
+        return [
+            'size' => FileUploadService::formatSizeUnits(File::size(public_path('storage/'.$this->photo_of_id))),
+            'extension' => File::extension($this->photo_of_id),
+            'basename' => File::basename($this->photo_of_id),
+            'path'=>asset('storage/'.$this->photo_of_id)
+        ];
     }
 
     public function notifications(): BelongsToMany
