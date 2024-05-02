@@ -2916,7 +2916,7 @@
                         }
                     },
                     {
-                        "name": "status",
+                        "name": "is_active",
                         "in": "query",
                         "description": "Status of the payment method",
                         "required": false,
@@ -2967,7 +2967,7 @@
                                                     "type": "string",
                                                     "example": "pm_123456789"
                                                 },
-                                                "status": {
+                                                "is_active": {
                                                     "type": "string",
                                                     "example": "active"
                                                 }
@@ -3210,6 +3210,95 @@
                     },
                     "500": {
                         "description": "Error occurred while deleting payment method",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "message": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "Error message goes here"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/default-payment-method": {
+            "get": {
+                "tags": [
+                    "Payment Methods"
+                ],
+                "summary": "Delete a payment method",
+                "description": "Change default payment method.",
+                "operationId": "0a65e255eec8833ab721710cba134221",
+                "responses": {
+                    "200": {
+                        "description": "Payment method change successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Payment method change successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Unauthenticated"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error occurred while change payment method",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4095,7 +4184,7 @@
                         }
                     },
                     {
-                        "name": "variations[0][size]",
+                        "name": "variations[0][size_id]",
                         "in": "query",
                         "description": "Size of the product variation at index 0",
                         "required": true,
@@ -4105,7 +4194,7 @@
                         }
                     },
                     {
-                        "name": "variations[0][color]",
+                        "name": "variations[0][color_id]",
                         "in": "query",
                         "description": "Color of the product variation at index 0",
                         "required": true,
@@ -5840,7 +5929,7 @@
                         }
                     },
                     {
-                        "name": "exchange_product[0][variation_size]",
+                        "name": "exchange_product[0][variation_size_id]",
                         "in": "query",
                         "description": "Product ID",
                         "required": true,
@@ -5851,7 +5940,7 @@
                         }
                     },
                     {
-                        "name": "exchange_product[0][variation_color]",
+                        "name": "exchange_product[0][variation_color_id]",
                         "in": "query",
                         "description": "Product ID",
                         "required": true,
@@ -6037,7 +6126,7 @@
                         }
                     },
                     {
-                        "name": "exchange_product[0][variation_size]",
+                        "name": "exchange_product[0][variation_size_id]",
                         "in": "query",
                         "description": "Product ID",
                         "required": true,
@@ -6048,7 +6137,7 @@
                         }
                     },
                     {
-                        "name": "exchange_product[0][variation_color]",
+                        "name": "exchange_product[0][variation_color_id]",
                         "in": "query",
                         "description": "Product ID",
                         "required": true,
@@ -7728,6 +7817,90 @@
                 ],
                 "summary": "User Inventory List.",
                 "operationId": "b84a0cf3aa441e91631d56545ceca836",
+                "parameters": [
+                    {
+                        "name": "pagination",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number"
+                        },
+                        "example": "10"
+                    },
+                    {
+                        "name": "get_all",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "example": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "json",
+                                            "example": []
+                                        },
+                                        "links": {
+                                            "type": "json",
+                                            "example": []
+                                        },
+                                        "meta": {
+                                            "type": "json",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Unauthenticated"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/user-store/{id}": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "User store List.",
+                "operationId": "d534ca7ec1e1058900bc43e83f0bd52e",
                 "parameters": [
                     {
                         "name": "pagination",
