@@ -24,8 +24,9 @@ class StoreShipmentRequest extends FormRequest
      */
     public function rules(): array
     {
-        $swap = Swap::find($this->swap_id);
+        $swap = Swap::find($this->get('swap_id'));
         if ($swap) {
+            $this->merge(['swap' => $swap]);
             if ($swap->requested_user_id == auth()->id()) {
                 return [
                     'swap_id' => 'required|string|exists:swaps,id',

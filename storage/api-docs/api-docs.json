@@ -5455,6 +5455,335 @@
                 ]
             }
         },
+        "/api/shipping": {
+            "put": {
+                "tags": [
+                    "Shipping"
+                ],
+                "summary": "Update Shipping info.",
+                "operationId": "86ff8af92cb1156c89f458cd995dd828",
+                "parameters": [
+                    {
+                        "name": "swap_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": "1"
+                    },
+                    {
+                        "name": "requested_address",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Khan"
+                    },
+                    {
+                        "name": "requested_tracking_number",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Khan"
+                    },
+                    {
+                        "name": "requested_carrier_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "file"
+                        },
+                        "example": "file"
+                    },
+                    {
+                        "name": "requested_carrier_contact",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "file"
+                        },
+                        "example": "file"
+                    },
+                    {
+                        "name": "requested_expected_delivery_date",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "file"
+                        },
+                        "example": "file"
+                    },
+                    {
+                        "name": "exchanged_address",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "file"
+                        },
+                        "example": "file"
+                    },
+                    {
+                        "name": "exchanged_tracking_number",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Business name"
+                    },
+                    {
+                        "name": "exchanged_carrier_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Business address"
+                    },
+                    {
+                        "name": "exchanged_carrier_contact",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "http://127.0.0.1:8000/api/documentation#/User/ad5b4db3132c00564bd7eede30c3e23a"
+                    },
+                    {
+                        "name": "exchanged_expected_delivery_date",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "ein"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Shipment created successfully."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "The given data was invalid."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Shipping"
+                ],
+                "summary": "Store a newly created resource in storage.",
+                "description": "Create Shipping info.",
+                "operationId": "1eeab5f1fff7dfa7848f1a1402a7ae54",
+                "parameters": [
+                    {
+                        "name": "swap_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": "1"
+                    },
+                    {
+                        "name": "requested_address",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Khan"
+                    },
+                    {
+                        "name": "requested_tracking_number",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Khan"
+                    },
+                    {
+                        "name": "requested_carrier_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "file"
+                        },
+                        "example": "file"
+                    },
+                    {
+                        "name": "requested_carrier_contact",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "file"
+                        },
+                        "example": "file"
+                    },
+                    {
+                        "name": "requested_expected_delivery_date",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "file"
+                        },
+                        "example": "file"
+                    },
+                    {
+                        "name": "exchanged_address",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "file"
+                        },
+                        "example": "file"
+                    },
+                    {
+                        "name": "exchanged_tracking_number",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Business name"
+                    },
+                    {
+                        "name": "exchanged_carrier_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Business address"
+                    },
+                    {
+                        "name": "exchanged_carrier_contact",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "http://127.0.0.1:8000/api/documentation#/User/ad5b4db3132c00564bd7eede30c3e23a"
+                    },
+                    {
+                        "name": "exchanged_expected_delivery_date",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "ein"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Shipment created successfully."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "The given data was invalid."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
         "/api/size": {
             "get": {
                 "tags": [
