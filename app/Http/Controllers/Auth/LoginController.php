@@ -101,6 +101,11 @@ class LoginController extends Controller
             $user = auth()->user();
             if ($user->is_approved_by_admin) {
                 $token = $this->getTokenAndRefreshToken($request->email, $request->password, 'user');
+
+                if (!$token) {
+                    return response()->json(['success' => false, 'message' => 'Invalid token.'], 422);
+                }
+
                 return response()->json([
                     'success' => true,
                     'message' => 'User successfully login!',
@@ -118,9 +123,9 @@ class LoginController extends Controller
     {
         $oClient = OClient::where('password_client', 1)->where('provider', 'users')->first();
 
-//        if (!$oClient) {
-//            return response()->json(['success' => false, 'message' => 'Oauth client not found. Please follow the project installation instruction!'], 404);
-//        }
+        if (!$oClient) {
+            return false;
+        }
 
         $response = request()->create('/oauth/token', 'post', [
             'grant_type' => 'password',
