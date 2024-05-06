@@ -11,6 +11,7 @@ use App\Http\Requests\Swap\StoreSwapRequestDetailsRequest;
 use App\Http\Requests\Swap\UpdateSwapDetailsRequest;
 use App\Http\Requests\Swap\UpdateSwapRequest;
 use App\Jobs\SwapJob;
+use App\Models\Billing;
 use App\Models\Message;
 use App\Models\Swap;
 use App\Models\SwapExchangeDetails;
@@ -621,7 +622,17 @@ class SwapController extends Controller
                 'Swap request has been completed'
             );
 
-            StripePaymentFacade::createInvoiceItem($user, $swap->requested_total_commission);
+            $invoiceItem = StripePaymentFacade::createInvoiceItem($user, $swap->requested_total_commission);
+
+            Billing::create([
+                'user_id' => auth()->id(),
+                'payment_type' => 'one_time',
+                'payment_method_id' => $user->activePaymentMethod->stripe_payment_method_id,
+                'stripe_payment_intent_id' => $invoiceItem->payment_intent,
+                'amount' => $swap->requested_total_commission,
+
+            ]);
+
 
 
             if ($swap->is_approve_by_exchanger) {
@@ -640,7 +651,16 @@ class SwapController extends Controller
                 'Swap request has been completed'
             );
 
-            StripePaymentFacade::createInvoiceItem($user, $swap->exchanger_total_commission);
+            $invoiceItem = StripePaymentFacade::createInvoiceItem($user, $swap->exchanger_total_commission);
+
+            Billing::create([
+                'user_id' => auth()->id(),
+                'payment_type' => 'one_time',
+                'payment_method_id' => $user->activePaymentMethod->stripe_payment_method_id,
+                'stripe_payment_intent_id' => $invoiceItem->payment_intent,
+                'amount' => $swap->exchanger_total_commission,
+
+            ]);
 
             if ($swap->is_approve_by_requester) {
                 $swap->update(['status' => 'completed']);

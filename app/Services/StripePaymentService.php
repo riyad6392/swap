@@ -117,4 +117,11 @@ class StripePaymentService
             ]
         );
     }
+
+    public function transactionList($limit = 3): \Stripe\Collection
+    {
+        return $this->stripe->paymentIntents->all(['limit' => $limit]);
+//        return $this->stripe->issuing->transactions->all(['limit' => 3]);
+
+    }
 }

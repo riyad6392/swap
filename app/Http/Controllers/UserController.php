@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\StripePaymentFacade;
 use App\Http\Requests\User\ListUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\User;
@@ -378,7 +379,8 @@ class UserController extends Controller
     }
 
     public function userProfile(){
-        $user = User::with('image')->find(auth()->id());
+        $user = User::with('image','activeSubscriptions','paymentMethods')->find(auth()->id());
+        $paymentList = StripePaymentFacade::transactionList();
         return response()->json(['success' => true, 'data' => $user]);
     }
 
