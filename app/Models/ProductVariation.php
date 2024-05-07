@@ -29,6 +29,15 @@ class ProductVariation extends Model
     {
         return $this->morphMany(Image::class, 'imageable');
     }
+    public function size()
+    {
+        return $this->belongsTo(Size::class);
+    }
+
+    public function color()
+    {
+        return $this->belongsTo(Color::class);
+    }
 
     protected static function boot()
     {

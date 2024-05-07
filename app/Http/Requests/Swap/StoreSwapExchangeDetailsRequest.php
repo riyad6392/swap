@@ -28,6 +28,7 @@ class StoreSwapExchangeDetailsRequest extends FormRequest
     {
         return [
             'define_type' => 'required|string|in:exchange_product',
+            'exchange_product' => 'required|array',
             'exchange_product.*.product_id' => 'required|integer|exists:products,id',
             'exchange_product.*.variation_id' => 'required|integer|exists:product_variations,id',
             'exchange_product.*.variation_size_id' => 'required|integer|exists:sizes,id',
@@ -43,6 +44,8 @@ class StoreSwapExchangeDetailsRequest extends FormRequest
             'define_type.required' => 'Define type is required',
             'define_type.string' => 'Define type must be a string',
             'define_type.in' => 'Define type must be either request_product or exchange_product',
+            'exchange_product.required' => 'Exchange product is required',
+            'exchange_product.array' => 'Exchange product must be an array',
             'exchange_product.*.product_id.required' => 'Product id is required',
             'exchange_product.*.product_id.integer' => 'Product id must be a number',
             'exchange_product.*.product_id.exists' => 'Product id does not exist',

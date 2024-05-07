@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\StripePaymentFacade;
 use App\Http\Requests\User\ListUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\User;
@@ -370,7 +371,7 @@ class UserController extends Controller
             return response()->json(['success' => true, 'data' => ['user'=> $user, 'store' => $user->store()->get()]]);
         }
 
-        $inventory = $user->store()->with('image')->paginate($request->pagination ?? self::PER_PAGE);
+        $inventory = $user->store()->with('image','category', 'brand','productVariations.size', 'productVariations.color')->paginate($request->pagination ?? self::PER_PAGE);
 
         return response()->json(['success' => true, 'data' => ['user'=> $user, 'store' => $inventory]]);
 
@@ -378,7 +379,7 @@ class UserController extends Controller
     }
 
     public function userProfile(){
-        $user = User::with('image')->find(auth()->id());
+        $user = User::with('image','activeSubscriptions','paymentMethods','billings')->find(auth()->id());
         return response()->json(['success' => true, 'data' => $user]);
     }
 

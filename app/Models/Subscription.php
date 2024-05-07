@@ -30,7 +30,7 @@ class Subscription extends Model
 
     }
 
-    public function paymentMethod()
+    public function paymentMethods()
     {
         return $this->belongsTo(PaymentMethods::class);
     }

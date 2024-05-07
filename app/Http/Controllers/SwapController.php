@@ -11,13 +11,16 @@ use App\Http\Requests\Swap\StoreSwapRequestDetailsRequest;
 use App\Http\Requests\Swap\UpdateSwapDetailsRequest;
 use App\Http\Requests\Swap\UpdateSwapRequest;
 use App\Jobs\SwapJob;
+use App\Models\Billing;
 use App\Models\Message;
 use App\Models\Swap;
 use App\Models\SwapExchangeDetails;
+use App\Models\SwapRequestDetails;
 use App\Models\User;
 use App\Services\SwapMessageService;
 use App\Services\SwapNotificationService;
 use App\Services\SwapRequestService;
+use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -401,7 +404,7 @@ class SwapController extends Controller
      * )
      */
     public function update(UpdateSwapRequest        $updateSwapRequest,
-                           UpdateSwapDetailsRequest $SwapExchangeDetailsRequest,
+                           UpdateSwapDetailsRequest $swapExchangeDetailsRequest,
                            Swap                     $swap): \Illuminate\Http\JsonResponse
     {
         try {
@@ -409,33 +412,41 @@ class SwapController extends Controller
 
             if (($swap->requested_user_id == auth()->id() || $swap->exchanged_user_id == auth()->id()) && $swap->status == 'accepted') {
 
+                $defineType = $swapExchangeDetailsRequest->define_type;
+
+               if (is_null($swapExchangeDetailsRequest->$defineType)) {
+                   return response()->json(['success' => false , 'message' => str_replace('_',' ', $defineType).' is empty']);
+               }
+
                 $prepareData = SwapRequestService::prepareDetailsData(
-                    $SwapExchangeDetailsRequest,
+                    $swapExchangeDetailsRequest,
                     $swap,
-                    $SwapExchangeDetailsRequest->define_type
+                    $swapExchangeDetailsRequest->define_type
                 );
 
-                SwapExchangeDetails::insert($prepareData['insertData']);
+                $this->swapDetailsClassMapper($swapExchangeDetailsRequest->define_type)::insert($prepareData['insertData']);
 
                 if ($updateSwapRequest->deleted_details_id) {
                     SwapRequestService::deleteDetailsData(
                         $updateSwapRequest->deleted_details_id,
                         $swap,
-                        SwapRequestService::matchClass($SwapExchangeDetailsRequest->define_type)
+                        SwapRequestService::matchClass($swapExchangeDetailsRequest->define_type)
                     );
                 }
 
-                $totalAmountAndCommission = SwapRequestService::calculateTotalAmountAndCommission(
-                    $swap,
-                    SwapRequestService::matchRelation($SwapExchangeDetailsRequest->define_type)
-                );
+                $defineWholeSaleColumn = SwapRequestService::swapColumnMapper($swapExchangeDetailsRequest->define_type)[0];
+                $defineTotalCommissionColumn = SwapRequestService::swapColumnMapper($swapExchangeDetailsRequest->define_type)[1];
+
 
                 $swap->update(
                     [
-                        'exchanged_wholesale_amount' => (int)$prepareData['wholeSaleAmount'] +
-                            (int)$totalAmountAndCommission['wholeSaleAmount'],
-                        'exchanged_total_commission' => $prepareData['totalCommission'] +
-                            (int)$totalAmountAndCommission['totalCommission'],
+                        $defineWholeSaleColumn =>
+                            (int)$prepareData['wholeSaleAmount'] +
+                            (int)$swap->$defineWholeSaleColumn,
+
+                        $defineTotalCommissionColumn =>
+                            $prepareData['totalCommission'] +
+                            $swap->$defineTotalCommissionColumn,
                     ]
                 );
 
@@ -448,7 +459,7 @@ class SwapController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'Failed to update swap'], 500);
+            return response()->json(['success' => false, 'message' => 'Failed to update swap' , 'errors'=>$e->getMessage()], 500);
         }
     }
 
@@ -601,54 +612,158 @@ class SwapController extends Controller
     {
         $swap = Swap::find($id);
 
-        $user = auth()->user()->load('activePaymentMethod');
+        if (!$swap) {
+            return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
+        }
 
+        $user = auth()->user()->load('activePaymentMethod');
         if (!$user->activePaymentMethod) {
             return response()->json(['success' => true, 'message' => 'You are not allow to change the swap status'], 200);
         }
 
-        if ($swap->requested_total_commission < .50 || $swap->exchanged_total_commission < .50){
-            return response()->json(['success' =>false , 'message'=> 'Minimum commission is 0.50'], 401);
+        if ($swap->requested_total_commission < 0.50 || $swap->exchanged_total_commission < 0.50) {
+            return response()->json(['success' => false, 'message' => 'Minimum commission is 0.50'], 401);
         }
 
-        if ($swap->requested_user_id == auth()->id()) {
-
-            $swap->update(['is_approve_by_requester' => 1]);
-
-            SwapNotificationService::sendNotification(
-                $swap,
-                [$swap->exchanged_user_id],
-                'Swap request has been completed'
-            );
-
-            StripePaymentFacade::createInvoiceItem($user, $swap->requested_total_commission);
-
-
-            if ($swap->is_approve_by_exchanger) {
-                $swap->update(['status' => 'completed']);
-            }
-
-            return response()->json(['success' => true, 'message' => 'You complete the swap request'], 200);
-
-        } elseif ($swap->exchanged_user_id == auth()->id()) {
-
-            $swap->update(['is_approve_by_exchanger' => 1]);
-
-            SwapNotificationService::sendNotification(
-                $swap,
-                [$swap->requested_user_id],
-                'Swap request has been completed'
-            );
-
-            StripePaymentFacade::createInvoiceItem($user, $swap->exchanger_total_commission);
-
-            if ($swap->is_approve_by_requester) {
-                $swap->update(['status' => 'completed']);
-            }
-
-            return response()->json(['success' => true, 'message' => 'You complete the swap request'], 200);
+        if ($swap->requested_user_id !== auth()->id() && $swap->exchanged_user_id !== auth()->id()) {
+            return response()->json(['success' => true, 'message' => 'You are not allow to change the swap status'], 200);
         }
 
-        return response()->json(['success' => true, 'message' => 'You are not allow to change the swap status'], 200);
+        return $this->processSwapCompletion($swap, $user);
     }
+
+    protected function processSwapCompletion($swap, $user)
+    {
+        $approvalField =
+            $swap->requested_user_id === auth()->id() ?
+                'is_approve_by_requester' :
+                'is_approve_by_exchanger';
+
+        $swap->update([$approvalField => 1]);
+
+        $this->sendSwapNotification($swap);
+        $this->handlePayment($swap, $user);
+
+        if ($swap->is_approve_by_requester && $swap->is_approve_by_exchanger) {
+            $swap->update(['status' => 'completed']);
+        }
+
+        return response()->json(['success' => true, 'message' => 'You completed the swap request'], 200);
+    }
+
+    protected function sendSwapNotification($swap)
+    {
+        $notificationRecipients =
+            $swap->requested_user_id === auth()->id() ?
+                [$swap->exchanged_user_id] :
+                [$swap->requested_user_id];
+
+        SwapNotificationService::sendNotification(
+            $swap,
+            $notificationRecipients,
+            'Swap request has been completed'
+        );
+    }
+
+    protected function handlePayment($swap, $user)
+    {
+        $commission =
+            $swap->requested_user_id === auth()->id() ?
+                $swap->requested_total_commission :
+                $swap->exchanged_total_commission;
+
+        $invoiceItem = StripePaymentFacade::createInvoiceItem(
+            $user,
+            $commission
+        );
+
+        Billing::create([
+            'user_id' => auth()->id(),
+            'payment_type' => 'one_time',
+            'payment_method_id' => $user->activePaymentMethod->stripe_payment_method_id,
+            'stripe_payment_intent_id' => $invoiceItem->payment_intent,
+            'amount' => $commission,
+        ]);
+    }
+
+    protected function swapDetailsClassMapper($defineType)
+    {
+        return $defineType === 'exchange_product' ?
+            SwapExchangeDetails::class :
+            SwapRequestDetails::class;
+    }
+
+
+
+//    public function complete($id): \Illuminate\Http\JsonResponse
+//    {
+//        $swap = Swap::find($id);
+//
+//        $user = auth()->user()->load('activePaymentMethod');
+//
+//        if (!$user->activePaymentMethod) {
+//            return response()->json(['success' => true, 'message' => 'You are not allow to change the swap status'], 200);
+//        }
+//
+//        if ($swap->requested_total_commission < .50 || $swap->exchanged_total_commission < .50){
+//            return response()->json(['success' =>false , 'message'=> 'Minimum commission is 0.50'], 401);
+//        }
+//
+//        if ($swap->requested_user_id == auth()->id()) {
+//
+//            $swap->update(['is_approve_by_requester' => 1]);
+//
+//            SwapNotificationService::sendNotification(
+//                $swap,
+//                [$swap->exchanged_user_id],
+//                'Swap request has been completed'
+//            );
+//
+//            $invoiceItem = StripePaymentFacade::createInvoiceItem($user, $swap->requested_total_commission);
+//
+//            Billing::create([
+//                'user_id' => auth()->id(),
+//                'payment_type' => 'one_time',
+//                'payment_method_id' => $user->activePaymentMethod->stripe_payment_method_id,
+//                'stripe_payment_intent_id' => $invoiceItem->payment_intent,
+//                'amount' => $swap->requested_total_commission,
+//            ]);
+//
+//
+//
+//            if ($swap->is_approve_by_exchanger) {
+//                $swap->update(['status' => 'completed']);
+//            }
+//
+//            return response()->json(['success' => true, 'message' => 'You complete the swap request'], 200);
+//
+//        } elseif ($swap->exchanged_user_id == auth()->id()) {
+//
+//            $swap->update(['is_approve_by_exchanger' => 1]);
+//
+//            SwapNotificationService::sendNotification(
+//                $swap,
+//                [$swap->requested_user_id],
+//                'Swap request has been completed'
+//            );
+//
+//            $invoiceItem = StripePaymentFacade::createInvoiceItem($user, $swap->exchanger_total_commission);
+//
+//            Billing::create([
+//                'user_id' => auth()->id(),
+//                'payment_type' => 'one_time',
+//                'payment_method_id' => $user->activePaymentMethod->stripe_payment_method_id,
+//                'stripe_payment_intent_id' => $invoiceItem->payment_intent,
+//                'amount' => $swap->exchanger_total_commission,
+//            ]);
+//
+//            if ($swap->is_approve_by_requester) {
+//                $swap->update(['status' => 'completed']);
+//            }
+//
+//            return response()->json(['success' => true, 'message' => 'You complete the swap request'], 200);
+//        }
+//
+//        return response()->json(['success' => true, 'message' => 'You are not allow to change the swap status'], 200);
+//    }
 }

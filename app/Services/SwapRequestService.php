@@ -88,4 +88,11 @@ class SwapRequestService
         };
     }
 
+    public static function swapColumnMapper($defineType)
+    {
+        return $defineType === 'exchange_product' ?
+            ['exchanged_wholesale_amount', 'exchanged_total_commission'] :
+            ['requested_wholesale_amount', 'requested_total_commission'];
+    }
+
 }
