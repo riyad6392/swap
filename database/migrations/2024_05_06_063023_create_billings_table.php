@@ -17,8 +17,9 @@ return new class extends Migration
             $table->enum('payment_type',['one_time','subscription']);
             $table->integer('subscription_id')->nullable();
             $table->foreignId('plan_id')->nullable();
-            $table->string('payment_method_id')->nullable();
+            $table->integer('payment_method_id')->nullable();
             $table->string('stripe_payment_intent_id')->nullable();
+            $table->string('stripe_payment_subscription_id')->nullable();
             $table->double('amount')->nullable();
             $table->timestamps();
         });

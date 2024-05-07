@@ -122,9 +122,6 @@ class PlanSubscriptionController extends Controller
 
             $stripeSubscription = StripePaymentFacade::subscription($plan, auth()->user());
 
-
-
-
             $subscription = Subscription::create([
                 'plan_id' => $planSubscriptionRequest->plan_id,
                 'user_id' => auth()->user()->id,
@@ -151,7 +148,7 @@ class PlanSubscriptionController extends Controller
                 'plan_id' => $planSubscriptionRequest->plan_id,
                 'subscription_id' => $subscription->id,
                 'payment_method_id' => $paymentMethods->id,
-                'stripe_payment_intent_id' => $stripeSubscription->id,
+                'stripe_payment_subscription_id' => $stripeSubscription->id,
             ]);
 
             DB::commit();
