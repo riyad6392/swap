@@ -33,276 +33,161 @@ class ShipmentController extends Controller
         //
     }
 
-    /**
-     * Create Shipping info.
-     *
-     * @OA\Post(
-     *     path="/api/shipping",
-     *     tags={"Shipping"},
-     *     security={{ "apiAuth": {} }},
-     *
-     *     @OA\MediaType(mediaType="multipart/form-data"),
-     *
-     *     @OA\Parameter(
-     *          in="query",
-     *          name="swap_id",
-     *          required=true,
-     *
-     *          @OA\Schema(type="integer"),
-     *          example="1"
-     *      ),
-     *
-     *       @OA\Parameter(
-     *           in="query",
-     *           name="last_name",
-     *           required=true,
-     *
-     *           @OA\Schema(type="string"),
-     *           example="Khan"
-     *       ),
-     *
-     *       @OA\Parameter(
-     *            in="query",
-     *            name="phone",
-     *            required=true,
-     *
-     *            @OA\Schema(type="string"),
-     *            example="Khan"
-     *        ),
-     *
-     *       @OA\Parameter(
-     *             in="query",
-     *             name="image",
-     *             required=true,
-     *
-     *             @OA\Schema(type="file"),
-     *             example="file"
-     *         ),
-     *
-     *            @OA\Parameter(
-     *              in="query",
-     *              name="resale_license",
-     *              required=true,
-     *
-     *              @OA\Schema(type="file"),
-     *              example="file"
-     *          ),
-     *
-     *         @OA\Parameter(
-     *               in="query",
-     *               name="photo_of_id",
-     *               required=true,
-     *
-     *               @OA\Schema(type="file"),
-     *               example="file"
-     *           ),
-     *              @OA\Parameter(
-     *                in="query",
-     *                name="photo_of_id",
-     *                required=true,
-     *
-     *                @OA\Schema(type="file"),
-     *                example="file"
-     *            ),
-     *          @OA\Parameter(
-     *                 in="query",
-     *                 name="business_name",
-     *                 required=true,
-     *
-     *                 @OA\Schema(type="string"),
-     *                 example="Business name"
-     *             ),
-     *          @OA\Parameter(
-     *                  in="query",
-     *                  name="business_address",
-     *                  required=true,
-     *
-     *                  @OA\Schema(type="string"),
-     *                  example="Business address"
-     *              ),
-     *          @OA\Parameter(
-     *                  in="query",
-     *                  name="online_store_url",
-     *                  required=true,
-     *
-     *                  @OA\Schema(type="string"),
-     *                  example="http://127.0.0.1:8000/api/documentation#/User/ad5b4db3132c00564bd7eede30c3e23a"
-     *              ),
-     *
-     *          @OA\Parameter(
-     *                   in="query",
-     *                   name="ein",
-     *                   required=true,
-     *
-     *                   @OA\Schema(type="string"),
-     *                   example="ein"
-     *               ),
-     *          @OA\Parameter(
-     *                   in="query",
-     *                   name="about_me",
-     *                   required=true,
-     *
-     *                   @OA\Schema(type="string"),
-     *                   example="this is a description about me"
-     *               ),
-     *
-     *      @OA\Parameter(
-     *          in="query",
-     *          name="get_all",
-     *          required=false,
-     *
-     *          @OA\Schema(type="boolean"),
-     *          example="1"
-     *
-     *      ),
-     *     @OA\Response(
-     *           response=200,
-     *           description="success",
-     *
-     *           @OA\JsonContent(
-     *               @OA\Property(property="data", type="json", example={}),
-     *               @OA\Property(property="links", type="json", example={}),
-     *               @OA\Property(property="meta", type="json", example={}),
-     *           )
-     *       ),
-     *
-     *       @OA\Response(
-     *           response=401,
-     *           description="Invalid user",
-     *
-     *           @OA\JsonContent(
-     *               @OA\Property(property="success", type="boolean", example="false"),
-     *               @OA\Property(property="errors", type="json", example={"message": {"Unauthenticated"}}),
-     *           )
-     *       )
-     * )
-     * Store a newly created resource in storage.
-     * Create Shipping info.
-     *
-     * @OA\Post(
-     *     path="/api/shipping",
-     *     tags={"Shipping"},
-     *     security={{ "apiAuth": {} }},
-     *
-     *     @OA\MediaType(mediaType="multipart/form-data"),
-     *
-     *     @OA\Parameter(
-     *          in="query",
-     *          name="swap_id",
-     *          required=true,
-     *
-     *          @OA\Schema(type="integer"),
-     *          example="1"
-     *      ),
-     *
-     *       @OA\Parameter(
-     *           in="query",
-     *           name="requested_address",
-     *           required=true,
-     *
-     *           @OA\Schema(type="string"),
-     *           example="Khan"
-     *       ),
-     *
-     *       @OA\Parameter(
-     *            in="query",
-     *            name="requested_tracking_number",
-     *            required=true,
-     *
-     *            @OA\Schema(type="string"),
-     *            example="Khan"
-     *        ),
-     *
-     *       @OA\Parameter(
-     *             in="query",
-     *             name="requested_carrier_name",
-     *             required=true,
-     *
-     *             @OA\Schema(type="file"),
-     *             example="file"
-     *         ),
-     *
-     *            @OA\Parameter(
-     *              in="query",
-     *              name="requested_carrier_contact",
-     *              required=true,
-     *
-     *              @OA\Schema(type="file"),
-     *              example="file"
-     *          ),
-     *
-     *         @OA\Parameter(
-     *               in="query",
-     *               name="requested_expected_delivery_date",
-     *               required=true,
-     *
-     *               @OA\Schema(type="file"),
-     *               example="file"
-     *           ),
-     *              @OA\Parameter(
-     *                in="query",
-     *                name="exchanged_address",
-     *                required=true,
-     *
-     *                @OA\Schema(type="file"),
-     *                example="file"
-     *            ),
-     *          @OA\Parameter(
-     *                 in="query",
-     *                 name="exchanged_tracking_number",
-     *                 required=true,
-     *
-     *                 @OA\Schema(type="string"),
-     *                 example="Business name"
-     *             ),
-     *          @OA\Parameter(
-     *                  in="query",
-     *                  name="exchanged_carrier_name",
-     *                  required=true,
-     *
-     *                  @OA\Schema(type="string"),
-     *                  example="Business address"
-     *              ),
-     *          @OA\Parameter(
-     *                  in="query",
-     *                  name="exchanged_carrier_contact",
-     *                  required=true,
-     *
-     *                  @OA\Schema(type="string"),
-     *                  example="http://127.0.0.1:8000/api/documentation#/User/ad5b4db3132c00564bd7eede30c3e23a"
-     *              ),
-     *
-     *          @OA\Parameter(
-     *                   in="query",
-     *                   name="exchanged_expected_delivery_date",
-     *                   required=true,
-     *
-     *                   @OA\Schema(type="string"),
-     *                   example="ein"
-     *               ),
-     *
-     *     @OA\Response(
-     *           response=200,
-     *           description="success",
-     *
-     *           @OA\JsonContent(
-     *
-     *               @OA\Property(property="success", type="boolean", example="true"),
-     *                @OA\Property(property="errors", type="json", example={"message": {"Shipment created successfully."}}),
-     *           ),
-     *       ),
-     *
-     *       @OA\Response(
-     *           response=401,
-     *           description="Invalid user",
-     *
-     *           @OA\JsonContent(
-     *               @OA\Property(property="success", type="boolean", example="false"),
-     *              @OA\Property(property="errors", type="json", example={"message": {"The given data was invalid."}}),
-     *           )
-     *       )
-     * )
-     */
+//    /**
+//     * Create Shipping info.
+//     *
+//     * @OA\Post(
+//     *     path="/api/shipping",
+//     *     tags={"Shipping"},
+//     *     security={{ "apiAuth": {} }},
+//     *
+//     *     @OA\MediaType(mediaType="multipart/form-data"),
+//     *
+//     *     @OA\Parameter(
+//     *          in="query",
+//     *          name="swap_id",
+//     *          required=true,
+//     *
+//     *          @OA\Schema(type="integer"),
+//     *          example="1"
+//     *      ),
+//     *
+//     *       @OA\Parameter(
+//     *           in="query",
+//     *           name="last_name",
+//     *           required=true,
+//     *
+//     *           @OA\Schema(type="string"),
+//     *           example="Khan"
+//     *       ),
+//     *
+//     *       @OA\Parameter(
+//     *            in="query",
+//     *            name="phone",
+//     *            required=true,
+//     *
+//     *            @OA\Schema(type="string"),
+//     *            example="Khan"
+//     *        ),
+//     *
+//     *       @OA\Parameter(
+//     *             in="query",
+//     *             name="image",
+//     *             required=true,
+//     *
+//     *             @OA\Schema(type="file"),
+//     *             example="file"
+//     *         ),
+//     *
+//     *            @OA\Parameter(
+//     *              in="query",
+//     *              name="resale_license",
+//     *              required=true,
+//     *
+//     *              @OA\Schema(type="file"),
+//     *              example="file"
+//     *          ),
+//     *
+//     *         @OA\Parameter(
+//     *               in="query",
+//     *               name="photo_of_id",
+//     *               required=true,
+//     *
+//     *               @OA\Schema(type="file"),
+//     *               example="file"
+//     *           ),
+//     *              @OA\Parameter(
+//     *                in="query",
+//     *                name="photo_of_id",
+//     *                required=true,
+//     *
+//     *                @OA\Schema(type="file"),
+//     *                example="file"
+//     *            ),
+//     *          @OA\Parameter(
+//     *                 in="query",
+//     *                 name="business_name",
+//     *                 required=true,
+//     *
+//     *                 @OA\Schema(type="string"),
+//     *                 example="Business name"
+//     *             ),
+//     *          @OA\Parameter(
+//     *                  in="query",
+//     *                  name="business_address",
+//     *                  required=true,
+//     *
+//     *                  @OA\Schema(type="string"),
+//     *                  example="Business address"
+//     *              ),
+//     *          @OA\Parameter(
+//     *                  in="query",
+//     *                  name="online_store_url",
+//     *                  required=true,
+//     *
+//     *                  @OA\Schema(type="string"),
+//     *                  example="http://127.0.0.1:8000/api/documentation#/User/ad5b4db3132c00564bd7eede30c3e23a"
+//     *              ),
+//     *
+//     *          @OA\Parameter(
+//     *                   in="query",
+//     *                   name="ein",
+//     *                   required=true,
+//     *
+//     *                   @OA\Schema(type="string"),
+//     *                   example="ein"
+//     *               ),
+//     *          @OA\Parameter(
+//     *                   in="query",
+//     *                   name="about_me",
+//     *                   required=true,
+//     *
+//     *                   @OA\Schema(type="string"),
+//     *                   example="this is a description about me"
+//     *               ),
+//     *
+//     *     @OA\Response(
+//     *           response=200,
+//     *           description="success",
+//     *
+//     *           @OA\JsonContent(
+//     *               @OA\Property(property="data", type="json", example={}),
+//     *               @OA\Property(property="links", type="json", example={}),
+//     *               @OA\Property(property="meta", type="json", example={}),
+//     *           )
+//     *       ),
+//     *
+//     *       @OA\Response(
+//     *           response=401,
+//     *           description="Invalid user",
+//     *
+//     *           @OA\JsonContent(
+//     *               @OA\Property(property="success", type="boolean", example="false"),
+//     *               @OA\Property(property="errors", type="json", example={"message": {"Unauthenticated"}}),
+//     *           )
+//     *       )
+//     *     @OA\Response(
+//     *           response=200,
+//     *           description="success",
+//     *
+//     *           @OA\JsonContent(
+//     *
+//     *               @OA\Property(property="success", type="boolean", example="true"),
+//     *                @OA\Property(property="errors", type="json", example={"message": {"Shipment created successfully."}}),
+//     *           ),
+//     *       ),
+//     *
+//     *       @OA\Response(
+//     *           response=401,
+//     *           description="Invalid user",
+//     *
+//     *           @OA\JsonContent(
+//     *               @OA\Property(property="success", type="boolean", example="false"),
+//     *              @OA\Property(property="errors", type="json", example={"message": {"The given data was invalid."}}),
+//     *           )
+//     *       )
+//     * )
+//     */
 
     public function store(StoreShipmentRequest $shipmentRequest)
     {
@@ -349,133 +234,133 @@ class ShipmentController extends Controller
         //
     }
 
-    /**
-     * Update Shipping info.
-     *
-     * @OA\Put (
-     *     path="/api/shipping",
-     *     tags={"Shipping"},
-     *     security={{ "apiAuth": {} }},
-     *
-     *     @OA\MediaType(mediaType="multipart/form-data"),
-     *
-     *     @OA\Parameter(
-     *          in="query",
-     *          name="swap_id",
-     *          required=true,
-     *
-     *          @OA\Schema(type="integer"),
-     *          example="1"
-     *      ),
-     *
-     *       @OA\Parameter(
-     *           in="query",
-     *           name="requested_address",
-     *           required=true,
-     *
-     *           @OA\Schema(type="string"),
-     *           example="Khan"
-     *       ),
-     *
-     *       @OA\Parameter(
-     *            in="query",
-     *            name="requested_tracking_number",
-     *            required=true,
-     *
-     *            @OA\Schema(type="string"),
-     *            example="Khan"
-     *        ),
-     *
-     *       @OA\Parameter(
-     *             in="query",
-     *             name="requested_carrier_name",
-     *             required=true,
-     *
-     *             @OA\Schema(type="file"),
-     *             example="file"
-     *         ),
-     *
-     *            @OA\Parameter(
-     *              in="query",
-     *              name="requested_carrier_contact",
-     *              required=true,
-     *
-     *              @OA\Schema(type="file"),
-     *              example="file"
-     *          ),
-     *
-     *         @OA\Parameter(
-     *               in="query",
-     *               name="requested_expected_delivery_date",
-     *               required=true,
-     *
-     *               @OA\Schema(type="file"),
-     *               example="file"
-     *           ),
-     *              @OA\Parameter(
-     *                in="query",
-     *                name="exchanged_address",
-     *                required=true,
-     *
-     *                @OA\Schema(type="file"),
-     *                example="file"
-     *            ),
-     *          @OA\Parameter(
-     *                 in="query",
-     *                 name="exchanged_tracking_number",
-     *                 required=true,
-     *
-     *                 @OA\Schema(type="string"),
-     *                 example="Business name"
-     *             ),
-     *          @OA\Parameter(
-     *                  in="query",
-     *                  name="exchanged_carrier_name",
-     *                  required=true,
-     *
-     *                  @OA\Schema(type="string"),
-     *                  example="Business address"
-     *              ),
-     *          @OA\Parameter(
-     *                  in="query",
-     *                  name="exchanged_carrier_contact",
-     *                  required=true,
-     *
-     *                  @OA\Schema(type="string"),
-     *                  example="http://127.0.0.1:8000/api/documentation#/User/ad5b4db3132c00564bd7eede30c3e23a"
-     *              ),
-     *
-     *          @OA\Parameter(
-     *                   in="query",
-     *                   name="exchanged_expected_delivery_date",
-     *                   required=true,
-     *
-     *                   @OA\Schema(type="string"),
-     *                   example="ein"
-     *               ),
-     *
-     *     @OA\Response(
-     *           response=200,
-     *           description="success",
-     *
-     *           @OA\JsonContent(
-     *
-     *               @OA\Property(property="success", type="boolean", example="true"),
-     *                @OA\Property(property="errors", type="json", example={"message": {"Shipment created successfully."}}),
-     *           ),
-     *       ),
-     *
-     *       @OA\Response(
-     *           response=401,
-     *           description="Invalid user",
-     *
-     *           @OA\JsonContent(
-     *               @OA\Property(property="success", type="boolean", example="false"),
-     *              @OA\Property(property="errors", type="json", example={"message": {"The given data was invalid."}}),
-     *           )
-     *       )
-     * )
-     */
+//    /**
+//     * Update Shipping info.
+//     *
+//     * @OA\Put (
+//     *     path="/api/shipping",
+//     *     tags={"Shipping"},
+//     *     security={{ "apiAuth": {} }},
+//     *
+//     *     @OA\MediaType(mediaType="multipart/form-data"),
+//     *
+//     *     @OA\Parameter(
+//     *          in="query",
+//     *          name="swap_id",
+//     *          required=true,
+//     *
+//     *          @OA\Schema(type="integer"),
+//     *          example="1"
+//     *      ),
+//     *
+//     *       @OA\Parameter(
+//     *           in="query",
+//     *           name="requested_address",
+//     *           required=true,
+//     *
+//     *           @OA\Schema(type="string"),
+//     *           example="Khan"
+//     *       ),
+//     *
+//     *       @OA\Parameter(
+//     *            in="query",
+//     *            name="requested_tracking_number",
+//     *            required=true,
+//     *
+//     *            @OA\Schema(type="string"),
+//     *            example="Khan"
+//     *        ),
+//     *
+//     *       @OA\Parameter(
+//     *             in="query",
+//     *             name="requested_carrier_name",
+//     *             required=true,
+//     *
+//     *             @OA\Schema(type="file"),
+//     *             example="file"
+//     *         ),
+//     *
+//     *            @OA\Parameter(
+//     *              in="query",
+//     *              name="requested_carrier_contact",
+//     *              required=true,
+//     *
+//     *              @OA\Schema(type="file"),
+//     *              example="file"
+//     *          ),
+//     *
+//     *         @OA\Parameter(
+//     *               in="query",
+//     *               name="requested_expected_delivery_date",
+//     *               required=true,
+//     *
+//     *               @OA\Schema(type="file"),
+//     *               example="file"
+//     *           ),
+//     *              @OA\Parameter(
+//     *                in="query",
+//     *                name="exchanged_address",
+//     *                required=true,
+//     *
+//     *                @OA\Schema(type="file"),
+//     *                example="file"
+//     *            ),
+//     *          @OA\Parameter(
+//     *                 in="query",
+//     *                 name="exchanged_tracking_number",
+//     *                 required=true,
+//     *
+//     *                 @OA\Schema(type="string"),
+//     *                 example="Business name"
+//     *             ),
+//     *          @OA\Parameter(
+//     *                  in="query",
+//     *                  name="exchanged_carrier_name",
+//     *                  required=true,
+//     *
+//     *                  @OA\Schema(type="string"),
+//     *                  example="Business address"
+//     *              ),
+//     *          @OA\Parameter(
+//     *                  in="query",
+//     *                  name="exchanged_carrier_contact",
+//     *                  required=true,
+//     *
+//     *                  @OA\Schema(type="string"),
+//     *                  example="http://127.0.0.1:8000/api/documentation#/User/ad5b4db3132c00564bd7eede30c3e23a"
+//     *              ),
+//     *
+//     *          @OA\Parameter(
+//     *                   in="query",
+//     *                   name="exchanged_expected_delivery_date",
+//     *                   required=true,
+//     *
+//     *                   @OA\Schema(type="string"),
+//     *                   example="ein"
+//     *               ),
+//     *
+//     *     @OA\Response(
+//     *           response=200,
+//     *           description="success",
+//     *
+//     *           @OA\JsonContent(
+//     *
+//     *               @OA\Property(property="success", type="boolean", example="true"),
+//     *                @OA\Property(property="errors", type="json", example={"message": {"Shipment created successfully."}}),
+//     *           ),
+//     *       ),
+//     *
+//     *       @OA\Response(
+//     *           response=401,
+//     *           description="Invalid user",
+//     *
+//     *           @OA\JsonContent(
+//     *               @OA\Property(property="success", type="boolean", example="false"),
+//     *              @OA\Property(property="errors", type="json", example={"message": {"The given data was invalid."}}),
+//     *           )
+//     *       )
+//     * )
+//     */
     public function edit(string $id)
     {
         $shipment = Shipment::find($id);

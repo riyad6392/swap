@@ -88,4 +88,24 @@ class SwapRequestService
         };
     }
 
+    public function updateSwapCommissionForExchangeAndRequest($swap){
+        $exchangeDetails = $swap->exchangeDetails;
+        $requestDetails = $swap->requestDetail;
+
+        $exchangeDetailsTotalCommission = $exchangeDetails->sum('commission');
+        $requestDetailsTotalCommission = $requestDetails->sum('commission');
+
+        $swap->update([
+            'requested_total_commission' => $requestDetailsTotalCommission,
+            'exchanged_total_commission' => $exchangeDetailsTotalCommission,
+        ]);
+    }
+
+//    public function updateSwapCommissionForExchangeAndRequest($swap){
+//
+//
+//
+//
+//    }
+
 }

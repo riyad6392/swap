@@ -15,6 +15,7 @@ use App\Models\Billing;
 use App\Models\Message;
 use App\Models\Swap;
 use App\Models\SwapExchangeDetails;
+use App\Models\SwapRequestDetails;
 use App\Models\User;
 use App\Services\SwapMessageService;
 use App\Services\SwapNotificationService;
@@ -417,7 +418,7 @@ class SwapController extends Controller
                     $SwapExchangeDetailsRequest->define_type
                 );
 
-                SwapExchangeDetails::insert($prepareData['insertData']);
+                $this->swapDetailsClassMapper($SwapExchangeDetailsRequest->define_type)::insert($prepareData['insertData']);
 
                 if ($updateSwapRequest->deleted_details_id) {
                     SwapRequestService::deleteDetailsData(
@@ -675,6 +676,20 @@ class SwapController extends Controller
             'stripe_payment_intent_id' => $invoiceItem->payment_intent,
             'amount' => $commission,
         ]);
+    }
+
+    protected function swapDetailsClassMapper($defineType)
+    {
+        return $defineType === 'exchange_product' ?
+            SwapExchangeDetails::class :
+            SwapRequestDetails::class;
+    }
+
+    protected function swapColumnMapper($defineType)
+    {
+        return $defineType === 'exchange_product' ?
+            ['exchanged_wholesale_amount', 'exchanged_total_commission'] :
+            ['requested_wholesale_amount', 'requested_total_commission'];
     }
 
 //    public function complete($id): \Illuminate\Http\JsonResponse
