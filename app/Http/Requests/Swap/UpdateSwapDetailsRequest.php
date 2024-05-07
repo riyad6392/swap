@@ -28,7 +28,7 @@ class UpdateSwapDetailsRequest extends FormRequest
             return [
                 'define_type' => 'required|string|in:request_product,exchange_product',
                 'deleted_details_id' => 'nullable|array',
-                'exchange_product' => 'sometimes|array',
+                'exchange_product' => 'required|array',
                 'exchange_product.*.product_id' => 'required|integer|exists:products,id',
                 'exchange_product.*.variation_id' => 'required|integer|exists:product_variations,id',
                 'exchange_product.*.variation_size_id' => 'required|exists:sizes,id',
@@ -40,7 +40,7 @@ class UpdateSwapDetailsRequest extends FormRequest
             return [
                 'define_type' => 'required|string|in:request_product,exchange_product',
                 'deleted_details_id' => 'nullable|array',
-                'exchange_product' => 'sometimes|array',
+                'exchange_product' => 'required|array',
                 'request_product.*.product_id' => 'required|integer|exists:products,id',
                 'request_product.*.variation_id' => 'required|integer|exists:product_variations,id',
                 'request_product.*.variation_size_id' => 'required|exists:sizes,id',
@@ -56,6 +56,9 @@ class UpdateSwapDetailsRequest extends FormRequest
             'define_type.required' => 'Define type is required',
             'define_type.string' => 'Define type must be a string',
             'define_type.in' => 'Define type must be either request_product or exchange_product',
+
+            'exchange_product.required' => 'Exchange product is required',
+            'exchange_product.array' => 'Exchange product must be an array',
 
             'exchange_product.*.product_id.required' => 'Product id is required',
             'exchange_product.*.product_id.integer' => 'Product id must be a number',

@@ -404,7 +404,7 @@ class SwapController extends Controller
      * )
      */
     public function update(UpdateSwapRequest        $updateSwapRequest,
-                           UpdateSwapDetailsRequest $SwapExchangeDetailsRequest,
+                           UpdateSwapDetailsRequest $swapExchangeDetailsRequest,
                            Swap                     $swap): \Illuminate\Http\JsonResponse
     {
         try {
@@ -412,33 +412,41 @@ class SwapController extends Controller
 
             if (($swap->requested_user_id == auth()->id() || $swap->exchanged_user_id == auth()->id()) && $swap->status == 'accepted') {
 
+                $defineType = $swapExchangeDetailsRequest->define_type;
+
+               if (is_null($swapExchangeDetailsRequest->$defineType)) {
+                   return response()->json(['success' => false , 'message' => str_replace('_',' ', $defineType).' is empty']);
+               }
+
                 $prepareData = SwapRequestService::prepareDetailsData(
-                    $SwapExchangeDetailsRequest,
+                    $swapExchangeDetailsRequest,
                     $swap,
-                    $SwapExchangeDetailsRequest->define_type
+                    $swapExchangeDetailsRequest->define_type
                 );
 
-                $this->swapDetailsClassMapper($SwapExchangeDetailsRequest->define_type)::insert($prepareData['insertData']);
+                $this->swapDetailsClassMapper($swapExchangeDetailsRequest->define_type)::insert($prepareData['insertData']);
 
                 if ($updateSwapRequest->deleted_details_id) {
                     SwapRequestService::deleteDetailsData(
                         $updateSwapRequest->deleted_details_id,
                         $swap,
-                        SwapRequestService::matchClass($SwapExchangeDetailsRequest->define_type)
+                        SwapRequestService::matchClass($swapExchangeDetailsRequest->define_type)
                     );
                 }
 
-                $totalAmountAndCommission = SwapRequestService::calculateTotalAmountAndCommission(
-                    $swap,
-                    SwapRequestService::matchRelation($SwapExchangeDetailsRequest->define_type)
-                );
+                $defineWholeSaleColumn = SwapRequestService::swapColumnMapper($swapExchangeDetailsRequest->define_type)[0];
+                $defineTotalCommissionColumn = SwapRequestService::swapColumnMapper($swapExchangeDetailsRequest->define_type)[1];
+
 
                 $swap->update(
                     [
-                        'exchanged_wholesale_amount' => (int)$prepareData['wholeSaleAmount'] +
-                            (int)$totalAmountAndCommission['wholeSaleAmount'],
-                        'exchanged_total_commission' => $prepareData['totalCommission'] +
-                            (int)$totalAmountAndCommission['totalCommission'],
+                        $defineWholeSaleColumn =>
+                            (int)$prepareData['wholeSaleAmount'] +
+                            (int)$swap->$defineWholeSaleColumn,
+
+                        $defineTotalCommissionColumn =>
+                            $prepareData['totalCommission'] +
+                            $swap->$defineTotalCommissionColumn,
                     ]
                 );
 
@@ -451,7 +459,7 @@ class SwapController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'Failed to update swap'], 500);
+            return response()->json(['success' => false, 'message' => 'Failed to update swap' , 'errors'=>$e->getMessage()], 500);
         }
     }
 
@@ -685,12 +693,7 @@ class SwapController extends Controller
             SwapRequestDetails::class;
     }
 
-    protected function swapColumnMapper($defineType)
-    {
-        return $defineType === 'exchange_product' ?
-            ['exchanged_wholesale_amount', 'exchanged_total_commission'] :
-            ['requested_wholesale_amount', 'requested_total_commission'];
-    }
+
 
 //    public function complete($id): \Illuminate\Http\JsonResponse
 //    {
