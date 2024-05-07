@@ -371,7 +371,7 @@ class UserController extends Controller
             return response()->json(['success' => true, 'data' => ['user'=> $user, 'store' => $user->store()->get()]]);
         }
 
-        $inventory = $user->store()->with('image')->paginate($request->pagination ?? self::PER_PAGE);
+        $inventory = $user->store()->with('image','category', 'brand','productVariations.size', 'productVariations.color')->paginate($request->pagination ?? self::PER_PAGE);
 
         return response()->json(['success' => true, 'data' => ['user'=> $user, 'store' => $inventory]]);
 
