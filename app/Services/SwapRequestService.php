@@ -88,24 +88,11 @@ class SwapRequestService
         };
     }
 
-    public function updateSwapCommissionForExchangeAndRequest($swap){
-        $exchangeDetails = $swap->exchangeDetails;
-        $requestDetails = $swap->requestDetail;
-
-        $exchangeDetailsTotalCommission = $exchangeDetails->sum('commission');
-        $requestDetailsTotalCommission = $requestDetails->sum('commission');
-
-        $swap->update([
-            'requested_total_commission' => $requestDetailsTotalCommission,
-            'exchanged_total_commission' => $exchangeDetailsTotalCommission,
-        ]);
+    public static function swapColumnMapper($defineType)
+    {
+        return $defineType === 'exchange_product' ?
+            ['exchanged_wholesale_amount', 'exchanged_total_commission'] :
+            ['requested_wholesale_amount', 'requested_total_commission'];
     }
-
-//    public function updateSwapCommissionForExchangeAndRequest($swap){
-//
-//
-//
-//
-//    }
 
 }

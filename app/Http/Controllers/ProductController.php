@@ -6,6 +6,7 @@ use App\Http\Requests\ProductVariation\StoreProductVariationRequest;
 use App\Http\Requests\Product\StoreProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Http\Requests\ProductVariation\UpdateProductVariationRequest;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Services\FileUploadService;
 use Illuminate\Http\Request;
@@ -87,7 +88,7 @@ class ProductController extends Controller
 
         $inventories = $inventories->paginate($request->pagination ?? self::PER_PAGE);
 
-        return response()->json(['success' => true, 'data' => $inventories]);
+        return response()->json(['success' => true, 'data' => ProductResource::collection($inventories)]);
     }
 
     /**
