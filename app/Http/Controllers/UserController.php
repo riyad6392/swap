@@ -379,8 +379,7 @@ class UserController extends Controller
     }
 
     public function userProfile(){
-        $user = User::with('image','activeSubscriptions','paymentMethods')->find(auth()->id());
-        $paymentList = StripePaymentFacade::transactionList();
+        $user = User::with('image','activeSubscriptions','paymentMethods','billings')->find(auth()->id());
         return response()->json(['success' => true, 'data' => $user]);
     }
 

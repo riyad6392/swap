@@ -156,4 +156,9 @@ class User extends Authenticatable
     public function store(){
         return $this->hasMany(Product::class)->where('is_published', 1);
     }
+
+    public function billings(): HasMany
+    {
+        return $this->hasMany(Billing::class);
+    }
 }
