@@ -24,13 +24,11 @@ class UpdateSwapDetailsRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
-            'define_type' => 'required|string|in:request_product,exchange_product',
-            'deleted_details_id' => 'nullable|array',
-        ];
-        if ($this->define_type == 'exchange_product') {
-            $rules = [
-//                'define_type' => 'required|string|in:request_product,exchange_product',
+        if (isset($this->define_type) && $this->define_type == 'exchange_product') {
+            return [
+                'define_type' => 'required|string|in:request_product,exchange_product',
+                'deleted_details_id' => 'nullable|array',
+                'exchange_product' => 'sometimes|array',
                 'exchange_product.*.product_id' => 'required|integer|exists:products,id',
                 'exchange_product.*.variation_id' => 'required|integer|exists:product_variations,id',
                 'exchange_product.*.variation_size_id' => 'required|exists:sizes,id',
@@ -38,9 +36,11 @@ class UpdateSwapDetailsRequest extends FormRequest
                 'exchange_product.*.variation_quantity' => 'nullable|numeric',
                 'exchange_product.*.discount_end_date' => 'nullable|date',
             ];
-        } else {
-            $rules = [
-//                'define_type' => 'required|string|in:request_product,exchange_product',
+        } else if (isset($this->define_type) && $this->define_type == 'request_product'){
+            return [
+                'define_type' => 'required|string|in:request_product,exchange_product',
+                'deleted_details_id' => 'nullable|array',
+                'exchange_product' => 'sometimes|array',
                 'request_product.*.product_id' => 'required|integer|exists:products,id',
                 'request_product.*.variation_id' => 'required|integer|exists:product_variations,id',
                 'request_product.*.variation_size_id' => 'required|exists:sizes,id',
@@ -49,7 +49,6 @@ class UpdateSwapDetailsRequest extends FormRequest
                 'request_product.*.discount_end_date' => 'nullable|date',
             ];
         }
-        return $rules;
     }
     public function messages(): array
     {
