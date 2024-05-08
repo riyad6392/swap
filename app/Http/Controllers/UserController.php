@@ -318,7 +318,13 @@ class UserController extends Controller
 
         $inventory = $inventory->paginate($request->pagination ?? self::PER_PAGE);
 
-        return response()->json(['success' => true, 'data' => ['user'=> $user, 'inventory' => ProductResource::collection($inventory)->resource]]);
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'user'=> $user,
+                'inventory' => ProductResource::collection($inventory)->resource
+            ]
+        ]);
     }
 
     /**
@@ -381,16 +387,58 @@ class UserController extends Controller
 
         $inventory = $user->store()->with('image','category', 'brand','productVariations.size', 'productVariations.color');
 
+        $user = new UserResource($user);
+
         if ($request->get('get_all')) {
-            return response()->json(['success' => true, 'data' => ['user'=> $user, 'store' => ProductResource::collection($user->store()->get())->resource]]);
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'user'=> $user,
+                    'store' => ProductResource::collection($user->store()->get())->resource]
+            ]);
         }
 
         $inventory = $inventory->paginate($request->pagination ?? self::PER_PAGE);
 
-        return response()->json(['success' => true, 'data' => ['user'=> $user, 'store' => ProductResource::collection($inventory)->resource]]);
-
-
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'user'=> $user,
+                'store' => ProductResource::collection($inventory)->resource
+            ]
+        ]);
     }
+
+    /**
+     * User Profile.
+     *
+     * @OA\Get(
+     *     path="/api/user-profile",
+     *     tags={"User"},
+     *     security={{ "apiAuth": {} }},
+     *
+     *     @OA\Response(
+     *           response=200,
+     *           description="success",
+     *
+     *           @OA\JsonContent(
+     *               @OA\Property(property="data", type="json", example={}),
+     *               @OA\Property(property="links", type="json", example={}),
+     *               @OA\Property(property="meta", type="json", example={}),
+     *           )
+     *       ),
+     *
+     *       @OA\Response(
+     *           response=401,
+     *           description="Invalid user",
+     *
+     *           @OA\JsonContent(
+     *               @OA\Property(property="success", type="boolean", example="false"),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Unauthenticated"}}),
+     *           )
+     *       )
+     * )
+     */
 
     public function userProfile(){
         $user = User::with('image','activeSubscriptions','paymentMethods','billings')->find(auth()->id());
