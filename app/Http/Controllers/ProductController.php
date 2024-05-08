@@ -591,7 +591,7 @@ class ProductController extends Controller
     /**
      *Change status to a product.
      *
-     * @OA\Delete (
+     * @OA\Post (
      *     path="/api/change-product-status/{id}",
      *     tags={"Inventory"},
      *     @OA\Parameter(

@@ -5059,12 +5059,12 @@
             }
         },
         "/api/change-product-status/{id}": {
-            "delete": {
+            "post": {
                 "tags": [
                     "Inventory"
                 ],
                 "summary": "Change status to a product.",
-                "operationId": "bead1b198060840d1b1983222ac78444",
+                "operationId": "d40ad521450e99ffc0da2630fd480c05",
                 "parameters": [
                     {
                         "name": "id",
