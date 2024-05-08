@@ -23,8 +23,6 @@ class ProductResource extends JsonResource
             'brand' => new BrandResource($this->brand),
             'description' => $this->description,
             'is_publish' => $this->is_publish,
-            'created_by' => $this->created_by,
-            'updated_by' => $this->updated_by,
             'image' => new ImageResource($this->image),
             'productVariations' => ProductVariationResource::collection($this->productVariations),
         ];
