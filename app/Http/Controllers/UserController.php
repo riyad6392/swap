@@ -6,6 +6,7 @@ use App\Facades\StripePaymentFacade;
 use App\Http\Requests\User\ListUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Http\Resources\ProductResource;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Services\FileUploadService;
 use Illuminate\Http\Request;
@@ -301,13 +302,23 @@ class UserController extends Controller
             return response()->json(['success' => false, 'message' => 'User not found'], 404);
         }
 
+        $inventory = $user->inventories()->with('image','category', 'brand','productVariations.size', 'productVariations.color');
+
+        $user = new UserResource($user);
+
         if ($request->get('get_all')) {
-            return response()->json(['success' => true, 'data' => ['user'=> $user, 'inventory' => $user->inventories()->get()]]);
+
+            return response()->json(['success' => true,
+                'data' => [
+                    'user'=> $user,
+                    'inventory' => ProductResource::collection($inventory->get())->resource
+                ]
+            ]);
         }
 
-        $inventory = $user->inventories()->with('image')->paginate($request->pagination ?? self::PER_PAGE);
+        $inventory = $inventory->paginate($request->pagination ?? self::PER_PAGE);
 
-        return response()->json(['success' => true, 'data' => ['user'=> $user, 'inventory' => $inventory]]);
+        return response()->json(['success' => true, 'data' => ['user'=> $user, 'inventory' => ProductResource::collection($inventory)->resource]]);
     }
 
     /**
@@ -368,13 +379,15 @@ class UserController extends Controller
             return response()->json(['success' => false, 'message' => 'User not found'], 404);
         }
 
+        $inventory = $user->store()->with('image','category', 'brand','productVariations.size', 'productVariations.color');
+
         if ($request->get('get_all')) {
-            return response()->json(['success' => true, 'data' => ['user'=> $user, 'store' => $user->store()->get()]]);
+            return response()->json(['success' => true, 'data' => ['user'=> $user, 'store' => ProductResource::collection($user->store()->get())->resource]]);
         }
 
-        $inventory = $user->store()->with('image','category', 'brand','productVariations.size', 'productVariations.color')->paginate($request->pagination ?? self::PER_PAGE);
+        $inventory = $inventory->paginate($request->pagination ?? self::PER_PAGE);
 
-        return response()->json(['success' => true, 'data' => ['user'=> $user, 'store' => ProductResource::collection($inventory)]]);
+        return response()->json(['success' => true, 'data' => ['user'=> $user, 'store' => ProductResource::collection($inventory)->resource]]);
 
 
     }
