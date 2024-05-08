@@ -4,25 +4,41 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class ProductResource extends JsonResource
 {
+
     /**
-     * Transform the resource into an array.
+     * Transform the resource collection into an array.
      *
-     * @return array<string, mixed>
+     * @return array<int|string, mixed>
      */
     public function toArray(Request $request): array
     {
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'slug' => $this->slug,
+            'category' => new CategoryResource($this->category),
+            'brand' => new BrandResource($this->brand),
             'description' => $this->description,
-            'image' => new ImageResource($this->whenLoaded('image')),
-            'brand' => new BrandResource($this->whenLoaded('brand')),
-            'category' => new CategoryResource($this->whenLoaded('category')),
-            'productVariations' => ProductVariationResource::collection($this->whenLoaded('productVariations')),
+            'is_publish' => $this->is_publish,
+            'created_by' => $this->created_by,
+            'updated_by' => $this->updated_by,
+            'image' => new ImageResource($this->image),
+            'productVariations' => ProductVariationResource::collection($this->productVariations),
         ];
+    }
+
+    public function nestedCollection($schema)
+    {
+        $data = [];
+        foreach ($schema as $key => $value) {
+            if (is_array($value)) {
+                $this->$key = $this->nestedCollection($value);
+            }
+            $data[$key] = $this->$key;
+        }
+        return $data;
     }
 }

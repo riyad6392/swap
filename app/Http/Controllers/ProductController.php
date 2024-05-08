@@ -9,7 +9,6 @@ use App\Http\Requests\ProductVariation\UpdateProductVariationRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Services\FileUploadService;
-use App\Wrapper\ProductResourceWrapper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -67,7 +66,7 @@ class ProductController extends Controller
      *       )
      * )
      */
-    public function index(Request $request): \Illuminate\Http\JsonResponse
+    public function index(Request $request)
     {
         $inventories = Product::query();
 
@@ -84,34 +83,12 @@ class ProductController extends Controller
         );
 
         if ($request->get('get_all')) {
-            return response()->json(['success' => true, 'data' => $inventories->get()]);
+            return response()->json(['success' => true, 'data' => ProductResource::collection($inventories->get())->resource]);
         }
 
         $inventories = $inventories->paginate($request->pagination ?? self::PER_PAGE);
 
-        $schema = [
-            "first_name" => "string",
-            "last_name" => "string",
-            "email" => "string",
-            "phone" => "string",
-            "address" => "string",
-            "city" => "string",
-            "image" => [
-                "id" => "integer",
-                "path" => "string",
-                "product_id" => "integer",
-            ],
-            "images" => [
-                "id" => "integer",
-                "path" => "string",
-                "product_id" => "integer",
-            ],
-        ];
-        $wrapperClass = new ProductResourceWrapper($inventories, $schema);
-//        $inventories = $wrapperClass->apiWrapper();
-//        dd($inventories);
-
-        return response()->json(['success' => true, 'data' => $inventories]);
+        return response()->json(['success' => true, 'data' => ProductResource::collection($inventories)->resource], 200);
     }
 
     /**
@@ -566,8 +543,14 @@ class ProductController extends Controller
      *     )
      * )
      */
-    public function destroy(Product $product): \Illuminate\Http\JsonResponse
+    public function destroy($id): \Illuminate\Http\JsonResponse
     {
+        $product = Product::find($id);
+
+        if (!$product) {
+            return response()->json(['success' => false, 'message' => 'Product not found'], 404);
+        }
+
         $productImgIds = $product->image()->select('id')->pluck('id')->toArray();
         $variationImgIds = $product->productVariations->pluck('images')->flatten()->pluck('id')->toArray();
         $imageIds = array_merge($productImgIds, $variationImgIds);
@@ -576,7 +559,7 @@ class ProductController extends Controller
             FileUploadService::deleteImages($imageIds, $product, 'image');
         }
 
-        $product->image()->delete();
+//        $product->image()->delete();
         $product->productVariations()->delete();
         $product->delete();
 
