@@ -26,6 +26,7 @@ class UserResource extends JsonResource
             'is_super_swapper' => $this->is_super_swapper,
             'business_name' => $this->business_name,
             'business_address' => $this->business_address,
+            'image' => new ImageResource($this->image),
         ];
     }
 }
