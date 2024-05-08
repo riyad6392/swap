@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Facades\StripePaymentFacade;
 use App\Http\Requests\User\ListUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
+use App\Http\Resources\ProductResource;
 use App\Models\User;
 use App\Services\FileUploadService;
 use Illuminate\Http\Request;
@@ -373,7 +374,7 @@ class UserController extends Controller
 
         $inventory = $user->store()->with('image','category', 'brand','productVariations.size', 'productVariations.color')->paginate($request->pagination ?? self::PER_PAGE);
 
-        return response()->json(['success' => true, 'data' => ['user'=> $user, 'store' => $inventory]]);
+        return response()->json(['success' => true, 'data' => ['user'=> $user, 'store' => ProductResource::collection($inventory)]]);
 
 
     }

@@ -16,11 +16,16 @@ class UserResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
             'email' => $this->email,
-            'email_verified_at' => $this->email_verified_at,
-//            'created_at' => $this->created_at,
-//            'updated_at' => $this->updated_at,
+            'phone' => $this->phone,
+            'subscription_is_active' => $this->subscription_is_active,
+            'stripe_customer_id' => $this->stripe_customer_id,
+            'is_approved_by_admin' => $this->is_approved_by_admin,
+            'is_super_swapper' => $this->is_super_swapper,
+            'business_name' => $this->business_name,
+            'business_address' => $this->business_address,
         ];
     }
 }

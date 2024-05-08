@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -109,7 +110,7 @@ class LoginController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => 'User successfully login!',
-                    'user' => $user,
+                    'user' => new UserResource($user),
                     'token' => $token,
                 ], 200);
             } else {
