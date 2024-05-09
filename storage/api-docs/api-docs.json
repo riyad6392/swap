@@ -3472,18 +3472,6 @@
                 "summary": "Delete a payment method",
                 "description": "Delete the specified payment method.",
                 "operationId": "deletePaymentMethod",
-                "parameters": [
-                    {
-                        "name": "payment_method_id",
-                        "in": "path",
-                        "description": "Stripe payment method ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": "pm_123456789"
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "Payment method deleted successfully",
@@ -3565,14 +3553,14 @@
                 ]
             }
         },
-        "/api/default-payment-method": {
+        "/api/default-payment-method/{payment_method_id}": {
             "get": {
                 "tags": [
                     "Payment Methods"
                 ],
                 "summary": "Delete a payment method",
                 "description": "Change default payment method.",
-                "operationId": "0a65e255eec8833ab721710cba134221",
+                "operationId": "0ae95dc0ac22e989bbb9bbf811fd5326",
                 "responses": {
                     "200": {
                         "description": "Payment method change successfully",
@@ -7835,6 +7823,24 @@
                             "type": "boolean"
                         },
                         "example": "1"
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Product name"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "asc,desc"
                     }
                 ],
                 "responses": {
@@ -7910,6 +7916,24 @@
                             "type": "number"
                         },
                         "example": "10"
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "product name"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "asc,desc"
                     },
                     {
                         "name": "get_all",

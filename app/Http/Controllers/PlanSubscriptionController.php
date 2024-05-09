@@ -152,7 +152,7 @@ class PlanSubscriptionController extends Controller
             ]);
 
             DB::commit();
-            return response()->json(['success' => true, 'data2' => $stripeSubscription, 'message' => 'Subscription created successfully!', 'data' => auth()->user()], 200);
+            return response()->json(['success' => true,'message' => 'Subscription created successfully!', 'data' => auth()->user()], 200);
 
         } catch (\Exception $exception) {
             DB::rollBack();
@@ -194,6 +194,7 @@ class PlanSubscriptionController extends Controller
 
             $subscription = Subscription::where('id', $id)
                 ->where('user_id', auth()->user()->id)
+                ->where('status', 'active')
                 ->first();
 
             if (!$subscription) {
@@ -204,12 +205,11 @@ class PlanSubscriptionController extends Controller
             if ($subscription->status == 'cancelled') {
                 return response()->json(['success' => false, 'message' => 'Subscription already cancelled!'], 422);
             }
-
             $subscription->paymentMethods->update(['is_active' => 0]);
 
             $subscription->update(['status' => 'cancelled']);
 
-            auth()->user()->update(['subscription_is_active' => false]);
+            auth()->user()->update(['subscription_is_active' => 0]);
 
             StripePaymentFacade::cancelSubscription($subscription->stripe_subscription_id);
 

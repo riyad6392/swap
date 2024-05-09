@@ -247,13 +247,7 @@ class PaymentMethodController extends Controller
      *     summary="Delete a payment method",
      *     description="Delete the specified payment method.",
      *     operationId="deletePaymentMethod",
-     *     @OA\Parameter(
-     *         in="path",
-     *         name="payment_method_id",
-     *         required=true,
-     *         description="Stripe payment method ID",
-     *         @OA\Schema(type="integer", example="pm_123456789"),
-     *     ),
+
      *     @OA\Response(
      *         response=200,
      *         description="Payment method deleted successfully",
@@ -284,18 +278,19 @@ class PaymentMethodController extends Controller
      *     ),
      * )
      */
-    public function destroy($payment_method_id)
+    public function destroy($id)
     {
+        $payment_method = PaymentMethods::where('id', $id)->where('user_id', auth()->id())->first();
+
+        if (!$payment_method) {
+            return response()->json(['success' => false, 'errors' => ['message' => ['Payment method not found']]], 404);
+        }
+
         try {
             $paymentMethod = StripePaymentFacade::detachCustomerPaymentMethod(
-                $payment_method_id
+                $payment_method->stripe_payment_method_id,
             );
-            PaymentMethods::where(
-                [
-                    ['user_id', auth()->id()],
-                    ['stripe_payment_method_id', $payment_method_id]
-                ])
-                ->update(['is_active', PaymentMethods::STATUS_INACTIVE]);
+            $payment_method->delete();
             return response()->json(['success' => true, 'message' => $paymentMethod], 201);
         } catch (\Exception $exception) {
             DB::rollBack();
@@ -307,12 +302,12 @@ class PaymentMethodController extends Controller
      * Default payment method.
      *
      * @OA\get(
-     *     path="/api/default-payment-method",
+     *     path="/api/default-payment-method/{payment_method_id}",
      *     tags={"Payment Methods"},
      *     security={{ "apiAuth": {} }},
      *     summary="Delete a payment method",
      *     description="Change default payment method.",
-     *
+
      *     @OA\Response(
      *         response=200,
      *         description="Payment method change successfully",
@@ -343,25 +338,35 @@ class PaymentMethodController extends Controller
      *     ),
      * )
      */
-    public function defaultPaymentMethod(Request $request): JsonResponse
+    public function defaultPaymentMethod($id): JsonResponse
     {
-        $auth = auth()->id();
+        $payment_method = PaymentMethods::where('id', $id)->where('user_id', auth()->id())->first();
 
-        PaymentMethods::where('user_id', $auth)
-            ->update(['is_active' =>
-                DB::raw("CASE WHEN id =
-                    '{$request->payment_method_id}' THEN '" . self::STATUS_ACTIVE .
-                    "' ELSE '" .
-                    self::STATUS_INACTIVE . "' END")]);
+        if (!$payment_method) {
+            return response()->json(['success' => false, 'errors' => ['message' => ['Payment method not found']]], 404);
+        }
 
-        $paymentMethod = PaymentMethods::where('user_id', $auth)
-            ->where('is_active', self::STATUS_ACTIVE)
-            ->first();
+        try {
+            $auth = auth()->id();
 
-        StripePaymentFacade::attachPaymentMethodToCustomer(
-            trim($paymentMethod->stripe_payment_method_id),
-            auth()->user()
-        );
-        return response()->json(['success' => true, 'message' => 'Payment method update successfully'], 200);
+            PaymentMethods::where('user_id', $auth)
+                ->update(['is_active' =>
+                    DB::raw("CASE WHEN id =
+                    '{$id}' THEN '" . self::STATUS_ACTIVE .
+                        "' ELSE '" .
+                        self::STATUS_INACTIVE . "' END")]);
+
+            $paymentMethod = $payment_method->update(['is_active' => self::STATUS_ACTIVE]);
+
+            StripePaymentFacade::attachPaymentMethodToCustomer(
+                trim($paymentMethod->stripe_payment_method_id),
+                auth()->user()
+            );
+            return response()->json(['success' => true, 'message' => 'Payment method update successfully'], 200);
+        }catch (\Exception $exception) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'errors' => ['message' => [$exception->getMessage()]]], 500);
+        }
+
     }
 }

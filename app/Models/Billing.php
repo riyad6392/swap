@@ -16,6 +16,7 @@ class Billing extends Model
         'plan_id',
         'payment_method_id',
         'stripe_payment_intent_id',
+        'stripe_payment_subscription_id',
         'amount'
     ];
 }
