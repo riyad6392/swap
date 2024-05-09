@@ -273,6 +273,22 @@ class UserController extends Controller
      *          example="1"
      *
      *      ),
+     *      @OA\Parameter(
+     *            in="query",
+     *            name="search",
+     *            required=true,
+     *
+     *            @OA\Schema(type="string"),
+     *            example="Product name"
+     *        ),
+     *      @OA\Parameter(
+     *             in="query",
+     *             name="sort",
+     *             required=true,
+     *
+     *             @OA\Schema(type="string"),
+     *             example="asc,desc"
+     *         ),
      *     @OA\Response(
      *           response=200,
      *           description="success",
@@ -362,6 +378,22 @@ class UserController extends Controller
      *          @OA\Schema(type="number"),
      *          example="10"
      *      ),
+     *     @OA\Parameter(
+     *           in="query",
+     *           name="search",
+     *           required=true,
+     *
+     *           @OA\Schema(type="string"),
+     *           example="product name"
+     *       ),
+     *     @OA\Parameter(
+     *            in="query",
+     *            name="sort",
+     *            required=true,
+     *
+     *            @OA\Schema(type="string"),
+     *            example="asc,desc"
+     *        ),
      *
      *      @OA\Parameter(
      *          in="query",

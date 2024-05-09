@@ -7835,6 +7835,24 @@
                             "type": "boolean"
                         },
                         "example": "1"
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Product name"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "asc,desc"
                     }
                 ],
                 "responses": {
@@ -7910,6 +7928,24 @@
                             "type": "number"
                         },
                         "example": "10"
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "product name"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "asc,desc"
                     },
                     {
                         "name": "get_all",
