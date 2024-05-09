@@ -73,12 +73,13 @@ class UserController extends Controller
 
         if ($listUserRequest->has('search')) {
 
-            $users->where('name', 'like', '%' . request('search') . '%');
+            $users->where('first_name', 'like', '%' . request('search') . '%')
+                ->orWhere('last_name', 'like', '%' . request('search') . '%');
         }
 
         if ($listUserRequest->has('sort')) {
 
-            $users->orderBy('name', $listUserRequest->sort);
+            $users->orderBy('first_name', $listUserRequest->sort);
         }
 
         if ($listUserRequest->get('get_all')) {
