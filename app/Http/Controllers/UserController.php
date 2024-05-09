@@ -222,7 +222,6 @@ class UserController extends Controller
      */
     public function userList(ListUserRequest $listUserRequest)
     {
-
         $users = User::query()->with('image')->withCount('receivedRatings');
 
         if ($listUserRequest->has('search')) {
@@ -233,7 +232,7 @@ class UserController extends Controller
 
         if ($listUserRequest->has('sort')) {
 
-            $users->orderBy('first_name', $listUserRequest->sort);
+            $users->orderBy('created_at', $listUserRequest->sort);
         }
 
         if ($listUserRequest->get('get_all')) {
@@ -296,7 +295,7 @@ class UserController extends Controller
      *       )
      * )
      */
-    public function userInventory(Request $request, $id)
+    public function userInventory(ListUserRequest $listUserRequest, $id)
     {
         $user = User::with('image')->withCount('receivedRatings')->find($id);
 
@@ -306,9 +305,19 @@ class UserController extends Controller
 
         $inventory = $user->inventories()->with('image','category', 'brand','productVariations.size', 'productVariations.color');
 
+        if ($listUserRequest->has('search')) {
+
+            $inventory->where('name', 'like', '%' . request('search') . '%');
+        }
+
+        if ($listUserRequest->has('sort')) {
+
+            $inventory->orderBy('created_at', $listUserRequest->sort);
+        }
+
         $user = new UserResource($user);
 
-        if ($request->get('get_all')) {
+        if ($listUserRequest->get('get_all')) {
 
             return response()->json(['success' => true,
                 'data' => [
@@ -318,7 +327,7 @@ class UserController extends Controller
             ]);
         }
 
-        $inventory = $inventory->paginate($request->pagination ?? self::PER_PAGE);
+        $inventory = $inventory->paginate($listUserRequest->pagination ?? self::PER_PAGE);
 
         return response()->json([
             'success' => true,
@@ -388,6 +397,15 @@ class UserController extends Controller
         }
 
         $inventory = $user->store()->with('image','category', 'brand','productVariations.size', 'productVariations.color');
+
+        if ($request->search) {
+            $inventory->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->has('sort')) {
+
+            $inventory->orderBy('created_at', $request->sort);
+        }
 
         $user = new UserResource($user);
 
