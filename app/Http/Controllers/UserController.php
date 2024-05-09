@@ -303,7 +303,13 @@ class UserController extends Controller
             return response()->json(['success' => false, 'message' => 'User not found'], 404);
         }
 
-        $inventory = $user->inventories()->with('image','category', 'brand','productVariations.size', 'productVariations.color');
+        $inventory = $user->inventories()->with(
+            'image',
+            'category',
+            'brand',
+            'productVariations.size',
+            'productVariations.color'
+        );
 
         if ($listUserRequest->has('search')) {
 
@@ -393,10 +399,21 @@ class UserController extends Controller
         $user = User::with('image')->withCount('receivedRatings')->find($id);
 
         if (!$user) {
-            return response()->json(['success' => false, 'message' => 'User not found'], 404);
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found'
+            ], 404);
         }
 
-        $inventory = $user->store()->with('image','category', 'brand','productVariations.size', 'productVariations.color');
+        $inventory = $user
+            ->store()
+            ->with(
+            'image',
+            'category',
+            'brand',
+            'productVariations.size',
+            'productVariations.color'
+        );
 
         if ($request->search) {
             $inventory->where('name', 'like', '%' . $request->search . '%');
