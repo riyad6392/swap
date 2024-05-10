@@ -258,8 +258,8 @@ class ProductController extends Controller
                 'is_publish'
             ]));
 
-            if ($productRequest->has('product_images')) {
-                FileUploadService::uploadImage([$productRequest->product_images], $product, 'image');
+            if ($productRequest->has('product_image')) {
+                FileUploadService::uploadImage([$productRequest->product_image], $product, 'image');
             }
 
             $this->storeVariations($productVariantRequest, $product);
@@ -599,11 +599,11 @@ class ProductController extends Controller
                 'color_id' => $variationData['color_id'],
                 'unit_price' => $variationData['unit_price'],
                 'stock' => $variationData['stock'],
-                'discount' => $variationData['discount'],
+                'discount' => $variationData['discount'] ?? 0,
                 'quantity' => $variationData['quantity'],
-                'discount_type' => $variationData['discount_type'],
-                'discount_start_date' => $variationData['discount_start_date'],
-                'discount_end_date' => $variationData['discount_end_date'],
+                'discount_type' => $variationData['discount_type'] ??  'percentage' ,
+                'discount_start_date' => $variationData['discount_start_date'] ?? now(),
+                'discount_end_date' => $variationData['discount_end_date'] ?? now(),
             ]);
 
             if ($request->has('variations.' . $key . '.variant_images')) {
