@@ -309,7 +309,7 @@ class PaymentMethodController extends Controller
      * Default payment method.
      *
      * @OA\get(
-     *     path="/api/default-payment-method/{payment_method_id}",
+     *     path="/api/default-payment-method/{id}",
      *     tags={"Payment Methods"},
      *     security={{ "apiAuth": {} }},
      *     summary="Delete a payment method",
