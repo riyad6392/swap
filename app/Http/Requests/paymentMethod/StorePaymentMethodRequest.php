@@ -34,20 +34,38 @@ class StorePaymentMethodRequest extends FormRequest
             'name' => 'string',
             'email' => 'email',
             'phone' => 'string',
+            'payment_type' => 'string',
+            'card_brand' => 'required|string',
+            'card_display_brand' => 'required|string',
+            'card_last_four' => 'string',
+            'card_exp_month' => 'string',
+            'card_exp_year' => 'string',
+            'card_country' => 'required|string',
+            'card_funding' => 'string',
         ];
     }
 
     public function messages(): array
     {
         return [
+            'stripe_payment_method_id.required' => 'Stripe payment method id is required',
+            'method_name.required' => 'Method name is required',
+            'card_brand.required' => 'Card brand is required',
+            'card_display_brand.required' => 'Card display brand is required',
+            'card_country.required' => 'Card country is required',
+            'card_country.string' => 'Card country must be a string',
+            'card_brand.string' => 'Card brand must be a string',
+            'card_display_brand.string' => 'Card display brand must be a string',
+            'master_key.string' => 'Master key must be a string',
+            'master_value.string' => 'Master value must be a string',
             'name.string' => 'Name must be a string',
             'email.email' => 'Email must be a valid email',
             'phone.string' => 'Phone must be a string',
-            'method_name.required' => 'Method name is required',
-            'method_name.string' => 'Method name must be a string',
-            'master_key.string' => 'Master key must be a string',
-            'master_value.string' => 'Master value must be a string',
-            'stripe_payment_method_id.required' => 'Stripe payment method id is required',
+            'payment_type.string' => 'Payment type must be a string',
+            'card_last_four.string' => 'Card last four must be a string',
+            'card_exp_month.string' => 'Card exp month must be a string',
+            'card_exp_year.string' => 'Card exp year must be a string',
+            'card_funding.string' => 'Card funding must be a string',
         ];
     }
 }
