@@ -4878,7 +4878,24 @@
                         }
                     },
                     {
-                        "name": "deleted_image_ids[]",
+                        "name": "deleted_product_image_ids[]",
+                        "in": "query",
+                        "description": "IDs of the images to be deleted",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer",
+                                "example": [
+                                    1,
+                                    5,
+                                    6,
+                                    7
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "name": "deleted_product_variation_image_ids[]",
                         "in": "query",
                         "description": "IDs of the images to be deleted",
                         "schema": {
