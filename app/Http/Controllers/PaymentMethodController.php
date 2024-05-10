@@ -133,6 +133,7 @@ class PaymentMethodController extends Controller
                 'stripe_payment_method_id' => $paymentMethodRequest->stripe_payment_method_id,
                 'is_active' => $paymentMethodRequest->is_active ?? 1,
                 'card_brand' => $paymentMethodRequest->card_brand,
+                'payment_type' => $paymentMethodRequest->payment_type,
                 'card_display_brand' => $paymentMethodRequest->card_display_brand,
                 'card_last_four' => $paymentMethodRequest->card_last_four,
                 'card_exp_month' => $paymentMethodRequest->card_exp_month,
