@@ -363,13 +363,14 @@ class PaymentMethodController extends Controller
                     '{$id}' THEN '" . self::STATUS_ACTIVE .
                         "' ELSE '" .
                         self::STATUS_INACTIVE . "' END")]);
-
-            $paymentMethod = $payment_method->update(['is_active' => self::STATUS_ACTIVE]);
-
+            
             StripePaymentFacade::attachPaymentMethodToCustomer(
-                trim($paymentMethod->stripe_payment_method_id),
+                trim($payment_method->stripe_payment_method_id),
                 auth()->user()
             );
+
+            $payment_method->update(['is_active' => self::STATUS_ACTIVE]);
+
             return response()->json(['success' => true, 'message' => 'Payment method update successfully'], 200);
         }catch (\Exception $exception) {
             DB::rollBack();
