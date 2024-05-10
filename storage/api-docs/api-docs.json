@@ -1,7 +1,7 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "SWAP API Documantation",
+        "title": "SWAP API Documentation",
         "version": "latest"
     },
     "paths": {
@@ -2027,46 +2027,52 @@
                 "tags": [
                     "Authentication"
                 ],
-                "summary": "Login User",
-                "operationId": "3673edffcdc18c06ac5aef5e2219d774",
+                "summary": "Authenticate a user",
+                "description": "Login User\n\nThis method supports authenticating a user by their email and password.\nOptionally, a 'remember' flag can be set to maintain the session persistence.",
+                "operationId": "loginUser",
                 "parameters": [
                     {
                         "name": "email",
                         "in": "query",
+                        "description": "User email address",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "format": "email"
                         },
                         "example": "k.r.imtiaz@gmail.com"
                     },
                     {
                         "name": "password",
                         "in": "query",
+                        "description": "User password",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "format": "password"
                         },
                         "example": "password"
                     },
                     {
                         "name": "remember",
                         "in": "query",
-                        "description": "This value must be boolean 0 or 1 not true/false.",
+                        "description": "Flag to remember the user on this device. Use 0 or 1 as values.",
+                        "required": false,
                         "schema": {
                             "type": "boolean"
                         },
-                        "example": "false"
+                        "example": false
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "success",
+                        "description": "Login successful",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "user": {
-                                            "type": "json",
+                                            "type": "object",
                                             "example": {
                                                 "id": 2,
                                                 "name": "Imtiaz Ur Rahman Khan",
@@ -2078,19 +2084,19 @@
                                         },
                                         "success": {
                                             "type": "boolean",
-                                            "example": "true"
+                                            "example": true
                                         },
                                         "token_type": {
                                             "type": "string",
                                             "example": "Bearer"
                                         },
                                         "expires_in": {
-                                            "type": "number",
-                                            "example": "86400"
+                                            "type": "integer",
+                                            "example": 86400
                                         },
                                         "access_token": {
-                                            "type": "token",
-                                            "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiOTAwNDU1YTJmZGY4YzQ3YmQ1ODQxODMwZDQzN2JhNWM4NDJhZDdlNTAwMDNiODBlNjJhZjFlYTJhZDhiZTAxY2FkMjdiOWIxZjkxZjkwZjMiLCJpYXQiOjE2Njc0MzQ1NTYuMTQ0MTk5LCJuYmYiOjE2Njc0MzQ1NTYuMTQ0MjAyLCJleHAiOjE2OTg5NzA1NTYuMDI2NDg3LCJzdWIiOiIyIiwic2NvcGVzIjpbXX0.LzRYUmOk7uCScSwi_RTR4nuKQ3tOeKiGAjM7PxvQUW9Fs93K3HqIxvIIBAnniTc8ee1plfy7qikxEsfOsJLaMjm7c2hmFyy4hhRxYJAxc0lAnA6G7i0Ue-kFeivs7cSzwEzvGRhnLgtv4J7vYbvJA8yh9KrvqvsB19_Y-RPzng6d4ZKR-Ij6nF5GfN-QCNP4nyqRfiPsuQVMJuP9KiWyacvpr7XUX2wjcY8xQtxQBfvaSNehujhX8B-0f0CwGpOBTi3fDdpvZbeqa9s7ZBDb9bSWahZ90XIvpls5bCnt7zuhXGte9HKeFulrISeCj-onCnGvqzFsxDESdCDVU0MC2hbXwHHLgQbBWhG0EM2u86VgdAqPktNsAK-4l7_zCRHuGMnT_qpY4He1e-MvECDQ8wfGtunKfizwTzxJ2VrsFPkWl90fldcmfTt0Mbd_HJfPCw4XViUYBQAPgSUKxKsuPN5RNott4zzCTtWJKA8Ot9L05H4zQQB6yWrj8juPUA3qBVO5jDC12SM32mrVwUTWXEfZa8EDUQ2MQytPR-uflfkTdYVPYvoRQPoEAAmD1oz4_kas0F23xSza6K8mwA3pT1Znqjbz4fDDrcoxQDENsPwTqfuZBWFfz5OXOh6f_5NO41g_qOWEdzwGLaST9p-8ALUC8oExDIfQq2EvM3Cqh-M"
+                                            "type": "string",
+                                            "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiw..."
                                         }
                                     },
                                     "type": "object"
@@ -2099,22 +2105,40 @@
                         }
                     },
                     "422": {
-                        "description": "Invalid user",
+                        "description": "Invalid user input",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "success": {
                                             "type": "boolean",
-                                            "example": "false"
+                                            "example": false
                                         },
                                         "errors": {
-                                            "type": "json",
+                                            "type": "object",
                                             "example": {
-                                                "message": [
-                                                    "Credientials does not match"
-                                                ]
+                                                "message": "Credentials do not match"
                                             }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Authentication failed"
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
                                         }
                                     },
                                     "type": "object"
@@ -4878,20 +4902,21 @@
                         }
                     },
                     {
+                        "name": "variations[0][varient_images][]",
+                        "in": "query",
+                        "description": "Images of the product variation at index 0",
+                        "schema": {
+                            "type": "string",
+                            "example": "[1,3]"
+                        }
+                    },
+                    {
                         "name": "deleted_product_image_ids[]",
                         "in": "query",
                         "description": "IDs of the images to be deleted",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "integer",
-                                "example": [
-                                    1,
-                                    5,
-                                    6,
-                                    7
-                                ]
-                            }
+                            "type": "string",
+                            "example": "[1,3]"
                         }
                     },
                     {
@@ -4899,36 +4924,8 @@
                         "in": "query",
                         "description": "IDs of the images to be deleted",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "type": "integer",
-                                "example": [
-                                    1,
-                                    5,
-                                    6,
-                                    7
-                                ]
-                            }
-                        }
-                    },
-                    {
-                        "name": "variations[0][varient_images][]",
-                        "in": "query",
-                        "description": "Images of the product variation at index 0",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "required": [
-                                    "path"
-                                ],
-                                "properties": {
-                                    "path": {
-                                        "type": "string",
-                                        "example": "updated_image1.jpg"
-                                    }
-                                },
-                                "type": "object"
-                            }
+                            "type": "string",
+                            "example": "[1,3]"
                         }
                     }
                 ],

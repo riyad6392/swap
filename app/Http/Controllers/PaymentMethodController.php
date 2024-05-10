@@ -132,6 +132,7 @@ class PaymentMethodController extends Controller
                 'master_value' => $paymentMethodRequest->master_value,
                 'stripe_payment_method_id' => $paymentMethodRequest->stripe_payment_method_id,
                 'is_active' => $paymentMethodRequest->is_active ?? 1,
+                ''
             ]);
 
             $paymentMethod = StripePaymentFacade::attachPaymentMethodToCustomer(

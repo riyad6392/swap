@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('stock');
             $table->double('discount', 10, 2)->nullable();
             $table->integer('quantity');
-            $table->string('discount_type')->nullable();
+            $table->enum('discount_type',['percentage', 'flat'])->nullable();
             $table->timestamp('discount_start_date')->nullable();
             $table->timestamp('discount_end_date')->nullable();
             $table->integer('created_by');
