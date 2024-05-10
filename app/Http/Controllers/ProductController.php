@@ -262,7 +262,7 @@ class ProductController extends Controller
                 'is_publish'
             ]));
 
-            if ($productRequest->has('product_images')) {
+            if ($productRequest->has('product_image')) {
                 FileUploadService::uploadImage([$productRequest->product_image], $product, 'image');
             }
 
