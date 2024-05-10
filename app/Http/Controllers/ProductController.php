@@ -263,7 +263,7 @@ class ProductController extends Controller
             ]));
 
             if ($productRequest->has('product_images')) {
-                FileUploadService::uploadImage([$productRequest->product_images], $product, 'image');
+                FileUploadService::uploadImage([$productRequest->product_image], $product, 'image');
             }
 
             $this->storeVariations($productVariantRequest, $product);
