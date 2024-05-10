@@ -138,7 +138,7 @@ class ProductController extends Controller
      *     ),
      *     @OA\Parameter(
      *         in="query",
-     *         name="product_images",
+     *         name="product_image",
      *         required=true,
      *         description="Images of the product",
      *         @OA\Schema(
