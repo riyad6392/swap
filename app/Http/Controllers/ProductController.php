@@ -138,7 +138,11 @@ class ProductController extends Controller
      *     ),
      *     @OA\Parameter(
      *         in="query",
+<<<<<<< HEAD
      *         name="product_images",
+=======
+     *         name="product_image",
+>>>>>>> ab61a0d2e38fd3b445d55187ca7552af3970c337
      *         required=true,
      *         description="Images of the product",
      *         @OA\Schema(
@@ -599,11 +603,11 @@ class ProductController extends Controller
                 'color_id' => $variationData['color_id'],
                 'unit_price' => $variationData['unit_price'],
                 'stock' => $variationData['stock'],
-                'discount' => $variationData['discount'],
+                'discount' => $variationData['discount'] ?? 0,
                 'quantity' => $variationData['quantity'],
-                'discount_type' => $variationData['discount_type'],
-                'discount_start_date' => $variationData['discount_start_date'],
-                'discount_end_date' => $variationData['discount_end_date'],
+                'discount_type' => $variationData['discount_type'] ??  'percentage' ,
+                'discount_start_date' => $variationData['discount_start_date'] ?? now(),
+                'discount_end_date' => $variationData['discount_end_date'] ?? now(),
             ]);
 
             if ($request->has('variations.' . $key . '.variant_images')) {
