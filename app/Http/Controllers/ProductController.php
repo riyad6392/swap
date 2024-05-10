@@ -8,6 +8,7 @@ use App\Http\Requests\Product\UpdateProductRequest;
 use App\Http\Requests\ProductVariation\UpdateProductVariationRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use App\Models\ProductVariation;
 use App\Services\FileUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -137,7 +138,7 @@ class ProductController extends Controller
      *     ),
      *     @OA\Parameter(
      *         in="query",
-     *         name="product_images[]",
+     *         name="product_images",
      *         required=true,
      *         description="Images of the product",
      *         @OA\Schema(
@@ -258,7 +259,7 @@ class ProductController extends Controller
             ]));
 
             if ($productRequest->has('product_images')) {
-                FileUploadService::uploadImage($productRequest->product_images, $product, 'image');
+                FileUploadService::uploadImage([$productRequest->product_images], $product, 'image');
             }
 
             $this->storeVariations($productVariantRequest, $product);
@@ -304,8 +305,14 @@ class ProductController extends Controller
      * )
      */
 
-    public function show(Product $product): \Illuminate\Http\JsonResponse
+    public function show($id): \Illuminate\Http\JsonResponse
     {
+        $product = Product::find($id);
+
+        if (!$product) {
+            return response()->json(['success' => false, 'message' => 'Product not found'], 404);
+        }
+
         try {
             $product->load(
                 'productVariations.images',
@@ -325,8 +332,14 @@ class ProductController extends Controller
      * Show the form for editing the specified resource.
      */
 
-    public function edit(Product $product)
+    public function edit($id)
     {
+        $product = Product::find($id);
+
+        if (!$product) {
+            return response()->json(['success' => false, 'message' => 'Product not found'], 404);
+        }
+
         $product->load(
             'productVariations.images',
             'image',
@@ -439,42 +452,25 @@ class ProductController extends Controller
      *         description="End date of the discount for the product variation at index 0",
      *         @OA\Schema(type="string", format="date", example="2024-03-20"),
      *     ),
-     *      @OA\Parameter(
-     *         in="query",
-     *         name="deleted_product_image_ids[]",
-     *         description="IDs of the images to be deleted",
-     *         @OA\Schema(
-     *             type="array",
-     *             @OA\Items(
-     *                 type="integer",
-     *                 example={1, 5, 6, 7},
-     *             ),
-     *         ),
-     *     ),
-     *           @OA\Parameter(
-     *          in="query",
-     *          name="deleted_product_variation_image_ids[]",
-     *          description="IDs of the images to be deleted",
-     *          @OA\Schema(
-     *              type="array",
-     *              @OA\Items(
-     *                  type="integer",
-     *                  example={1, 5, 6, 7},
-     *              ),
-     *          ),
-     *      ),
      *     @OA\Parameter(
-     *         in="query",
-     *         name="variations[0][varient_images][]",
-     *         description="Images of the product variation at index 0",
-     *         @OA\Schema(
-     *             type="array",
-     *             @OA\Items(
-     *                 required={"path"},
-     *                 @OA\Property(property="path", type="string", example="updated_image1.jpg"),
-     *             ),
-     *         ),
-     *     ),
+     *          in="query",
+     *          name="variations[0][varient_images][]",
+     *          description="Images of the product variation at index 0",
+     *          @OA\Schema(type="string", example="[1,3]"),
+     *      ),
+     *
+     *      @OA\Parameter(
+     *          in="query",
+     *          name="deleted_product_image_ids[]",
+     *          description="IDs of the images to be deleted",
+     *          @OA\Schema(type="string", example="[1,3]"),
+     *      ),
+     *      @OA\Parameter(
+     *           in="query",
+     *           name="deleted_product_variation_image_ids[]",
+     *           description="IDs of the images to be deleted",
+     *           @OA\Schema(type="string", example="[1,3]"),
+     *       ),
      *     @OA\Response(
      *         response=200,
      *         description="Success",
@@ -592,21 +588,23 @@ class ProductController extends Controller
         return response()->json(['success' => true, 'message' => 'Product and related data deleted successfully'], 200);
     }
 
-    protected function deleteProduct(){
-
-    }
-
     protected function storeVariations($request, Product $product): void
     {
         if ($request->has('deleted_product_variation_image_ids')) {
             FileUploadService::deleteImages($request->deleted_product_variation_image_ids, $product, 'productVariations.images'); //deleted_product_variation_image_ids is an array of image ids
         }
         foreach ($request->variations as $key => $variationData) {
-            $variation = $product->productVariations()
-                ->updateOrCreate(
-                    ['product_id' => $product->id],
-                    $variationData
-                );
+            $variation = $product->productVariations()->create([
+                'size_id' => $variationData['size_id'],
+                'color_id' => $variationData['color_id'],
+                'unit_price' => $variationData['unit_price'],
+                'stock' => $variationData['stock'],
+                'discount' => $variationData['discount'],
+                'quantity' => $variationData['quantity'],
+                'discount_type' => $variationData['discount_type'],
+                'discount_start_date' => $variationData['discount_start_date'],
+                'discount_end_date' => $variationData['discount_end_date'],
+            ]);
 
             if ($request->has('variations.' . $key . '.variant_images')) {
                 FileUploadService::uploadImage($variationData['variant_images'], $variation);
@@ -656,5 +654,75 @@ class ProductController extends Controller
         $product->update(['is_publish' => !$product->is_publish]);
 
         return response()->json(['success' => true, 'message' => 'Product status updated successfully'], 200);
+    }
+
+    /**
+     * Delete Product variation to a product.
+     *
+     * @OA\Post (
+     *     path="/api/delete-product-variation}",
+     *     tags={"Inventory"},
+     *     @OA\Parameter(
+     *         name="product_id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the product",
+     *         @OA\Schema(type="integer", format="int64")
+     *     ),
+     *
+     *     @OA\Parameter(
+     *          name="product_variation_id",
+     *          in="path",
+     *          required=true,
+     *          description="ID of the product variation",
+     *          @OA\Schema(type="integer", format="int64")
+     *      ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="success",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example="true"),
+     *             @OA\Property(property="message", type="string", example="Product status updated successfully")
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example="false"),
+     *             @OA\Property(property="message", type="string", example="Product not found")
+     *         ),
+     *     )
+     * )
+     */
+    public function destroyProductVariation(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'product_variation_id' => 'required|exists:product_variations,id'
+        ]);
+
+        $product = Product::where('id', $request->product_id)->where('user_id', auth()->id())->first();
+
+        if (!$product) {
+            return response()->json(['success' => false, 'message' => 'Product not found'], 404);
+        }
+
+        $productVariation = ProductVariation::where('id', $request->product_variation_id)->where('product_id', $request->product_id)->first();
+
+        if (!$productVariation) {
+            return response()->json(['success' => false, 'message' => 'Product variation not found'], 404);
+        }
+
+        $variationImgIds = $product->productVariations->pluck('images')->flatten()->pluck('id')->toArray();
+
+        if ($variationImgIds) {
+            FileUploadService::deleteImages($variationImgIds, $product, 'image');
+        }
+
+        $productVariation->delete();
+
+        return response()->json(['success' => true, 'message' => 'Product variation deleted successfully'], 200);
     }
 }

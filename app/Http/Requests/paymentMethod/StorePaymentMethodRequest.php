@@ -34,6 +34,14 @@ class StorePaymentMethodRequest extends FormRequest
             'name' => 'string',
             'email' => 'email',
             'phone' => 'string',
+            'payment_type' => 'string',
+            'card_brand' => 'required|string',
+            'card_display_brand' => 'required|string',
+            'card_last_four' => 'string',
+            'card_exp_month' => 'string',
+            'card_exp_year' => 'string',
+            'card_country' => 'required|string',
+            'card_funding' => 'string',
         ];
     }
 

@@ -71,6 +71,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::resource('color', ColorController::class);
         Route::resource('product', ProductController::class);
         Route::get('change-product-status/{id}', [ProductController::class, 'changeStatus']);
+        Route::post('delete-product-variation', [ProductController::class, 'destroyProductVariation']);
 //        Route::resource('plan', PlanController::class);
 
         //rating
