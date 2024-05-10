@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\Auth\AdminController;
 use App\Http\Controllers\Admin\Auth\ForgetPasswordController;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\Auth\RegistrationController;
@@ -24,7 +25,7 @@ Route::group(['middleware' => 'auth:admin-api'], function () {
     })->name('data');
 
     Route::post('admin/logout', [LoginController::class, 'logout']);
-    Route::post('admin/approve-user/{user}', 'AdminController@approveUser')->name('admin.approve-user');
+    Route::post('admin/approve-user/{user}', [AdminController::class , 'approveUser'])->name('admin.approve-user');
 
     //User
     Route::resource('user', UserController::class);

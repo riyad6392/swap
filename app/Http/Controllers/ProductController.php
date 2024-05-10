@@ -74,7 +74,8 @@ class ProductController extends Controller
             $inventories = $inventories->where('name', 'like', '%' . $request->name . '%');
         }
 
-        $inventories = $inventories->with('productVariations.images',
+        $inventories = $inventories->with(
+            'productVariations.images',
             'image',
             'category',
             'brand',
@@ -306,7 +307,13 @@ class ProductController extends Controller
     public function show(Product $product): \Illuminate\Http\JsonResponse
     {
         try {
-            $product->load('images', 'productVariations');
+            $product->load(
+                'productVariations.images',
+                'image',
+                'category',
+                'brand',
+                'productVariations.size',
+                'productVariations.color');
 
             return response()->json(['success' => true, 'data' => $product], 200);
         } catch (\Exception $e) {
@@ -320,7 +327,14 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
-        $product->load('images', 'productVariations');
+        $product->load(
+            'productVariations.images',
+            'image',
+            'category',
+            'brand',
+            'productVariations.size',
+            'productVariations.color'
+        );
 
         return response()->json(['success' => true, 'data' => $product], 200);
     }
@@ -427,7 +441,7 @@ class ProductController extends Controller
      *     ),
      *      @OA\Parameter(
      *         in="query",
-     *         name="deleted_image_ids[]",
+     *         name="deleted_product_image_ids[]",
      *         description="IDs of the images to be deleted",
      *         @OA\Schema(
      *             type="array",
@@ -437,6 +451,18 @@ class ProductController extends Controller
      *             ),
      *         ),
      *     ),
+     *           @OA\Parameter(
+     *          in="query",
+     *          name="deleted_product_variation_image_ids[]",
+     *          description="IDs of the images to be deleted",
+     *          @OA\Schema(
+     *              type="array",
+     *              @OA\Items(
+     *                  type="integer",
+     *                  example={1, 5, 6, 7},
+     *              ),
+     *          ),
+     *      ),
      *     @OA\Parameter(
      *         in="query",
      *         name="variations[0][varient_images][]",
