@@ -27,7 +27,7 @@ class UpdateProductVariationRequest extends FormRequest
     {
         return [
             'variations' => 'sometimes|array',
-            'variations.*.id' => 'required|integer|exists:product_variations,id,product_id,' . $this->product->id,
+            'variations.*.id' => 'required|integer|exists:product_variations,id,product_id,' . $this->product,
             'variations.*.size_id' => 'required|integer|exists:sizes,id',
             'variations.*.color_id' => 'required|integer|exists:colors,id',
             'variations.*.unit_price' => 'required|numeric',
