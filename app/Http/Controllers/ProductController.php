@@ -516,14 +516,14 @@ class ProductController extends Controller
             $product->update([
                 'name' => $updateProductRequest->name,
                 'category_id' => $updateProductRequest->category_id,
-                'user_id' => $updateProductRequest->user_id,
+                // 'user_id' => $updateProductRequest->user_id,
                 'description' => $updateProductRequest->description,
                 'brand_id' => $updateProductRequest->brand_id,
                 'is_publish' => $updateProductRequest->is_publish
             ]);
 
             if ($updateProductRequest->has('deleted_product_image_ids')) {
-                FileUploadService::deleteImages($this->deleted_product_image_ids, $product, 'image'); //deleted_product_image_ids is an array of image ids
+                FileUploadService::deleteImages($updateProductVariationRequest->deleted_product_image_ids, $product, 'image'); //deleted_product_image_ids is an array of image ids
             }
 
             if ($updateProductRequest->has('product_image')) {
@@ -540,7 +540,7 @@ class ProductController extends Controller
             return response()->json(['success' => true, 'data' => $product->load('productVariations.images')], 201);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'Failed to update product'], 500);
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 
