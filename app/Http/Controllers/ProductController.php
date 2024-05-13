@@ -12,6 +12,7 @@ use App\Models\ProductVariation;
 use App\Services\FileUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use ReflectionClass;
 
 class ProductController extends Controller
 {
@@ -138,11 +139,7 @@ class ProductController extends Controller
      *     ),
      *     @OA\Parameter(
      *         in="query",
-<<<<<<< HEAD
-     *         name="product_images",
-=======
      *         name="product_image",
->>>>>>> ab61a0d2e38fd3b445d55187ca7552af3970c337
      *         required=true,
      *         description="Images of the product",
      *         @OA\Schema(
@@ -523,7 +520,7 @@ class ProductController extends Controller
             ]);
 
             if ($updateProductRequest->has('deleted_product_image_ids')) {
-                FileUploadService::deleteImages($updateProductVariationRequest->deleted_product_image_ids, $product, 'image'); //deleted_product_image_ids is an array of image ids
+//                FileUploadService::deleteImages($updateProductVariationRequest->deleted_product_image_ids, $product, 'image'); //deleted_product_image_ids is an array of image ids
             }
 
             if ($updateProductRequest->has('product_image')) {
@@ -600,18 +597,23 @@ class ProductController extends Controller
 
     protected function storeVariations($request, Product $product): void
     {
+
         if ($request->has('deleted_product_variation_image_ids')) {
-            FileUploadService::deleteImages($request->deleted_product_variation_image_ids, $product, 'productVariations.images'); //deleted_product_variation_image_ids is an array of image ids
+            FileUploadService::deleteImages($request->deleted_product_variation_image_ids, new ProductVariation(), 'images'); //deleted_product_variation_image_ids is an array of image ids
         }
+
         foreach ($request->variations as $key => $variationData) {
-            $variation = $product->productVariations()->create([
+            $variation = ProductVariation::updateOrCreate([
+                'product_id' => $product->id,
+                'id' => $variationData['id'] ?? ''
+            ], [
                 'size_id' => $variationData['size_id'],
                 'color_id' => $variationData['color_id'],
                 'unit_price' => $variationData['unit_price'],
                 'stock' => $variationData['stock'],
-                'discount' => $variationData['discount'] ?? 0,
+                'discount' => $variationData['discount'],
                 'quantity' => $variationData['quantity'],
-                'discount_type' => $variationData['discount_type'] ??  'percentage' ,
+                'discount_type' => $variationData['discount_type'] ?? 'percentage',
                 'discount_start_date' => $variationData['discount_start_date'] ?? now(),
                 'discount_end_date' => $variationData['discount_end_date'] ?? now(),
             ]);
