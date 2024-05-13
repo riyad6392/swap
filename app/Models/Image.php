@@ -26,6 +26,10 @@ class Image extends Model
         return asset('storage/'.$this->path);
     }
 
+    public function imageable()
+    {
+        return $this->morphTo();
+    }
     protected static function boot()
     {
         parent::boot();

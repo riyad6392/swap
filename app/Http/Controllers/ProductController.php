@@ -7,6 +7,7 @@ use App\Http\Requests\Product\StoreProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Http\Requests\ProductVariation\UpdateProductVariationRequest;
 use App\Http\Resources\ProductResource;
+use App\Models\Image;
 use App\Models\Product;
 use App\Models\ProductVariation;
 use App\Services\FileUploadService;
@@ -599,7 +600,14 @@ class ProductController extends Controller
     {
 
         if ($request->has('deleted_product_variation_image_ids')) {
-            FileUploadService::deleteImages($request->deleted_product_variation_image_ids, new ProductVariation(), 'images'); //deleted_product_variation_image_ids is an array of image ids
+
+            $images = Image::whereHasMorph('imageable', ProductVariation::class, function ($query) use ($product) {
+                $query->where('product_id', $product->id);
+            })->whereIn('id', $request->deleted_product_variation_image_ids)
+                ->get();
+            if ($images){
+                FileUploadService::deleteImages($request->deleted_product_variation_image_ids, new ProductVariation(), 'images'); //deleted_product_variation_image_ids is an array of image ids
+            }
         }
 
         foreach ($request->variations as $key => $variationData) {
