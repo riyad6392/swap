@@ -526,8 +526,8 @@ class ProductController extends Controller
                 FileUploadService::deleteImages($this->deleted_product_image_ids, $product, 'image'); //deleted_product_image_ids is an array of image ids
             }
 
-            if ($updateProductRequest->has('product_images')) {
-                FileUploadService::uploadImage($updateProductRequest->product_images, $product, 'image');
+            if ($updateProductRequest->has('product_image')) {
+                FileUploadService::uploadImage($updateProductRequest->product_image, $product, 'image');
             }
 
 
