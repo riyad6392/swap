@@ -13,10 +13,16 @@ class Billing extends Model
         'user_id',
         'payment_type',
         'subscription_id',
+        'swap_id',
         'plan_id',
         'payment_method_id',
         'stripe_payment_intent_id',
         'stripe_payment_subscription_id',
         'amount'
     ];
+
+    public function swap()
+    {
+        return $this->belongsTo(Swap::class);
+    }
 }

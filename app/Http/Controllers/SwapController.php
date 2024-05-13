@@ -679,6 +679,7 @@ class SwapController extends Controller
 
         Billing::create([
             'user_id' => auth()->id(),
+            'swap_id' => $swap->id,
             'payment_type' => 'one_time',
             'payment_method_id' => $user->activePaymentMethod->stripe_payment_method_id,
             'stripe_payment_intent_id' => $invoiceItem->payment_intent,
