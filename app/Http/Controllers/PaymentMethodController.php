@@ -133,6 +133,7 @@ class PaymentMethodController extends Controller
                 'stripe_payment_method_id' => $paymentMethodRequest->stripe_payment_method_id,
                 'is_active' => $paymentMethodRequest->is_active ?? 1,
                 'card_brand' => $paymentMethodRequest->card_brand,
+                'payment_type' => $paymentMethodRequest->payment_type,
                 'card_display_brand' => $paymentMethodRequest->card_display_brand,
                 'card_last_four' => $paymentMethodRequest->card_last_four,
                 'card_exp_month' => $paymentMethodRequest->card_exp_month,
@@ -309,7 +310,7 @@ class PaymentMethodController extends Controller
      * Default payment method.
      *
      * @OA\get(
-     *     path="/api/default-payment-method/{payment_method_id}",
+     *     path="/api/default-payment-method/{id}",
      *     tags={"Payment Methods"},
      *     security={{ "apiAuth": {} }},
      *     summary="Delete a payment method",
@@ -363,12 +364,13 @@ class PaymentMethodController extends Controller
                         "' ELSE '" .
                         self::STATUS_INACTIVE . "' END")]);
 
-            $paymentMethod = $payment_method->update(['is_active' => self::STATUS_ACTIVE]);
-
             StripePaymentFacade::attachPaymentMethodToCustomer(
-                trim($paymentMethod->stripe_payment_method_id),
+                trim($payment_method->stripe_payment_method_id),
                 auth()->user()
             );
+
+            $payment_method->update(['is_active' => self::STATUS_ACTIVE]);
+
             return response()->json(['success' => true, 'message' => 'Payment method update successfully'], 200);
         }catch (\Exception $exception) {
             DB::rollBack();

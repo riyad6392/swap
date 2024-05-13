@@ -502,8 +502,14 @@ class ProductController extends Controller
      * )
      */
 
-    public function update(UpdateProductRequest $updateProductRequest, UpdateProductVariationRequest $updateProductVariationRequest, Product $product): \Illuminate\Http\JsonResponse
+    public function update(UpdateProductRequest $updateProductRequest, UpdateProductVariationRequest $updateProductVariationRequest, $id): \Illuminate\Http\JsonResponse
     {
+        $product = Product::find($id);
+
+        if (!$product) {
+            return response()->json(['success' => false, 'message' => 'Product not found'], 404);
+        }
+
         try {
             DB::beginTransaction();
 

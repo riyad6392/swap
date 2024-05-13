@@ -33,7 +33,7 @@ class UpdateProductVariationRequest extends FormRequest
             'variations.*.stock' => 'required|integer',
             'variations.*.discount' => 'nullable|numeric',
             'variations.*.quantity' => 'required|integer',
-            'variations.*.discount_type' => 'nullable|enum:percentage,flat',
+            'variations.*.discount_type' => 'nullable|in:percentage,flat',
             'variations.*.discount_start_date' => 'nullable|date',
             'variations.*.discount_end_date' => 'nullable|date',
             'variations.*.variant_images.*' => 'nullable|array',
