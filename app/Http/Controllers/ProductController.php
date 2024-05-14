@@ -541,7 +541,7 @@ class ProductController extends Controller
 
             DB::commit();
 
-            return response()->json(['success' => true, 'data' => $product->load('productVariations.images')], 201);
+            return response()->json(['success' => true, 'message'=> 'Product update successfully','data' => $product->load('productVariations.images')], 201);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
