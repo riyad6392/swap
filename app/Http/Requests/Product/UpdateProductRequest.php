@@ -36,6 +36,7 @@ class UpdateProductRequest extends FormRequest
             'deleted_product_variation_image_ids' => 'sometimes|array',
             'deleted_image_ids' => 'sometimes|array',
             'is_publish' => 'required|boolean',
+            'deleted_variation_ids' => 'sometimes|array',
         ];
     }
 
