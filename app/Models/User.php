@@ -101,13 +101,13 @@ class User extends Authenticatable
 
     public function getResaleLicenseInfoAttribute()
     {
-        return $this->fileDetails();
+        return $this->fileDetails($this->resale_license);
     }
 
 
     public function getPhotoOfIdInfoAttribute()
     {
-        return $this->fileDetails();
+        return $this->fileDetails($this->photo_of_id);
     }
 
     public function notifications(): BelongsToMany

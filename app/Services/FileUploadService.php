@@ -29,7 +29,6 @@ class FileUploadService
         $imagePath = [];
 
         if (is_array($requestImages)) {
-
             foreach ($requestImages as $imageData) {
                 $imagePath[] = (new FileUploadService)->manageStore($imageData, $model, $relation, $upload_path,);
             }
