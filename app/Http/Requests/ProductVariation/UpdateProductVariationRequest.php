@@ -27,7 +27,7 @@ class UpdateProductVariationRequest extends FormRequest
     {
         return [
             'variations' => 'sometimes|array',
-            'variations.*.id' => 'required|integer|exists:product_variations,id,product_id,' . $this->product,
+            'variations.*.id' => 'sometimes',
             'variations.*.size_id' => 'required|integer|exists:sizes,id',
             'variations.*.color_id' => 'required|integer|exists:colors,id',
             'variations.*.unit_price' => 'required|numeric',
@@ -37,7 +37,7 @@ class UpdateProductVariationRequest extends FormRequest
             'variations.*.discount_type' => 'nullable|in:percentage,flat',
             'variations.*.discount_start_date' => 'nullable|date',
             'variations.*.discount_end_date' => 'nullable|date',
-            'variations.*.variant_images.*' => 'nullable|array',
+            'variations.*.variant_images' => 'nullable|array',
         ];
     }
 
