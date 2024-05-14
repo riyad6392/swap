@@ -611,8 +611,13 @@ class ProductController extends Controller
                 $query->where('product_id', $product->id);
             })->whereIn('id', $request->deleted_product_variation_image_ids)
                 ->get();
+
             if ($images){
-                FileUploadService::deleteImages($request->deleted_product_variation_image_ids, new ProductVariation(), 'images'); //deleted_product_variation_image_ids is an array of image ids
+                FileUploadService::deleteImages(
+                    $request->deleted_product_variation_image_ids,
+                    new ProductVariation(),
+                    'images'
+                ); //deleted_product_variation_image_ids is an array of image ids
             }
         }
 

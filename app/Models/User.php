@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Services\FileUploadService;
+use App\Traits\ModelAttributeTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,7 +18,7 @@ use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable,Billable;
+    use HasApiTokens, HasFactory, Notifiable, Billable, ModelAttributeTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -68,12 +69,6 @@ class User extends Authenticatable
     protected $appends = [
         'average_rating', 'resale_license_info', 'photo_of_id_info'
     ];
-
-//    public function getImagePathAttribute()
-//    {
-//        return asset($this->image);
-//    }
-
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
@@ -88,10 +83,12 @@ class User extends Authenticatable
     {
         return $this->hasOne(PaymentMethods::class)->where('is_active', 1);
     }
+
     public function givenRatings(): HasMany
     {
         return $this->hasMany(Rating::class, 'user_id');
     }
+
     public function receivedRatings(): HasMany
     {
         return $this->hasMany(Rating::class, 'rated_id');
@@ -99,28 +96,18 @@ class User extends Authenticatable
 
     public function getAverageRatingAttribute()
     {
-        return round($this->receivedRatings()->avg('rating'),1);
+        return round($this->receivedRatings()->avg('rating'), 1);
     }
 
     public function getResaleLicenseInfoAttribute()
     {
-        return [
-            'size' => FileUploadService::formatSizeUnits(File::size(public_path('storage/'.$this->resale_license))),
-            'extension' => File::extension($this->resale_license),
-            'basename' => File::basename($this->resale_license),
-            'path' => asset('storage/'.$this->resale_license)];
+        return $this->fileDetails($this->resale_license);
     }
-
 
 
     public function getPhotoOfIdInfoAttribute()
     {
-        return [
-            'size' => FileUploadService::formatSizeUnits(File::size(public_path('storage/'.$this->photo_of_id))),
-            'extension' => File::extension($this->photo_of_id),
-            'basename' => File::basename($this->photo_of_id),
-            'path'=>asset('storage/'.$this->photo_of_id)
-        ];
+        return $this->fileDetails($this->photo_of_id);
     }
 
     public function notifications(): BelongsToMany
@@ -149,11 +136,13 @@ class User extends Authenticatable
         return $this->hasOne(Subscription::class)->where('status', 'active');
     }
 
-    public function inventories(){
+    public function inventories()
+    {
         return $this->hasMany(Product::class);
     }
 
-    public function store(){
+    public function store()
+    {
         return $this->hasMany(Product::class)->where('is_publish', 1);
     }
 
