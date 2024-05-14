@@ -59,13 +59,13 @@ trait ModelAttributeTrait
         });
     }
 
-    public function fileDetails()
+    public function fileDetails($data)
     {
         return [
-            'size' => $this->photo_of_id ? FileUploadService::formatSizeUnits(File::size(public_path('storage/' . $this->photo_of_id))) : null,
-            'extension' => $this->photo_of_id ? File::extension($this->photo_of_id) : null,
-            'basename' => $this->photo_of_id ? File::basename($this->photo_of_id) : null,
-            'path' => $this->photo_of_id ? asset('storage/' . $this->photo_of_id) : null
+            'size' => $data ? FileUploadService::formatSizeUnits(File::size(public_path('storage/' . $data))) : null,
+            'extension' => $data ? File::extension($data) : null,
+            'basename' => $data ? File::basename($data) : null,
+            'path' => $data ? asset('storage/' . $data) : null
         ];
     }
 }
