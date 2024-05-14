@@ -2,6 +2,8 @@
 
 namespace App\Traits;
 
+use App\Services\FileUploadService;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 trait ModelAttributeTrait
@@ -57,5 +59,13 @@ trait ModelAttributeTrait
         });
     }
 
-
+    public function fileDetails()
+    {
+        return [
+            'size' => $this->photo_of_id ? FileUploadService::formatSizeUnits(File::size(public_path('storage/' . $this->photo_of_id))) : null,
+            'extension' => $this->photo_of_id ? File::extension($this->photo_of_id) : null,
+            'basename' => $this->photo_of_id ? File::basename($this->photo_of_id) : null,
+            'path' => $this->photo_of_id ? asset('storage/' . $this->photo_of_id) : null
+        ];
+    }
 }

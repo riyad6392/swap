@@ -7,11 +7,13 @@ use App\Http\Requests\Product\StoreProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Http\Requests\ProductVariation\UpdateProductVariationRequest;
 use App\Http\Resources\ProductResource;
+use App\Models\Image;
 use App\Models\Product;
 use App\Models\ProductVariation;
 use App\Services\FileUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use ReflectionClass;
 
 class ProductController extends Controller
 {
@@ -498,26 +500,38 @@ class ProductController extends Controller
      * )
      */
 
-    public function update(UpdateProductRequest $updateProductRequest, UpdateProductVariationRequest $updateProductVariationRequest, Product $product): \Illuminate\Http\JsonResponse
+    public function update(UpdateProductRequest $updateProductRequest, UpdateProductVariationRequest $updateProductVariationRequest, $id): \Illuminate\Http\JsonResponse
     {
+        $product = Product::find($id);
+
+        if (!$product) {
+            return response()->json(['success' => false, 'message' => 'Product not found'], 404);
+        }
+
         try {
             DB::beginTransaction();
 
             $product->update([
                 'name' => $updateProductRequest->name,
                 'category_id' => $updateProductRequest->category_id,
-                'user_id' => $updateProductRequest->user_id,
+                // 'user_id' => $updateProductRequest->user_id,
                 'description' => $updateProductRequest->description,
                 'brand_id' => $updateProductRequest->brand_id,
                 'is_publish' => $updateProductRequest->is_publish
             ]);
 
             if ($updateProductRequest->has('deleted_product_image_ids')) {
-                FileUploadService::deleteImages($this->deleted_product_image_ids, $product, 'image'); //deleted_product_image_ids is an array of image ids
+                FileUploadService::deleteImages($updateProductVariationRequest->deleted_product_image_ids, $product, 'image'); //deleted_product_image_ids is an array of image ids
             }
 
-            if ($updateProductRequest->has('product_images')) {
-                FileUploadService::uploadImage($updateProductRequest->product_images, $product, 'image');
+            if ($updateProductRequest->has('deleted_variation_ids')){
+                ProductVariation::where('product_id', $product->id)
+                    ->whereIn('id', $updateProductRequest->deleted_variation_ids)
+                    ->delete();
+            }
+
+            if ($updateProductRequest->has('product_image')) {
+                FileUploadService::uploadImage([$updateProductRequest->product_image], $product, 'image');
             }
 
 
@@ -527,10 +541,10 @@ class ProductController extends Controller
 
             DB::commit();
 
-            return response()->json(['success' => true, 'data' => $product->load('productVariations.images')], 201);
+            return response()->json(['success' => true, 'message'=> 'Product update successfully','data' => $product->load('productVariations.images')], 201);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'Failed to update product'], 500);
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 
@@ -590,18 +604,35 @@ class ProductController extends Controller
 
     protected function storeVariations($request, Product $product): void
     {
+
         if ($request->has('deleted_product_variation_image_ids')) {
-            FileUploadService::deleteImages($request->deleted_product_variation_image_ids, $product, 'productVariations.images'); //deleted_product_variation_image_ids is an array of image ids
+
+            $images = Image::whereHasMorph('imageable', ProductVariation::class, function ($query) use ($product) {
+                $query->where('product_id', $product->id);
+            })->whereIn('id', $request->deleted_product_variation_image_ids)
+                ->get();
+
+            if ($images){
+                FileUploadService::deleteImages(
+                    $request->deleted_product_variation_image_ids,
+                    new ProductVariation(),
+                    'images'
+                ); //deleted_product_variation_image_ids is an array of image ids
+            }
         }
+
         foreach ($request->variations as $key => $variationData) {
-            $variation = $product->productVariations()->create([
+            $variation = ProductVariation::updateOrCreate([
+                'product_id' => $product->id,
+                'id' => $variationData['id'] ?? ''
+            ], [
                 'size_id' => $variationData['size_id'],
                 'color_id' => $variationData['color_id'],
                 'unit_price' => $variationData['unit_price'],
                 'stock' => $variationData['stock'],
-                'discount' => $variationData['discount'] ?? 0,
+                'discount' => $variationData['discount'],
                 'quantity' => $variationData['quantity'],
-                'discount_type' => $variationData['discount_type'] ??  'percentage' ,
+                'discount_type' => $variationData['discount_type'] ?? 'percentage',
                 'discount_start_date' => $variationData['discount_start_date'] ?? now(),
                 'discount_end_date' => $variationData['discount_end_date'] ?? now(),
             ]);

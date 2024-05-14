@@ -363,7 +363,7 @@ class PaymentMethodController extends Controller
                     '{$id}' THEN '" . self::STATUS_ACTIVE .
                         "' ELSE '" .
                         self::STATUS_INACTIVE . "' END")]);
-            
+
             StripePaymentFacade::attachPaymentMethodToCustomer(
                 trim($payment_method->stripe_payment_method_id),
                 auth()->user()
