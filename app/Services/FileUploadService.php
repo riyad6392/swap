@@ -19,7 +19,7 @@ class FileUploadService
     {
         $upload_path = $upload_path ?? strtolower(class_basename($model));
         $filename = time() . '-' . uniqid() . '.' . $requestFile->getClientOriginalExtension();
-        return Storage::putFileAs($upload_path, $requestFile, $filename);
+        return Storage::disk(self::FILE_STORAGE)->putFileAs($upload_path, $requestFile, $filename);
     }
 
     public static function uploadImage($requestImages, Product|ProductVariation|User $model, string $relation = null, string $upload_path = null,): array|string
@@ -41,7 +41,7 @@ class FileUploadService
     protected function manageStore($imageData, $model, $relation, $upload_path,): bool|string
     {
         $filename = time() . '-' . uniqid() . '.' . $imageData->getClientOriginalExtension();
-        $path = Storage::putFileAs($upload_path, $imageData, $filename);
+        $path = Storage::disk(self::FILE_STORAGE)->putFileAs($upload_path, $imageData, $filename);
         $model->$relation()->create([
             'path' => $path
         ]);
@@ -56,7 +56,7 @@ class FileUploadService
             ->get();
 
         foreach ($images as $image) {
-            Storage::delete($image->path);
+            Storage::disk(self::FILE_STORAGE)->delete($image->path);
             $image->delete();
         }
         return true;

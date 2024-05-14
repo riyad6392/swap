@@ -621,7 +621,7 @@ class ProductController extends Controller
             }
         }
 
-        foreach ($request->variations as $key => $variationData) {
+        foreach ($request->variations ?? [] as $key => $variationData) {
             $variation = ProductVariation::updateOrCreate([
                 'product_id' => $product->id,
                 'id' => $variationData['id'] ?? ''
