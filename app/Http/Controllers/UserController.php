@@ -320,7 +320,6 @@ class UserController extends Controller
         }
 
         $inventory = $user->inventories()->with(
-            'image',
             'category',
             'brand',
             'productVariations.size',
@@ -687,16 +686,16 @@ class UserController extends Controller
             }
 
             $user->update([
-                'first_name' => $userRequest->first_name ?? $user->first_name,
-                'last_name' => $userRequest->last_name ?? $user->last_name,
-                'phone' => $userRequest->phone ?? $user->phone,
-                'business_name' => $userRequest->business_name ?? $user->business_name,
-                'business_address' => $userRequest->business_address ?? $user->business_address,
+                'first_name' => $userRequest->first_name,
+                'last_name' => $userRequest->last_name,
+                'phone' => $userRequest->phone,
+                'business_name' => $userRequest->business_name,
+                'business_address' => $userRequest->business_address,
                 'resale_license' => $resaleLicense ?? $user->resale_license,
                 'photo_of_id' => $photoOfId ?? $user->photo_of_id,
-                'online_store_url' => $userRequest->online_store_url ?? $user->online_store_url,
-                'ein' => $userRequest->ein ?? $user->ein,
-                'about_me' => $userRequest->about_me ?? $user->about_me,
+                'online_store_url' => $userRequest->online_store_url,
+                'ein' => $userRequest->ein,
+                'about_me' => $userRequest->about_me,
             ]);
 
             $user = $user->load('image');

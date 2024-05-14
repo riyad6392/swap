@@ -23,20 +23,20 @@ class ProductResource extends JsonResource
             'brand' => new BrandResource($this->brand),
             'description' => $this->description,
             'is_publish' => $this->is_publish,
-            'image' => new ImageResource($this->image),
+            'image' => $this->image,
             'productVariations' => ProductVariationResource::collection($this->productVariations),
         ];
     }
 
-    public function nestedCollection($schema)
-    {
-        $data = [];
-        foreach ($schema as $key => $value) {
-            if (is_array($value)) {
-                $this->$key = $this->nestedCollection($value);
-            }
-            $data[$key] = $this->$key;
-        }
-        return $data;
-    }
+//    public function nestedCollection($schema)
+//    {
+//        $data = [];
+//        foreach ($schema as $key => $value) {
+//            if (is_array($value)) {
+//                $this->$key = $this->nestedCollection($value);
+//            }
+//            $data[$key] = $this->$key;
+//        }
+//        return $data;
+//    }
 }
