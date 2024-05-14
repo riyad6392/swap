@@ -3577,14 +3577,14 @@
                 ]
             }
         },
-        "/api/default-payment-method/{payment_method_id}": {
+        "/api/default-payment-method/{id}": {
             "get": {
                 "tags": [
                     "Payment Methods"
                 ],
                 "summary": "Delete a payment method",
                 "description": "Change default payment method.",
-                "operationId": "0ae95dc0ac22e989bbb9bbf811fd5326",
+                "operationId": "5819d539280bf2f81fd35fec23a60927",
                 "responses": {
                     "200": {
                         "description": "Payment method change successfully",
@@ -4496,7 +4496,7 @@
                         }
                     },
                     {
-                        "name": "product_images[]",
+                        "name": "product_image",
                         "in": "query",
                         "description": "Images of the product",
                         "required": true,
@@ -5072,6 +5072,79 @@
                         "name": "id",
                         "in": "path",
                         "description": "ID of the product to change the status",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Product status updated successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Product not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/delete-product-variation}": {
+            "post": {
+                "tags": [
+                    "Inventory"
+                ],
+                "summary": "Delete Product variation to a product.",
+                "operationId": "5d62cd52abd1ea7a29e8aa7ed70b8d60",
+                "parameters": [
+                    {
+                        "name": "product_id",
+                        "in": "path",
+                        "description": "ID of the product",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "name": "product_variation_id",
+                        "in": "path",
+                        "description": "ID of the product variation",
                         "required": true,
                         "schema": {
                             "type": "integer",

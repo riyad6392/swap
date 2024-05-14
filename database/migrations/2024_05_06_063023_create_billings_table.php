@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->enum('payment_type',['one_time','subscription']);
             $table->integer('subscription_id')->nullable();
+            $table->integer('swap_id')->nullable();
             $table->foreignId('plan_id')->nullable();
             $table->integer('payment_method_id')->nullable();
             $table->string('stripe_payment_intent_id')->nullable();
