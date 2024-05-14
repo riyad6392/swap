@@ -13,6 +13,7 @@ use App\Models\ProductVariation;
 use App\Services\FileUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use ReflectionClass;
 
 class ProductController extends Controller
@@ -613,11 +614,10 @@ class ProductController extends Controller
                 ->get();
 
             if ($images){
-                FileUploadService::deleteImages(
-                    $request->deleted_product_variation_image_ids,
-                    new ProductVariation(),
-                    'images'
-                ); //deleted_product_variation_image_ids is an array of image ids
+                foreach ($images as $image){
+                    Storage::disk(FileUploadService::FILE_STORAGE)->delete($image->path);
+                    $image->delete();
+                }
             }
         }
 
