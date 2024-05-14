@@ -342,7 +342,7 @@ class UserController extends Controller
 
             return response()->json(['success' => true,
                 'data' => [
-                    'user'=> $user,
+                    'user' => $user,
                     'inventory' => ProductResource::collection($inventory->get())->resource
                 ]
             ]);
@@ -353,7 +353,7 @@ class UserController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-                'user'=> $user,
+                'user' => $user,
                 'inventory' => ProductResource::collection($inventory)->resource
             ]
         ]);
@@ -425,7 +425,8 @@ class UserController extends Controller
      *       )
      * )
      */
-    public function userStore(Request $request, $id){
+    public function userStore(Request $request, $id)
+    {
 
         $user = User::with('image')->withCount('receivedRatings')->find($id);
 
@@ -439,12 +440,12 @@ class UserController extends Controller
         $inventory = $user
             ->store()
             ->with(
-            'image',
-            'category',
-            'brand',
-            'productVariations.size',
-            'productVariations.color'
-        );
+                'image',
+                'category',
+                'brand',
+                'productVariations.size',
+                'productVariations.color'
+            );
 
         if ($request->search) {
             $inventory->where('name', 'like', '%' . $request->search . '%');
@@ -461,7 +462,7 @@ class UserController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'user'=> $user,
+                    'user' => $user,
                     'store' => ProductResource::collection($user->store()->get())->resource]
             ]);
         }
@@ -471,7 +472,7 @@ class UserController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-                'user'=> $user,
+                'user' => $user,
                 'store' => ProductResource::collection($inventory)->resource
             ]
         ]);
@@ -508,8 +509,9 @@ class UserController extends Controller
      * )
      */
 
-    public function userProfile(){
-        $user = User::with('image','activeSubscriptions','paymentMethods','billings.swap')->find(auth()->id());
+    public function userProfile()
+    {
+        $user = User::with('image', 'activeSubscriptions', 'paymentMethods', 'billings.swap')->find(auth()->id());
         return response()->json(['success' => true, 'data' => $user]);
     }
 
@@ -670,7 +672,7 @@ class UserController extends Controller
 
             if ($userRequest->has('image')) {
                 if ($user->image) {
-                   FileUploadService::deleteImages([$user->image->id], $user, 'image');
+                    FileUploadService::deleteImages([$user->image->id], $user, 'image');
                 }
                 FileUploadService::uploadImage($userRequest->image, $user, 'image');
             }
@@ -691,8 +693,8 @@ class UserController extends Controller
                 'phone' => $userRequest->phone,
                 'business_name' => $userRequest->business_name,
                 'business_address' => $userRequest->business_address,
-                'resale_license' => $resaleLicense ?? $user->resale_license,
-                'photo_of_id' => $photoOfId ?? $user->photo_of_id,
+                'resale_license' => $resaleLicense,
+                'photo_of_id' => $photoOfId,
                 'online_store_url' => $userRequest->online_store_url,
                 'ein' => $userRequest->ein,
                 'about_me' => $userRequest->about_me,
