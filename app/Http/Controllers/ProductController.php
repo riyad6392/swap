@@ -531,7 +531,7 @@ class ProductController extends Controller
             }
 
             if ($updateProductRequest->has('product_image')) {
-                FileUploadService::uploadImage($updateProductRequest->product_image, $product, 'image');
+                FileUploadService::uploadImage([$updateProductRequest->product_image], $product, 'image');
             }
 
 
