@@ -510,7 +510,7 @@ class UserController extends Controller
      */
 
     public function userProfile(){
-        $user = User::with('image','activeSubscriptions','paymentMethods','billings')->find(auth()->id());
+        $user = User::with('image','activeSubscriptions','paymentMethods','billings.swap')->find(auth()->id());
         return response()->json(['success' => true, 'data' => $user]);
     }
 

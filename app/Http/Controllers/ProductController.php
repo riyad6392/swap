@@ -521,7 +521,7 @@ class ProductController extends Controller
             ]);
 
             if ($updateProductRequest->has('deleted_product_image_ids')) {
-//                FileUploadService::deleteImages($updateProductVariationRequest->deleted_product_image_ids, $product, 'image'); //deleted_product_image_ids is an array of image ids
+                FileUploadService::deleteImages($updateProductVariationRequest->deleted_product_image_ids, $product, 'image'); //deleted_product_image_ids is an array of image ids
             }
 
             if ($updateProductRequest->has('product_image')) {
