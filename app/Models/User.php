@@ -102,22 +102,44 @@ class User extends Authenticatable
 
     public function getResaleLicenseInfoAttribute()
     {
-        return [
-            'size' => $this->resale_license ? FileUploadService::formatSizeUnits(File::size(public_path('storage/' . $this->resale_license))) : null,
-            'extension' => $this->resale_license ? File::extension($this->resale_license) : null,
-            'basename' => $this->resale_license ? File::basename($this->resale_license) : null,
-            'path' => $this->resale_license ? asset('storage/' . $this->resale_license) : null,
-        ];
+        if ($this->resale_license && file_exists(public_path('storage/' . $this->resale_license))) {
+            return [
+                'size' => FileUploadService::formatSizeUnits(File::size(public_path('storage/' . $this->resale_license))),
+                'extension' => File::extension($this->resale_license),
+                'basename' => File::basename($this->resale_license),
+                'path' => asset('storage/' . $this->resale_license),
+                'exist' => file_exists(public_path('storage/' . $this->resale_license))
+            ];
+        }else{
+            return $this->nullFileInfo();
+        }
+
     }
 
 
     public function getPhotoOfIdInfoAttribute()
     {
+        if ($this->photo_of_id && file_exists(public_path('storage/' . $this->photo_of_id))) {
+            return [
+                'size' => FileUploadService::formatSizeUnits(File::size(public_path('storage/' . $this->photo_of_id))),
+                'extension' => File::extension($this->photo_of_id),
+                'basename' => File::basename($this->photo_of_id),
+                'path' => asset('storage/' . $this->photo_of_id),
+                'exist' => file_exists(public_path('storage/' . $this->photo_of_id))
+            ];
+        }else{
+            return $this->nullFileInfo();
+        }
+    }
+
+    protected function nullFileInfo(){
         return [
-            'size' => $this->photo_of_id ? FileUploadService::formatSizeUnits(File::size(public_path('storage/' . $this->photo_of_id))) : null,
-            'extension' => $this->photo_of_id ? File::extension($this->photo_of_id) : null,
-            'basename' => $this->photo_of_id ? File::basename($this->photo_of_id) : null,
-            'path' => $this->photo_of_id ? asset('storage/' . $this->photo_of_id) : null,
+            'size' => null,
+            'extension' => null,
+            'basename' => null,
+            'path' => null,
+            'exist' => null
+
         ];
     }
 
