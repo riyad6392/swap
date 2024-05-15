@@ -190,6 +190,17 @@ class SwapController extends Controller
     public function store(StoreSwapRequest                $swapRequest,
                           StoreSwapExchangeDetailsRequest $SwapExchangeDetailsRequest): \Illuminate\Http\JsonResponse
     {
+
+        //check is $SwapExchangeDetailsRequest exchange product_id is the owner of the user
+
+//        if (!User::where('id', $SwapExchangeDetailsRequest->exchange_product[0]['product_id'])->exists()) {
+//            return response()->json(['success' => false, 'message' => 'Product not found'], 404);
+//        }
+
+        if ($SwapExchangeDetailsRequest->exchange == $swapRequest->requested_user_id) {
+            return response()->json(['success' => false, 'message' => 'You can not swap with yourself'], 401);
+        }
+
         try {
             DB::beginTransaction();
 
