@@ -83,6 +83,18 @@ class SwapController extends Controller
 
         $swaps->where('requested_user_id', auth()->id());
 
+        if ($request->name){
+            $swaps
+                ->whereHas('user', function ($query) use ($request) {
+                $query->where('first_name', 'like', '%' . $request->name . '%');
+            })
+                ->orWhereHas('exchangeDetails', function ($query) use ($request) {
+                $query->whereHas('product', function ($query) use ($request) {
+                    $query->where('name', 'like', '%' . $request->name . '%');
+                });
+            });
+        }
+
         if ($request->get('get_all')) {
             return response()->json(['success' => true, 'data' => $swaps->get()]);
         }
@@ -190,17 +202,6 @@ class SwapController extends Controller
     public function store(StoreSwapRequest                $swapRequest,
                           StoreSwapExchangeDetailsRequest $SwapExchangeDetailsRequest): \Illuminate\Http\JsonResponse
     {
-
-        //check is $SwapExchangeDetailsRequest exchange product_id is the owner of the user
-
-//        if (!User::where('id', $SwapExchangeDetailsRequest->exchange_product[0]['product_id'])->exists()) {
-//            return response()->json(['success' => false, 'message' => 'Product not found'], 404);
-//        }
-
-        if ($SwapExchangeDetailsRequest->exchange == $swapRequest->requested_user_id) {
-            return response()->json(['success' => false, 'message' => 'You can not swap with yourself'], 401);
-        }
-
         try {
             DB::beginTransaction();
 
