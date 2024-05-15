@@ -679,7 +679,11 @@ class UserController extends Controller
 
             if ($userRequest->has('resale_license')) {
                 if ($user->resale_license) Storage::delete($user->resale_license);
-                $resaleLicense = FileUploadService::uploadFile($userRequest->resale_license, $user, 'resale_license');
+                $resaleLicense = FileUploadService::uploadFile(
+                    $userRequest->resale_license,
+                    $user,
+                    'resale_license'
+                );
             }
 
             if ($userRequest->has('photo_of_id')) {

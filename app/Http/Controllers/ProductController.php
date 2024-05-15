@@ -31,6 +31,46 @@ class ProductController extends Controller
      *     @OA\MediaType(mediaType="multipart/form-data"),
      *
      *     @OA\Parameter(
+     *           in="query",
+     *           name="name",
+     *           required=true,
+     *
+     *           @OA\Schema(type="string"),
+     *           example="Product 1"
+     *       ),
+     *          @OA\Parameter(
+     *            in="query",
+     *            name="category_id[]",
+     *            required=true,
+     *
+     *            @OA\Schema(type="string"),
+     *            example="1"
+     *        ),
+     *          @OA\Parameter(
+     *            in="query",
+     *            name="size_id[]",
+     *            required=true,
+     *
+     *            @OA\Schema(type="string"),
+     *            example="1"
+     *        ),
+     *          @OA\Parameter(
+     *            in="query",
+     *            name="brand_id[]",
+     *            required=true,
+     *
+     *            @OA\Schema(type="string"),
+     *            example="1"
+     *        ),
+     *     @OA\Parameter(
+     *            in="query",
+     *            name="color_id[]",
+     *            required=true,
+     *
+     *            @OA\Schema(type="string"),
+     *            example="1"
+     *        ),
+     *     @OA\Parameter(
      *          in="query",
      *          name="pagination",
      *          required=true,
