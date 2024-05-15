@@ -25,6 +25,7 @@ class ProductResource extends JsonResource
             'is_publish' => $this->is_publish,
             'image' => $this->image,
             'productVariations' => ProductVariationResource::collection($this->productVariations),
+            'user' => new UserResource($this->user),
         ];
     }
 

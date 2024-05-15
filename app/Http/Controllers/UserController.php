@@ -662,7 +662,7 @@ class UserController extends Controller
 
     public function updateProfile(UpdateUserRequest $userRequest)
     {
-        try {
+//        try {
             DB::beginTransaction();
 
             $user = User::find(auth()->id());
@@ -677,10 +677,16 @@ class UserController extends Controller
                 FileUploadService::uploadImage($userRequest->image, $user, 'image');
             }
 
+
             if ($userRequest->has('resale_license')) {
-                if ($user->resale_license) Storage::delete($user->resale_license);
-                $resaleLicense = FileUploadService::uploadFile($userRequest->resale_license, $user, 'resale_license');
+                if ($user->resale_license && Storage::fileExists($user->resale_license)) Storage::delete($user->resale_license);
+                $resaleLicense = FileUploadService::uploadFile(
+                    $userRequest->resale_license,
+                    $user,
+                    'resale_license'
+                );
             }
+
 
             if ($userRequest->has('photo_of_id')) {
                 if ($user->photo_of_id) Storage::delete($user->photo_of_id);
@@ -704,9 +710,9 @@ class UserController extends Controller
 
             DB::commit();
             return response()->json(['success' => true, 'data' => $user]);
-        } catch (\Exception $exception) {
-            DB::rollBack();
-            return response()->json(['success' => false, 'message' => $exception->getMessage()], 500);
-        }
+//        } catch (\Exception $exception) {
+//            DB::rollBack();
+//            return response()->json(['success' => false, 'message' => $exception->getMessage()], 500);
+//        }
     }
 }
