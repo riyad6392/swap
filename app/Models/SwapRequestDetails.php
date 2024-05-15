@@ -30,4 +30,9 @@ class SwapRequestDetails extends Model
         self::bootUID();
     }
 
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
 }

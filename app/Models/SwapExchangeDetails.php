@@ -29,4 +29,9 @@ class SwapExchangeDetails extends Model
         self::bootCreatedUpdatedBy();
         self::bootUID();
     }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }
