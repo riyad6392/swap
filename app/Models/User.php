@@ -138,7 +138,7 @@ class User extends Authenticatable
             'extension' => null,
             'basename' => null,
             'path' => null,
-            'exist' => null
+            'exist' => false
 
         ];
     }
