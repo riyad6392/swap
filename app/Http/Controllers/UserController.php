@@ -662,7 +662,7 @@ class UserController extends Controller
 
     public function updateProfile(UpdateUserRequest $userRequest)
     {
-//        try {
+        try {
             DB::beginTransaction();
 
             $user = User::find(auth()->id());
@@ -710,9 +710,9 @@ class UserController extends Controller
 
             DB::commit();
             return response()->json(['success' => true, 'data' => $user]);
-//        } catch (\Exception $exception) {
-//            DB::rollBack();
-//            return response()->json(['success' => false, 'message' => $exception->getMessage()], 500);
-//        }
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $exception->getMessage()], 500);
+        }
     }
 }

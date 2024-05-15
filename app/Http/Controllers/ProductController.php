@@ -145,7 +145,7 @@ class ProductController extends Controller
             'brand',
             'productVariations.size',
             'productVariations.color',
-            'user'
+            'user.image'
         );
 
         if ($request->get('get_all')) {
