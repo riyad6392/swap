@@ -78,6 +78,26 @@ class ProductController extends Controller
             $inventories = $inventories->where('name', 'like', '%' . $request->name . '%');
         }
 
+        if ($request->category_id) {
+            $inventories = $inventories->whereIn('category_id', $request->category_id);
+        }
+
+        if ($request->brand_id) {
+            $inventories = $inventories->whereIn('brand_id', $request->brand_id);
+        }
+
+        if ($request->size_id) {
+            $inventories = $inventories->whereHas('productVariations', function ($query) use ($request) {
+                $query->whereIn('size_id', $request->size_id);
+            });
+        }
+
+        if ($request->color_id) {
+            $inventories = $inventories->whereHas('productVariations', function ($query) use ($request) {
+                $query->whereIn('color_id', $request->color_id);
+            });
+        }
+
         $inventories = $inventories->with(
             'productVariations.images',
             'image',
