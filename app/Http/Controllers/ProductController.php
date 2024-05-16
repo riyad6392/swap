@@ -32,12 +32,20 @@ class ProductController extends Controller
      *
      *     @OA\Parameter(
      *           in="query",
-     *           name="name",
+     *           name="search",
      *           required=true,
      *
      *           @OA\Schema(type="string"),
      *           example="Product 1"
      *       ),
+     *          @OA\Parameter(
+     *            in="query",
+     *            name="sort",
+     *            required=true,
+     *
+     *            @OA\Schema(type="string"),
+     *            example="asc/desc"
+     *        ),
      *          @OA\Parameter(
      *            in="query",
      *            name="category_id[]",
@@ -114,7 +122,7 @@ class ProductController extends Controller
     {
         $inventories = Product::query();
 
-        if ($request->name) {
+        if ($request->search) {
             $inventories = $inventories->where('name', 'like', '%' . $request->name . '%');
         }
 
@@ -136,6 +144,10 @@ class ProductController extends Controller
             $inventories = $inventories->whereHas('productVariations', function ($query) use ($request) {
                 $query->whereIn('color_id', $request->color_id);
             });
+        }
+
+        if ($request->sort){
+            $inventories = $inventories->orderBy('created_at', $request->sort ?? 'asc');
         }
 
         $inventories = $inventories->with(
