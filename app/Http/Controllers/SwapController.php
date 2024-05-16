@@ -10,6 +10,7 @@ use App\Http\Requests\Swap\StoreSwapRequestDetails;
 use App\Http\Requests\Swap\StoreSwapRequestDetailsRequest;
 use App\Http\Requests\Swap\UpdateSwapDetailsRequest;
 use App\Http\Requests\Swap\UpdateSwapRequest;
+use App\Http\Resources\SwapResource;
 use App\Jobs\SwapJob;
 use App\Models\Billing;
 use App\Models\Message;
@@ -90,18 +91,32 @@ class SwapController extends Controller
             })
                 ->orWhereHas('exchangeDetails', function ($query) use ($request) {
                 $query->whereHas('product', function ($query) use ($request) {
-                    $query->where('name', 'like', '%' . $request->name . '%');
+                    $query->where('name', 'like', '%' . $request->name . '%')
+                        ->orWhere('description', 'like', '%' . $request->name . '%');
                 });
             });
         }
 
-        if ($request->get('get_all')) {
-            return response()->json(['success' => true, 'data' => $swaps->get()]);
+        if ($request->sort) {
+            $swaps->orderBy('created_at', $request->sort);
         }
+
+        $swaps = $swaps->with(
+            'exchangeDetails',
+            'exchangeDetails.product.productVariations.size',
+            'exchangeDetails.product.productVariations.color',
+            'user'
+        );
+
+
+        if ($request->get('get_all')) {
+            return response()->json(['success' => true, 'data' => SwapResource::collection($swaps->get())->resource]);
+        }
+
 
         $swap = $swaps->paginate($request->pagination ?? self::PER_PAGE);
 
-        return response()->json(['success' => true, 'data' => $swap]);
+        return response()->json(['success' => true, 'data' => SwapResource::collection($swap)->resource]);
     }
 
     /**
