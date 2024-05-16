@@ -32,7 +32,7 @@ class ProductController extends Controller
      *
      *     @OA\Parameter(
      *           in="query",
-     *           name="name",
+     *           name="search",
      *           required=true,
      *
      *           @OA\Schema(type="string"),
@@ -122,7 +122,7 @@ class ProductController extends Controller
     {
         $inventories = Product::query();
 
-        if ($request->name) {
+        if ($request->search) {
             $inventories = $inventories->where('name', 'like', '%' . $request->name . '%');
         }
 
@@ -147,7 +147,7 @@ class ProductController extends Controller
         }
 
         if ($request->sort){
-            $inventories = $inventories->orderBy('created_at', $request->order ?? 'asc');
+            $inventories = $inventories->orderBy('created_at', $request->sort ?? 'asc');
         }
 
         $inventories = $inventories->with(
