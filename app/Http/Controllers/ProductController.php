@@ -40,6 +40,14 @@ class ProductController extends Controller
      *       ),
      *          @OA\Parameter(
      *            in="query",
+     *            name="sort",
+     *            required=true,
+     *
+     *            @OA\Schema(type="string"),
+     *            example="asc/desc"
+     *        ),
+     *          @OA\Parameter(
+     *            in="query",
      *            name="category_id[]",
      *            required=true,
      *
@@ -136,6 +144,10 @@ class ProductController extends Controller
             $inventories = $inventories->whereHas('productVariations', function ($query) use ($request) {
                 $query->whereIn('color_id', $request->color_id);
             });
+        }
+
+        if ($request->sort){
+            $inventories = $inventories->orderBy('created_at', $request->order ?? 'asc');
         }
 
         $inventories = $inventories->with(
