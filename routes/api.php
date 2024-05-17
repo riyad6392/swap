@@ -39,7 +39,6 @@ Route::post('forget-password', [ForgetPasswordController::class, 'forgetPassword
 Route::post('reset-password', [ForgetPasswordController::class, 'resetPassword']);
 Route::post('refresh-token', [LoginController::class, 'getRefreshToken']);
 
-Route::resource('plan', PlanController::class)->only(['index', 'show']);
 
 
 
@@ -65,10 +64,10 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::post('update-profile', [UserController::class, 'updateProfile']);
 
         //Inventory
-        Route::resource('category', CategoryController::class);
-        Route::resource('brand', BrandController::class);
-        Route::resource('size', SizeController::class);
-        Route::resource('color', ColorController::class);
+        Route::resource('category', CategoryController::class)->only(['index', 'show']);
+        Route::resource('brand', BrandController::class)->only(['index', 'show']);
+        Route::resource('size', SizeController::class)->only(['index', 'show']);
+        Route::resource('color', ColorController::class)->only(['index', 'show']);
         Route::resource('product', ProductController::class);
         Route::get('change-product-status/{id}', [ProductController::class, 'changeStatus']);
         Route::post('delete-product-variation', [ProductController::class, 'destroyProductVariation']);
@@ -118,6 +117,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     });
 
     //plan
+    Route::resource('plan', PlanController::class)->only(['index', 'show']);
 
 
     //Subscription
