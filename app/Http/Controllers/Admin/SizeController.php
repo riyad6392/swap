@@ -158,11 +158,44 @@ class SizeController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Size Show.
+     *
+     * @OA\Get(
+     *     path="/api/size/{id}",
+     *     tags={"Size"},
+     *     security={{ "apiAuth": {} }},
+     *
+     *     @OA\MediaType(mediaType="multipart/form-data"),
+     *
+     *     @OA\Response(
+     *           response=200,
+     *           description="success",
+     *
+     *           @OA\JsonContent(
+     *               @OA\Property(property="data", type="json", example={}),
+     *               @OA\Property(property="links", type="json", example={}),
+     *               @OA\Property(property="meta", type="json", example={}),
+     *           )
+     *       ),
+     *
+     *       @OA\Response(
+     *           response=401,
+     *           description="Invalid user",
+     *
+     *           @OA\JsonContent(
+     *               @OA\Property(property="success", type="boolean", example="false"),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Unauthenticated"}}),
+     *           )
+     *       )
+     * )
      */
     public function show(string $id)
     {
-        //
+        $size = Size::find($id);
+        if (!$size) {
+            return response()->json(['success' => false, 'message' => 'Size not found']);
+        }
+        return response()->json(['success' => true, 'data' => $size]);
     }
 
     /**

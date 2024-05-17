@@ -4372,7 +4372,7 @@
                 "operationId": "02191ace01f4f2e4a399a85886836a49",
                 "parameters": [
                     {
-                        "name": "name",
+                        "name": "search",
                         "in": "query",
                         "required": true,
                         "schema": {
