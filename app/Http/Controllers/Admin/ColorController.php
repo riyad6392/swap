@@ -158,11 +158,44 @@ class ColorController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Color Show.
+     *
+     * @OA\Get(
+     *     path="/api/color/{id}",
+     *     tags={"Color"},
+     *     security={{ "apiAuth": {} }},
+     *
+     *     @OA\MediaType(mediaType="multipart/form-data"),
+     *
+     *     @OA\Response(
+     *           response=200,
+     *           description="success",
+     *
+     *           @OA\JsonContent(
+     *               @OA\Property(property="data", type="json", example={}),
+     *               @OA\Property(property="links", type="json", example={}),
+     *               @OA\Property(property="meta", type="json", example={}),
+     *           )
+     *       ),
+     *
+     *       @OA\Response(
+     *           response=401,
+     *           description="Invalid user",
+     *
+     *           @OA\JsonContent(
+     *               @OA\Property(property="success", type="boolean", example="false"),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Unauthenticated"}}),
+     *           )
+     *       )
+     * )
      */
     public function show(string $id)
     {
-        //
+        $color = Color::find($id);
+        if (!$color) {
+            return response()->json(['success' => false, 'message' => 'Color not found']);
+        }
+        return response()->json(['success' => true, 'data' => $color]);
     }
 
     /**
