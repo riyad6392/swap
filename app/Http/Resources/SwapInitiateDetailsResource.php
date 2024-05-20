@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class SwapResource extends JsonResource
+class SwapInitiateDetailsResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,12 +16,13 @@ class SwapResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'uid' => $this->uid,
             'swap_id' => $this->swap_id,
-            'user' => new UserResource($this->user),
-            'initiateDetails' => SwapInitiateDetailsResource::collection($this->initiateDetails),
+            'product' => new ProductResource($this->product),
+            'product_id' => $this->product_id,
+            'productVariations' => new ProductVariationResource($this->productVariations),
+            'quantity' => $this->quantity,
             'created_at' => $this->created_at,
-            'exchangeDetails' => SwapExchangeDetailsResource::collection($this->exchangeDetails),
+            'updated_at' => $this->updated_at,
         ];
     }
 }
