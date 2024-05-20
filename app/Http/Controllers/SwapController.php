@@ -82,7 +82,8 @@ class SwapController extends Controller
     {
         $swaps = Swap:: query();
 
-        $swaps->where('requested_user_id', auth()->id());
+        $swaps->where('requested_user_id', auth()->id())
+            ->orWhere('exchanged_user_id', auth()->id());
 
         if ($request->name){
             $swaps
