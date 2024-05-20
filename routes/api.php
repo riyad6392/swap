@@ -17,6 +17,7 @@ use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\SwapController;
 use App\Http\Controllers\SwapExchangeDetailsController;
+use App\Http\Controllers\SwapInitiateDetailsController;
 use App\Http\Controllers\SwapRequestDetailsController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -86,6 +87,9 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::get('swap-approve/{id}', [SwapController::class, 'approve']);
         Route::get('swap-decline/{id}', [SwapController::class, 'decline']);
         Route::get('swap-complete/{id}', [SwapController::class, 'complete']);
+
+        //Swap Initiate
+        Route::resource('swap-initiate', SwapInitiateDetailsController::class);
 
 //        Broadcast::routes();
 

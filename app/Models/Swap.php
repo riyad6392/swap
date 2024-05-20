@@ -18,7 +18,8 @@ class Swap extends Model
         'user_id',
         'requested_user_id',
         'exchanged_user_id',
-        'status',
+        'exchange_user_status',
+        'request_user_status',
         'requested_wholesale_amount',
         'exchanged_wholesale_amount',
         'requested_total_commission',
@@ -40,6 +41,11 @@ class Swap extends Model
     public function requestDetail(): HasMany
     {
         return $this->hasMany(SwapRequestDetails::class);
+    }
+
+    public function initiateDetails(): HasMany
+    {
+        return $this->hasMany(SwapInitiateDetails::class);
     }
 
     public function shipments(): HasMany

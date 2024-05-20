@@ -40,7 +40,7 @@ class UpdateSwapDetailsRequest extends FormRequest
             return [
                 'define_type' => 'required|string|in:request_product,exchange_product',
                 'deleted_details_id' => 'nullable|array',
-                'exchange_product' => 'required|array',
+                'request_product' => 'required|array',
                 'request_product.*.product_id' => 'required|integer|exists:products,id',
                 'request_product.*.variation_id' => 'required|integer|exists:product_variations,id',
                 'request_product.*.variation_size_id' => 'required|exists:sizes,id',

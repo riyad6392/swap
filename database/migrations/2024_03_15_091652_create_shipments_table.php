@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('exchanged_carrier_name')->nullable();
             $table->string('exchanged_carrier_contact')->nullable();
             $table->date('exchanged_expected_delivery_date')->nullable();
+            $table->enum('status', ['pending', 'shipped', 'delivered'])->default('pending');
             $table->integer('created_by');
             $table->integer('updated_by');
             $table->timestamps();
