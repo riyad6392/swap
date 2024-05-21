@@ -25,6 +25,11 @@ class SwapInitiateDetails extends Model
         return $this->belongsTo(Product::class);
     }
 
+    public function swap(): BelongsTo
+    {
+        return $this->belongsTo(Swap::class);
+    }
+
     public static function boot()
     {
         parent::boot();

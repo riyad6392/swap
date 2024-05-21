@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('uid');
             $table->integer('user_id');
             $table->integer('product_id');
-            $table->integer('product_variation_id');
-            $table->integer('quantity');
+            $table->integer('product_variation_id')->nullable();
+            $table->integer('quantity')->nullable();
             $table->integer('created_by');
             $table->integer('updated_by');
             $table->timestamps();

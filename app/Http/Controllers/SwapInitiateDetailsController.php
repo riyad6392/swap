@@ -107,8 +107,8 @@ class SwapInitiateDetailsController extends Controller
                     'uid' => 'sid-'.uniqid(),
                     'user_id' => auth()->id(),
                     'product_id' => $products['product_id'],
-                    'product_variation_id' => $products['product_variation_id'],
-                    'quantity' => $products['quantity'],
+//                    'product_variation_id' => $products['product_variation_id'],
+//                    'quantity' => $products['quantity'],
                     'created_by' => auth()->id(),
                     'updated_by' => auth()->id(),
                 ];

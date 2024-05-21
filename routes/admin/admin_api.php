@@ -29,6 +29,7 @@ Route::group(['middleware' => 'auth:admin-api'], function () {
 
     //User
     Route::resource('user', UserController::class);
+    Route::get('approved-user/{id}', [UserController::class , 'approvedUser']);
 
     //Plan
     Route::resource('plan', \App\Http\Controllers\PlanController::class)->only(['create', 'store', 'edit', 'update', 'destroy']);
