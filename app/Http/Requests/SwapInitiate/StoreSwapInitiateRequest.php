@@ -27,8 +27,8 @@ class StoreSwapInitiateRequest extends FormRequest
             'exchanged_user_id' => 'required|integer|exists:users,id',
             'products' => 'array|required',
             'products.*.product_id' => 'required|integer|exists:products,id',
-            'products.*.product_variation_id' => 'integer|exists:product_variations,id',
-            'products.*.quantity' => 'required|integer',
+//            'products.*.product_variation_id' => 'integer|exists:product_variations,id',
+//            'products.*.quantity' => 'required|integer',
         ];
     }
 }
