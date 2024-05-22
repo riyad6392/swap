@@ -20,11 +20,10 @@ class SwapResource extends JsonResource
             'swap_id' => $this->swap_id,
             'exchange_user_status' => $this->exchange_user_status,
             'request_user_status' => $this->request_user_status,
-//            'user' => new UserResource($this->user),
-//            'initiateDetails' => SwapInitiateDetailsResource::collection($this->initiateDetails),
-            'initiateDetails' => $this->initiateDetails,
+            'user' => new UserResource($this->user),
+            'initiateDetails' => SwapInitiateDetailsResource::collection($this->initiateDetails),
             'created_at' => $this->created_at,
-//            'exchangeDetails' => SwapExchangeDetailsResource::collection($this->exchangeDetails),
+            'exchangeDetails' => SwapExchangeDetailsResource::collection($this->exchangeDetails),
         ];
     }
 }
