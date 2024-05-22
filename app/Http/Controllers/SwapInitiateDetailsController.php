@@ -111,6 +111,8 @@ class SwapInitiateDetailsController extends Controller
 //                    'quantity' => $products['quantity'],
                     'created_by' => auth()->id(),
                     'updated_by' => auth()->id(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ];
             }
 
