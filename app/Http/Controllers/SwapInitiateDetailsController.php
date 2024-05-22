@@ -182,9 +182,9 @@ class SwapInitiateDetailsController extends Controller
      *      )
      * )
      */
-    public function destroy(SwapInitiateDetails $swapInitiateDetails)
+    public function destroy($id)
     {
-        $swaps = SwapInitiateDetails::find($swapInitiateDetails->id);
+        $swaps = Swap::find($id);
 
         if (!$swaps) {
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
