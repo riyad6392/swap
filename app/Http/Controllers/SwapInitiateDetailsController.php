@@ -95,8 +95,8 @@ class SwapInitiateDetailsController extends Controller
                 'user_id' => auth()->id(),
                 'exchanged_user_id' => $swapInitiateRequest->exchanged_user_id,
                 'requested_user_id' => auth()->id(),
-                'request_user_status' => 'requested',
-                'exchange_user_status' => 'pending',
+                'requested_user_status' => 'requested',
+                'exchanged_user_status' => 'pending',
             ]);
 
             $insertData = [];
@@ -150,17 +150,59 @@ class SwapInitiateDetailsController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Accept Swap.
+     *
+     * @OA\Delete  (
+     *     path="/api/swap/destroy/{id}",
+     *     tags={"Swaps Initiate"},
+     *     security={{ "apiAuth": {} }},
+     *     summary="Swap Request accepted by message request",
+     *     @OA\Response(
+     *          response=200,
+     *          description="success",
+     *
+     *          @OA\JsonContent(
+     *
+     *              @OA\Property(property="success", type="boolean", example="true"),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Request accepted successfully."}}),
+     *          ),
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=422,
+     *          description="Invalid data",
+     *
+     *          @OA\JsonContent(
+     *
+     *              @OA\Property(property="success", type="boolean", example="false"),
+     *              @OA\Property(property="errors", type="json", example={"message": {"The given data was invalid."}}),
+     *          )
+     *      )
+     * )
      */
     public function destroy(SwapInitiateDetails $swapInitiateDetails)
     {
-        //
+        $swaps = SwapInitiateDetails::find($swapInitiateDetails->id);
+
+        if (!$swaps && $swaps->requested_user_id != auth()->id()) {
+            return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
+        }
+
+        if ($swaps->exchanged_user_status == 'pending') {
+            $swaps->initiateDetails()->delete();
+            $swaps->delete();
+
+            return response()->json(['success' => true, 'message' => 'Swap deleted successfully'], 200);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Your Swap request has different status'], 400);
+
     }
 
     /**
      * Accept Swap.
      *
-     * @OA\Post (
+     * @OA\Get  (
      *     path="/api/swap-accept/{id}",
      *     tags={"Swaps Initiate"},
      *     security={{ "apiAuth": {} }},
@@ -196,12 +238,12 @@ class SwapInitiateDetailsController extends Controller
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
         }
 
-        if ($swap->exchange_user_status != 'pending') {
+        if ($swap->exchanged_user_status != 'pending') {
             return response()->json(['success' => false, 'message' => 'Your Swap request has different status'], 400);
         }
 
         $swap->update([
-            'exchange_user_status' => 'accepted',
+            'exchanged_user_status' => 'accepted',
         ]);
 
         return response()->json(['success' => true, 'message' => 'Request accepted successfully'], 200);
