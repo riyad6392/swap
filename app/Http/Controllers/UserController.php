@@ -21,8 +21,8 @@ class UserController extends Controller
      * User List.
      *
      * @OA\Get(
-     *     path="/api/user",
-     *     tags={"Admin User List"},
+     *     path="/api/admin/user",
+     *     tags={"Admin User"},
      *     security={{ "apiAuth": {} }},
      *
      *     @OA\MediaType(mediaType="multipart/form-data"),
@@ -30,12 +30,36 @@ class UserController extends Controller
      *     @OA\Parameter(
      *          in="query",
      *          name="pagination",
-     *          required=true,
+     *          required=false,
      *
      *          @OA\Schema(type="number"),
      *          example="10"
      *      ),
+     *          @OA\Parameter(
+     *           in="query",
+     *           name="sort",
+     *           required=false,
      *
+     *           @OA\Schema(type="string"),
+     *           example="asc/desc"
+     *       ),
+     *          @OA\Parameter(
+     *           in="query",
+     *           name="search",
+     *           required=false,
+     *
+     *           @OA\Schema(type="string"),
+     *           example="Imtiaz Ur Rahman Khan"
+     *       ),
+     *
+     *        @OA\Parameter(
+     *            in="query",
+     *            name="sort",
+     *            required=false,
+     *
+     *            @OA\Schema(type="string"),
+     *            example="asc,desc"
+     *        ),
      *      @OA\Parameter(
      *          in="query",
      *          name="get_all",
@@ -62,7 +86,7 @@ class UserController extends Controller
      *
      *           @OA\JsonContent(
      *               @OA\Property(property="success", type="boolean", example="false"),
-     *               @OA\Property(property="errors", type="json", example={"message": {"Unauthenticated"}}),
+     *               @OA\Property(property="message", type="json", example="Unauthenticated"),
      *           )
      *       )
      * )
@@ -143,13 +167,44 @@ class UserController extends Controller
     {
         //
     }
-
     /**
-     * Remove the specified resource from storage.
+     * Admin Delete.
+     *
+     * @OA\delete(
+     *     path="/api/admin/user/destroy/{id}",
+     *     tags={"Admin User"},
+     *     security={{ "apiAuth": {} }},
+     *
+     *     @OA\MediaType(mediaType="multipart/form-data"),
+     *
+     *     @OA\Response(
+     *           response=200,
+     *           description="success",
+     *
+     *           @OA\JsonContent(
+     *               @OA\Property(property="success", type="boolean", example="true"),
+     *                @OA\Property(property="message", type="json", example="User Deleted successfully")
+     *           )
+     *       ),
+     *
+     *       @OA\Response(
+     *           response=401,
+     *           description="Invalid user",
+     *           @OA\JsonContent(
+     *               @OA\Property(property="success", type="boolean", example="false"),
+     *               @OA\Property(property="message", type="json", example="Unauthenticated"),
+     *           )
+     *       )
+     * )
      */
     public function destroy(string $id)
     {
-        //
+        $user = User::find($id);
+        if ($user) {
+            $user->delete();
+            return response()->json(['success' => true, 'message' => 'User deleted successfully']);
+        }
+        return response()->json(['success' => false, 'message' => 'User not found'], 404);
     }
 
     /**
@@ -714,5 +769,46 @@ class UserController extends Controller
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $exception->getMessage()], 500);
         }
+    }
+
+    /**
+     * Admin Approve.
+     *
+     * @OA\Get(
+     *     path="/api/admin/approved-user/{id}",
+     *     tags={"Admin User"},
+     *     security={{ "apiAuth": {} }},
+     *
+     *     @OA\MediaType(mediaType="multipart/form-data"),
+     *
+     *     @OA\Response(
+     *           response=200,
+     *           description="success",
+     *
+     *           @OA\JsonContent(
+     *               @OA\Property(property="success", type="boolean", example="true"),
+     *                @OA\Property(property="message", type="json", example="User Update successfully")
+     *           )
+     *       ),
+     *
+     *       @OA\Response(
+     *           response=401,
+     *           description="Invalid user",
+     *           @OA\JsonContent(
+     *               @OA\Property(property="success", type="boolean", example="false"),
+     *               @OA\Property(property="message", type="json", example="Unauthenticated"),
+     *           )
+     *       )
+     * )
+     */
+    public function approvedUser($id)
+    {
+        $user = User::find($id);
+        if ($user) {
+            $user->is_active = !$user->is_active;
+            $user->save();
+            return response()->json(['success' => true, 'message' => 'User updated successfully', 'data' => $user]);
+        }
+        return response()->json(['success' => false, 'message' => 'User not found'], 404);
     }
 }

@@ -5986,166 +5986,6 @@
                         "apiAuth": []
                     }
                 ]
-            },
-            "post": {
-                "tags": [
-                    "Swaps"
-                ],
-                "summary": "Create a new swap",
-                "description": "Create Swap.",
-                "operationId": "82590266f8107084d1a4b8f21149c9b2",
-                "parameters": [
-                    {
-                        "name": "requested_user_id",
-                        "in": "query",
-                        "description": "Requested User ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 2
-                        }
-                    },
-                    {
-                        "name": "exchanged_user_id",
-                        "in": "query",
-                        "description": "Exchanged User ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "example": 3
-                        }
-                    },
-                    {
-                        "name": "status",
-                        "in": "query",
-                        "description": "Status",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "example": "pending"
-                        }
-                    },
-                    {
-                        "name": "define_type",
-                        "in": "query",
-                        "description": "Exchanged Wholesale Amount",
-                        "required": true,
-                        "schema": {
-                            "type": "enum",
-                            "example": "exchange_product | request_product"
-                        }
-                    },
-                    {
-                        "name": "exchange_product[0][product_id]",
-                        "in": "query",
-                        "description": "Product ID",
-                        "required": true,
-                        "schema": {
-                            "type": "number",
-                            "format": "integer",
-                            "example": 1
-                        }
-                    },
-                    {
-                        "name": "exchange_product[0][variation_id]",
-                        "in": "query",
-                        "description": "Product ID",
-                        "required": true,
-                        "schema": {
-                            "type": "number",
-                            "format": "integer",
-                            "example": 1
-                        }
-                    },
-                    {
-                        "name": "exchange_product[0][variation_size_id]",
-                        "in": "query",
-                        "description": "Product ID",
-                        "required": true,
-                        "schema": {
-                            "type": "number",
-                            "format": "integer",
-                            "example": 1
-                        }
-                    },
-                    {
-                        "name": "exchange_product[0][variation_color_id]",
-                        "in": "query",
-                        "description": "Product ID",
-                        "required": true,
-                        "schema": {
-                            "type": "number",
-                            "format": "integer",
-                            "example": 1
-                        }
-                    },
-                    {
-                        "name": "exchange_product[0][variation_quantity]",
-                        "in": "query",
-                        "description": "Product ID",
-                        "required": true,
-                        "schema": {
-                            "type": "number",
-                            "format": "integer",
-                            "example": 1
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": "true"
-                                        },
-                                        "errors": {
-                                            "type": "json",
-                                            "example": {
-                                                "message": [
-                                                    "Swap created successfully."
-                                                ]
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Invalid data",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": "false"
-                                        },
-                                        "errors": {
-                                            "type": "json",
-                                            "example": {
-                                                "message": [
-                                                    "The given data was invalid."
-                                                ]
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "apiAuth": []
-                    }
-                ]
             }
         },
         "/api/swap/{id}": {
@@ -7179,6 +7019,115 @@
                 }
             }
         },
+        "/api/swap-initiate": {
+            "post": {
+                "tags": [
+                    "Swaps Initiate"
+                ],
+                "summary": "Create a new swap",
+                "description": "Create Swap.",
+                "operationId": "b91d41b76610ff77161d7c2488f14e00",
+                "parameters": [
+                    {
+                        "name": "exchanged_user_id",
+                        "in": "query",
+                        "description": "Exchanged User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 3
+                        }
+                    },
+                    {
+                        "name": "products[0][product_id]",
+                        "in": "query",
+                        "description": "Product ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": "products[0][1]"
+                        }
+                    },
+                    {
+                        "name": "products[0][product_variation_id]",
+                        "in": "query",
+                        "description": "Product Variation ID",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "integer",
+                            "example": "products[0][product_variation_id]"
+                        }
+                    },
+                    {
+                        "name": "products[0][quantity]",
+                        "in": "query",
+                        "description": "Product quantity",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "integer",
+                            "example": "products[0][quantity]"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Swap created successfully."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "The given data was invalid."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
         "/api/swap-request-details": {
             "get": {
                 "tags": [
@@ -7753,22 +7702,49 @@
                 }
             }
         },
-        "/api/user": {
+        "/api/admin/user": {
             "get": {
                 "tags": [
-                    "Admin User List"
+                    "Admin User"
                 ],
                 "summary": "User List.",
-                "operationId": "971db9bc974c0e607288cfe7ecc10096",
+                "operationId": "49e2261e269919a3abba12b08a8c2bd5",
                 "parameters": [
                     {
                         "name": "pagination",
                         "in": "query",
-                        "required": true,
+                        "required": false,
                         "schema": {
                             "type": "number"
                         },
                         "example": "10"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "asc/desc"
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Imtiaz Ur Rahman Khan"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "asc,desc"
                     },
                     {
                         "name": "get_all",
@@ -7815,13 +7791,65 @@
                                             "type": "boolean",
                                             "example": "false"
                                         },
-                                        "errors": {
+                                        "message": {
                                             "type": "json",
-                                            "example": {
-                                                "message": [
-                                                    "Unauthenticated"
-                                                ]
-                                            }
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/user/destroy/{id}": {
+            "delete": {
+                "tags": [
+                    "Admin User"
+                ],
+                "summary": "Admin Delete.",
+                "operationId": "e4ada1c7ff9476d5b24ba711e0a8a8b9",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "message": {
+                                            "type": "json",
+                                            "example": "User Deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "message": {
+                                            "type": "json",
+                                            "example": "Unauthenticated"
                                         }
                                     },
                                     "type": "object"
@@ -8375,6 +8403,62 @@
                                                     "Unauthenticated"
                                                 ]
                                             }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/approved-user/{id}": {
+            "get": {
+                "tags": [
+                    "Admin User"
+                ],
+                "summary": "Admin Approve.",
+                "operationId": "074584e49dd154f641e36ac6e971a7b4",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "message": {
+                                            "type": "json",
+                                            "example": "User Update successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "message": {
+                                            "type": "json",
+                                            "example": "Unauthenticated"
                                         }
                                     },
                                     "type": "object"
