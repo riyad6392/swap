@@ -190,7 +190,7 @@ class SwapInitiateDetailsController extends Controller
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
         }
 
-        if ($swaps->exchanged_user_status == 'pending') {
+        if ($swaps->exchanged_user_status == 'pending' && $swaps->requested_user_status == 'requested') {
             $swaps->initiateDetails()->delete();
             $swaps->delete();
 
@@ -240,15 +240,16 @@ class SwapInitiateDetailsController extends Controller
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
         }
 
-        if ($swap->exchanged_user_status != 'pending') {
-            return response()->json(['success' => false, 'message' => 'Your Swap request has different status'], 400);
+        if ($swap->exchanged_user_status == 'pending') {
+
+            $swap->update([
+                'exchanged_user_status' => 'accepted',
+                'requested_user_status' => 'accepted',
+            ]);
+    
+            return response()->json(['success' => true, 'message' => 'Request accepted successfully'], 200);
         }
 
-        $swap->update([
-            'exchanged_user_status' => 'accepted',
-        ]);
-
-        return response()->json(['success' => true, 'message' => 'Request accepted successfully'], 200);
-
+        return response()->json(['success' => false, 'message' => 'Your Swap request has different status'], 400);
     }
 }

@@ -577,11 +577,12 @@ class SwapController extends Controller
     {
         $swap = Swap::find($id);
 
-        if (!$swap) {
+        if (!$swap && $swap->exchanged_user_id != auth()->id()) {
+
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
         }
 
-        if ($swap->exchanged_user_id == auth()->id()) {
+        if ($swap->exchanged_user_status == 'accepted') {
 
             $swap->update([
                 'exchanged_user_status' => 'approved',
@@ -635,11 +636,11 @@ class SwapController extends Controller
     {
         $swap = Swap::find($id);
 
-        if (!$swap) {
+        if (!$swap && $swap->exchanged_user_id != auth()->id()) {
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
         }
 
-        if ($swap->exchanged_user_id == auth()->id()) {
+        if ($swap->exchanged_user_status == 'pending') {
 
             $swap->update([
                 'exchanged_user_status' => 'decline',
