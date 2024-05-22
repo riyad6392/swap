@@ -49,20 +49,20 @@ class SwapInitiateDetailsController extends Controller
      *         description="Product ID",
      *         @OA\Schema(type="integer", example="products[0][1]"),
      *     ),
-//     *     @OA\Parameter(
-//     *         in="query",
-//     *         name="products[0][product_variation_id]",
-//     *         required=true,
-//     *         description="Product Variation ID",
-//     *         @OA\Schema(type="number", format="integer", example="products[0][product_variation_id]"),
-//     *     ),
-//     *     @OA\Parameter(
-//     *          in="query",
-//     *          name="products[0][quantity]",
-//     *          required=true,
-//     *          description="Product quantity",
-//     *          @OA\Schema(type="number", format="integer", example="products[0][quantity]"),
-//     * *     ),
+    //     *     @OA\Parameter(
+    //     *         in="query",
+    //     *         name="products[0][product_variation_id]",
+    //     *         required=true,
+    //     *         description="Product Variation ID",
+    //     *         @OA\Schema(type="number", format="integer", example="products[0][product_variation_id]"),
+    //     *     ),
+    //     *     @OA\Parameter(
+    //     *          in="query",
+    //     *          name="products[0][quantity]",
+    //     *          required=true,
+    //     *          description="Product quantity",
+    //     *          @OA\Schema(type="number", format="integer", example="products[0][quantity]"),
+    //     * *     ),
      *
      *     @OA\Response(
      *          response=200,
@@ -182,15 +182,19 @@ class SwapInitiateDetailsController extends Controller
      *      )
      * )
      */
-    public function destroy(SwapInitiateDetails $swapInitiateDetails)
+    public function destroy($id)
     {
-        $swaps = SwapInitiateDetails::find($swapInitiateDetails->id);
+        $swaps = Swap::find($id);
 
-        if (!$swaps && $swaps->requested_user_id != auth()->id()) {
+        if (!$swaps) {
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
         }
 
-        if ($swaps->exchanged_user_status == 'pending') {
+        if ($swaps->requested_user_id != auth()->id()) {
+            return response()->json(['success' => false, 'message' => 'You are not authorized to delete this swap'], 401);
+        }
+
+        if ($swaps->exchanged_user_status == 'pending' && $swaps->requested_user_status == 'requested') {
             $swaps->initiateDetails()->delete();
             $swaps->delete();
 
@@ -236,19 +240,24 @@ class SwapInitiateDetailsController extends Controller
     public function swapAccept($id)
     {
         $swap = Swap::find($id);
-        if (!$swap && $swap->exchanged_user_id != auth()->id()) {
+        if (!$swap) {
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
         }
 
-        if ($swap->exchanged_user_status != 'pending') {
-            return response()->json(['success' => false, 'message' => 'Your Swap request has different status'], 400);
+        if ($swap->exchanged_user_id != auth()->id()) {
+            return response()->json(['success' => false, 'message' => 'You are not authorized to Accept this swap'], 401);
         }
 
-        $swap->update([
-            'exchanged_user_status' => 'accepted',
-        ]);
+        if ($swap->exchanged_user_status == 'pending') {
 
-        return response()->json(['success' => true, 'message' => 'Request accepted successfully'], 200);
+            $swap->update([
+                'exchanged_user_status' => 'accepted',
+                'requested_user_status' => 'accepted',
+            ]);
 
+            return response()->json(['success' => true, 'message' => 'Request accepted successfully'], 200);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Your Swap request has different status'], 400);
     }
 }
