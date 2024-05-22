@@ -83,12 +83,13 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::resource('swap', SwapController::class);
         Route::resource('swap-request-details', SwapRequestDetailsController::class);
         Route::resource('swap-exchange-details', SwapExchangeDetailsController::class);
-        Route::get('swap-approve/{id}', [SwapController::class, 'approve']);
-        Route::get('swap-decline/{id}', [SwapController::class, 'decline']);
-        Route::get('swap-complete/{id}', [SwapController::class, 'complete']);
+        Route::get('swap-approve/{id}', [SwapController::class, 'swapApprove']);
+        Route::get('swap-decline/{id}', [SwapController::class, 'swapDecline']);
+        Route::get('swap-complete/{id}', [SwapController::class, 'swapComplete']);
 
         //Swap Initiate
         Route::resource('swap-initiate', SwapInitiateDetailsController::class);
+        Route::get('swap-accept/{id}', [SwapInitiateDetailsController::class, 'swapAccept']);
 
 //        Broadcast::routes();
 

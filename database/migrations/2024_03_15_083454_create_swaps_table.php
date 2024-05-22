@@ -18,8 +18,8 @@ return new class extends Migration
             $table->integer('requested_user_id')->comment('User who requested the swap');
             $table->integer('exchanged_user_id')->comment('User who accepted the swap');
 
-            $table->enum('exchange_user_status', ['pending', 'accepted', 'completed', 'decline'])->default('pending');
-            $table->enum('request_user_status', ['requested', 'accepted', 'completed', 'rejected'])->default('requested');
+            $table->enum('exchange_user_status', ['pending', 'accepted','approved', 'completed', 'decline'])->default('pending');
+            $table->enum('request_user_status', ['requested', 'accepted','approved', 'completed', 'rejected'])->default('requested');
 
 //            $table->enum('status', ['requested', 'accepted', 'completed', 'decline'])->default('requested');
 

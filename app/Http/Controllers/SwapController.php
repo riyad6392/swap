@@ -573,7 +573,7 @@ class SwapController extends Controller
      *     )
      * )
      */
-    public function approve($id): \Illuminate\Http\JsonResponse
+    public function swapApprove($id): \Illuminate\Http\JsonResponse
     {
         $swap = Swap::find($id);
 
@@ -584,8 +584,8 @@ class SwapController extends Controller
         if ($swap->exchanged_user_id == auth()->id()) {
 
             $swap->update([
-                'exchange_user_status' => 'accepted',
-                'requested_user_status' => 'accepted'
+                'exchange_user_status' => 'approved',
+                'requested_user_status' => 'approved'
             ]);
 
             SwapNotificationService::sendNotification(
@@ -631,7 +631,7 @@ class SwapController extends Controller
      *     )
      * )
      */
-    public function decline($id): \Illuminate\Http\JsonResponse
+    public function swapDecline($id): \Illuminate\Http\JsonResponse
     {
         $swap = Swap::find($id);
 
@@ -658,7 +658,7 @@ class SwapController extends Controller
         return response()->json(['success' => true, 'message' => 'You are not allow to change the swap status'], 200);
     }
 
-    public function complete($id): \Illuminate\Http\JsonResponse
+    public function swapComplete($id): \Illuminate\Http\JsonResponse
     {
         $swap = Swap::find($id);
 

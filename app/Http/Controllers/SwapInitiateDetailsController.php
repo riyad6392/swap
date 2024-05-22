@@ -49,20 +49,20 @@ class SwapInitiateDetailsController extends Controller
      *         description="Product ID",
      *         @OA\Schema(type="integer", example="products[0][1]"),
      *     ),
-     *     @OA\Parameter(
-     *         in="query",
-     *         name="products[0][product_variation_id]",
-     *         required=true,
-     *         description="Product Variation ID",
-     *         @OA\Schema(type="number", format="integer", example="products[0][product_variation_id]"),
-     *     ),
-     *     @OA\Parameter(
-     *          in="query",
-     *          name="products[0][quantity]",
-     *          required=true,
-     *          description="Product quantity",
-     *          @OA\Schema(type="number", format="integer", example="products[0][quantity]"),
-     * *     ),
+//     *     @OA\Parameter(
+//     *         in="query",
+//     *         name="products[0][product_variation_id]",
+//     *         required=true,
+//     *         description="Product Variation ID",
+//     *         @OA\Schema(type="number", format="integer", example="products[0][product_variation_id]"),
+//     *     ),
+//     *     @OA\Parameter(
+//     *          in="query",
+//     *          name="products[0][quantity]",
+//     *          required=true,
+//     *          description="Product quantity",
+//     *          @OA\Schema(type="number", format="integer", example="products[0][quantity]"),
+//     * *     ),
      *
      *     @OA\Response(
      *          response=200,
@@ -104,7 +104,7 @@ class SwapInitiateDetailsController extends Controller
             foreach ($swapInitiateRequest->products as $products) {
                 $insertData[] = [
                     'swap_id' => $swap->id,
-                    'uid' => 'sid-'.uniqid(),
+                    'uid' => 'sid-' . uniqid(),
                     'user_id' => auth()->id(),
                     'product_id' => $products['product_id'],
 //                    'product_variation_id' => $products['product_variation_id'],
@@ -119,7 +119,7 @@ class SwapInitiateDetailsController extends Controller
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Swap initiated successfully'], 200);
 
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
 
@@ -155,5 +155,56 @@ class SwapInitiateDetailsController extends Controller
     public function destroy(SwapInitiateDetails $swapInitiateDetails)
     {
         //
+    }
+
+    /**
+     * Accept Swap.
+     *
+     * @OA\Post (
+     *     path="/api/swap-accept/{id}",
+     *     tags={"Swaps Initiate"},
+     *     security={{ "apiAuth": {} }},
+     *     summary="Swp Request accepted by message request",
+     *     @OA\Response(
+     *          response=200,
+     *          description="success",
+     *
+     *          @OA\JsonContent(
+     *
+     *              @OA\Property(property="success", type="boolean", example="true"),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Request accepted successfully."}}),
+     *          ),
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=422,
+     *          description="Invalid data",
+     *
+     *          @OA\JsonContent(
+     *
+     *              @OA\Property(property="success", type="boolean", example="false"),
+     *              @OA\Property(property="errors", type="json", example={"message": {"The given data was invalid."}}),
+     *          )
+     *      )
+     * )
+     */
+
+    public function swapAccept($id)
+    {
+        $swap = Swap::find($id);
+        if (!$swap && $swap->exchanged_user_id != auth()->id()) {
+            return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
+        }
+
+        if ($swap->exchange_user_status != 'pending') {
+            return response()->json(['success' => false, 'message' => 'Your Swap request has different status'], 400);
+        }
+
+        $swap->update([
+            'exchange_user_status' => 'accepted',
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Request accepted successfully'], 200);
+
     }
 }
