@@ -18,7 +18,10 @@ class SwapResource extends JsonResource
             'id' => $this->id,
             'uid' => $this->uid,
             'swap_id' => $this->swap_id,
+            'exchange_user_status' => $this->exchange_user_status,
+            'request_user_status' => $this->request_user_status,
             'user' => new UserResource($this->user),
+            'initiateDetails' => SwapInitiateDetailsResource::collection($this->initiateDetails),
             'created_at' => $this->created_at,
             'exchangeDetails' => SwapExchangeDetailsResource::collection($this->exchangeDetails),
         ];
