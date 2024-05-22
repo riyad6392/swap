@@ -499,37 +499,37 @@ class SwapController extends Controller
         }
     }
 
-    /**
-     * Delete Swap.
-     *
-     * @OA\Delete (
-     *     path="/api/swap/{id}",
-     *     tags={"Swaps"},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         description="Delete a swap by ID",
-     *         @OA\Schema(type="integer", format="int64")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="success",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example="true"),
-     *             @OA\Property(property="message", type="string", example="Swap and related data deleted successfully")
-     *         ),
-     *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Not found",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example="false"),
-     *             @OA\Property(property="message", type="string", example="Swap not found")
-     *         ),
-     *     )
-     * )
-     */
+//    /**
+//     * Delete Swap.
+//     *
+//     * @OA\Delete (
+//     *     path="/api/swap/{id}",
+//     *     tags={"Swaps"},
+//     *     @OA\Parameter(
+//     *         name="id",
+//     *         in="path",
+//     *         required=true,
+//     *         description="Delete a swap by ID",
+//     *         @OA\Schema(type="integer", format="int64")
+//     *     ),
+//     *     @OA\Response(
+//     *         response=200,
+//     *         description="success",
+//     *         @OA\JsonContent(
+//     *             @OA\Property(property="success", type="boolean", example="true"),
+//     *             @OA\Property(property="message", type="string", example="Swap and related data deleted successfully")
+//     *         ),
+//     *     ),
+//     *     @OA\Response(
+//     *         response=404,
+//     *         description="Not found",
+//     *         @OA\JsonContent(
+//     *             @OA\Property(property="success", type="boolean", example="false"),
+//     *             @OA\Property(property="message", type="string", example="Swap not found")
+//     *         ),
+//     *     )
+//     * )
+//     */
     public function destroy(Swap $swap): \Illuminate\Http\JsonResponse
     {
         if ($swap->user_id != auth()->id()) {
@@ -577,10 +577,14 @@ class SwapController extends Controller
     {
         $swap = Swap::find($id);
 
-        if (!$swap && $swap->exchanged_user_id != auth()->id()) {
-
+        if (!$swap) {
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
         }
+
+        if ($swap->exchanged_user_id != auth()->id()){
+            return response()->json(['success' => false, 'message' => 'You are not authorized to approve this swap'], 401);
+        }
+
 
         if ($swap->exchanged_user_status == 'accepted') {
 
@@ -636,8 +640,12 @@ class SwapController extends Controller
     {
         $swap = Swap::find($id);
 
-        if (!$swap && $swap->exchanged_user_id != auth()->id()) {
+        if (!$swap) {
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
+        }
+
+        if ($swap->exchanged_user_id != auth()->id()){
+            return response()->json(['success' => false, 'message' => 'You are not authorized to decline this swap'], 401);
         }
 
         if ($swap->exchanged_user_status == 'pending') {
