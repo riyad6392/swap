@@ -446,7 +446,7 @@ class SwapController extends Controller
         try {
             DB::beginTransaction();
 
-            if (($swap->requested_user_id == auth()->id() || $swap->exchanged_user_id == auth()->id()) && $swap->exchange_user_status == 'accepted') {
+            if (($swap->requested_user_id == auth()->id() || $swap->exchanged_user_id == auth()->id()) && $swap->exchanged_user_status == 'approved') {
 
                 $defineType = $swapExchangeDetailsRequest->define_type;
 
@@ -584,7 +584,7 @@ class SwapController extends Controller
         if ($swap->exchanged_user_id == auth()->id()) {
 
             $swap->update([
-                'exchange_user_status' => 'approved',
+                'exchanged_user_status' => 'approved',
                 'requested_user_status' => 'approved'
             ]);
 
@@ -642,7 +642,7 @@ class SwapController extends Controller
         if ($swap->exchanged_user_id == auth()->id()) {
 
             $swap->update([
-                'exchange_user_status' => 'decline',
+                'exchanged_user_status' => 'decline',
                 'requested_user_status' => 'rejected'
             ]);
 
@@ -686,8 +686,8 @@ class SwapController extends Controller
     {
         $approvalField =
             $swap->requested_user_id === auth()->id() ?
-                'request_user_status' :
-                'exchange_user_status';
+                'requested_user_status' :
+                'exchanged_user_status';
 
         $swap->update([$approvalField => 'completed']);
 
