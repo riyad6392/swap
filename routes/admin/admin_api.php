@@ -38,9 +38,9 @@ Route::group(['prefix' => 'admin'], function () {
         Route::resource('brand', BrandController::class);
         Route::resource('size', SizeController::class);
         Route::resource('color', ColorController::class);
-    //User
-    Route::resource('user', UserController::class);
-    Route::get('approved-user/{id}', [UserController::class , 'approvedUser']);
+        //User
+        Route::resource('user', UserController::class);
+        Route::get('approved-user/{id}', [UserController::class, 'approvedUser']);
 
         //Plan
         Route::resource('plan', PlanController::class);
