@@ -17,9 +17,9 @@ class SwapInitiateDetailsResource extends JsonResource
         return [
             'id' => $this->id,
             'swap_id' => $this->swap_id,
-            'product' => new ProductResource($this->product),
+            'product' => new SwapInitiateDetailsProductResouce($this->product),
             'product_id' => $this->product_id,
-            'productVariations' => new ProductVariationResource($this->productVariations),
+//            'productVariations' => new ProductVariationResource($this->productVariations),
             'quantity' => $this->quantity,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
