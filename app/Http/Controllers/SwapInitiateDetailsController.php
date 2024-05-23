@@ -49,20 +49,20 @@ class SwapInitiateDetailsController extends Controller
      *         description="Product ID",
      *         @OA\Schema(type="integer", example="products[0][1]"),
      *     ),
-    //     *     @OA\Parameter(
-    //     *         in="query",
-    //     *         name="products[0][product_variation_id]",
-    //     *         required=true,
-    //     *         description="Product Variation ID",
-    //     *         @OA\Schema(type="number", format="integer", example="products[0][product_variation_id]"),
-    //     *     ),
-    //     *     @OA\Parameter(
-    //     *          in="query",
-    //     *          name="products[0][quantity]",
-    //     *          required=true,
-    //     *          description="Product quantity",
-    //     *          @OA\Schema(type="number", format="integer", example="products[0][quantity]"),
-    //     * *     ),
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="products[0][product_variation_id]",
+     *         required=true,
+     *         description="Product Variation ID",
+     *         @OA\Schema(type="number", format="integer", example="products[0][product_variation_id]"),
+     *     ),
+     *     @OA\Parameter(
+     *          in="query",
+     *          name="products[0][quantity]",
+     *          required=true,
+     *          description="Product quantity",
+     *          @OA\Schema(type="number", format="integer", example="products[0][quantity]"),
+     *      ),
      *
      *     @OA\Response(
      *          response=200,
