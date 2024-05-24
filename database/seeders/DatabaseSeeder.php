@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             ColorSeeder::class,
             SizeSeeder::class,
+            PermissionSeeder::class,
         ]);
         // \App\Models\User::factory(10)->create();
 
