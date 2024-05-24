@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ColorController;
 use App\Http\Controllers\Admin\SizeController;
 use App\Http\Controllers\PlanController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -44,6 +45,9 @@ Route::group(['prefix' => 'admin'], function () {
 
         //Plan
         Route::resource('plan', PlanController::class);
+
+        //Role
+        Route::resource('role', RoleController::class);
 
 
 //    Route::resource('product', \App\Http\Controllers\ProductController::class);

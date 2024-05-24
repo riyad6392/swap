@@ -293,7 +293,7 @@ class SwapController extends Controller
      *         description="success",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example="true"),
-     *             @OA\Property(property="errors", type="json", example={"message": {"Get swap details."}}),
+     *             @OA\Property(property="data", type="json", example={"uid": "swp-547689"}),
      *         ),
      *     ),
      *     @OA\Response(
