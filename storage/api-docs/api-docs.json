@@ -576,7 +576,7 @@
                     {
                         "name": "pagination",
                         "in": "query",
-                        "required": true,
+                        "required": false,
                         "schema": {
                             "type": "number"
                         },
@@ -590,6 +590,15 @@
                             "type": "boolean"
                         },
                         "example": "1"
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "T-shirt"
                     }
                 ],
                 "responses": {
@@ -723,6 +732,68 @@
             }
         },
         "/api/brand/{id}": {
+            "get": {
+                "tags": [
+                    "Brand"
+                ],
+                "summary": "Brand Show.",
+                "operationId": "63f192ced3f2dc97cd628847bda18f3d",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "json",
+                                            "example": []
+                                        },
+                                        "links": {
+                                            "type": "json",
+                                            "example": []
+                                        },
+                                        "meta": {
+                                            "type": "json",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Unauthenticated"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            },
             "put": {
                 "tags": [
                     "Brand"
@@ -1389,6 +1460,68 @@
             }
         },
         "/api/color/{id}": {
+            "get": {
+                "tags": [
+                    "Color"
+                ],
+                "summary": "Color Show.",
+                "operationId": "53209f2b5d28fe73b6f55ab52c161a86",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "json",
+                                            "example": []
+                                        },
+                                        "links": {
+                                            "type": "json",
+                                            "example": []
+                                        },
+                                        "meta": {
+                                            "type": "json",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Unauthenticated"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            },
             "put": {
                 "tags": [
                     "Color"
@@ -1710,6 +1843,68 @@
             }
         },
         "/api/size/{id}": {
+            "get": {
+                "tags": [
+                    "Size"
+                ],
+                "summary": "Size Show.",
+                "operationId": "f2a3284fe841dbba2ead52958cb42c87",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "json",
+                                            "example": []
+                                        },
+                                        "links": {
+                                            "type": "json",
+                                            "example": []
+                                        },
+                                        "meta": {
+                                            "type": "json",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Unauthenticated"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            },
             "put": {
                 "tags": [
                     "Size"
@@ -6248,67 +6443,6 @@
                         "apiAuth": []
                     }
                 ]
-            },
-            "delete": {
-                "tags": [
-                    "Swaps"
-                ],
-                "summary": "Delete Swap.",
-                "operationId": "e8f53adca2752aabffa3b885d98b589a",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Delete a swap by ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": "true"
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Swap and related data deleted successfully"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": "false"
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Swap not found"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
             }
         },
         "/api/swap-approve/{id}": {
@@ -6317,7 +6451,7 @@
                     "Swaps"
                 ],
                 "summary": "Swap Approve by user.",
-                "operationId": "79c3e533072edb72e94d7a67d9ed2bc9",
+                "operationId": "4825c2e186546493c041a2c7fbe88c14",
                 "parameters": [
                     {
                         "name": "id",
@@ -6384,7 +6518,7 @@
                     "Swaps"
                 ],
                 "summary": "Swap Decline by user.",
-                "operationId": "14e1028d748068bb6f44611f86b5ef22",
+                "operationId": "8b9c697d093fe8a28f1f590786b1b749",
                 "parameters": [
                     {
                         "name": "id",
@@ -7087,6 +7221,136 @@
                                             "example": {
                                                 "message": [
                                                     "Swap created successfully."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "The given data was invalid."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/swap/destroy/{id}": {
+            "delete": {
+                "tags": [
+                    "Swaps Initiate"
+                ],
+                "summary": "Swap Request accepted by message request",
+                "description": "Accept Swap.",
+                "operationId": "e25850d37de5d8bc4c1d12263a0d5f0d",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Request accepted successfully."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "The given data was invalid."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/swap-accept/{id}": {
+            "get": {
+                "tags": [
+                    "Swaps Initiate"
+                ],
+                "summary": "Swp Request accepted by message request",
+                "description": "Accept Swap.",
+                "operationId": "a1c186c83a3b1b0f428349ee0794b994",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Request accepted successfully."
                                                 ]
                                             }
                                         }
