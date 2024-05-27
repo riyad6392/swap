@@ -6213,12 +6213,10 @@
                                             "type": "boolean",
                                             "example": "true"
                                         },
-                                        "errors": {
+                                        "data": {
                                             "type": "json",
                                             "example": {
-                                                "message": [
-                                                    "Get swap details."
-                                                ]
+                                                "uid": "swp-547689"
                                             }
                                         }
                                     },
