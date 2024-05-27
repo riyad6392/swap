@@ -1,16 +1,16 @@
 <?php
 
-use App\Http\Controllers\Admin\Auth\AdminController;
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\Auth\ForgetPasswordController;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\Auth\RegistrationController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ColorController;
+use App\Http\Controllers\Admin\PermissionController;
+use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SizeController;
-use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PlanController;
-use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -32,10 +32,11 @@ Route::group(['prefix' => 'admin'], function () {
         })->name('data');
 
         Route::post('logout', [LoginController::class, 'logout']);
-        Route::post('approve-user/{user}', [AdminController::class, 'approveUser'])->name('admin.approve-user');
 
         //User
         Route::resource('user', UserController::class);
+        Route::post('approve-user/{user}', [AdminController::class, 'approveUser'])->name('admin.approve-user');
+        Route::resource('admin-user', AdminController::class);
         Route::resource('category', CategoryController::class);
         Route::resource('brand', BrandController::class);
         Route::resource('size', SizeController::class);

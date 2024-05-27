@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\RolePermission\StoreRoleRequest;
 use App\Http\Requests\RolePermission\UpdateRoleRequest;
 use Illuminate\Http\JsonResponse;
