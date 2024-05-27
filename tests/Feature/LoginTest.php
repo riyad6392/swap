@@ -32,6 +32,7 @@ class LoginTest extends TestCase
 
         $clients = new \Laravel\Passport\ClientRepository();
 
+
         for ($i = 0; $i < 2; $i++) {
             $clients->createPasswordGrantClient(
                 null, $name[$i], 'http://localhost', $provider[$i]
@@ -57,6 +58,9 @@ class LoginTest extends TestCase
             'password' => 'password',
             'scope' => 'user'
         ]);
+       // dd(1);
+
+       // dd($response->getContent());
 
         $response->assertStatus(200);
     }
