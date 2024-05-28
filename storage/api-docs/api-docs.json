@@ -2251,12 +2251,12 @@
                     {
                         "name": "remember",
                         "in": "query",
-                        "description": "Flag to remember the user on this device. Use 0 or 1 as values.",
-                        "required": false,
+                        "description": "remember option",
+                        "required": true,
                         "schema": {
-                            "type": "boolean"
+                            "type": "string"
                         },
-                        "example": false
+                        "example": "1"
                     }
                 ],
                 "responses": {
@@ -2269,7 +2269,7 @@
                                         "user": {
                                             "type": "object",
                                             "example": {
-                                                "id": 2,
+                                                "id": 25,
                                                 "name": "Imtiaz Ur Rahman Khan",
                                                 "email": "k.r.imtiaz@gmail.com",
                                                 "email_verified_at": null,
@@ -2279,7 +2279,7 @@
                                         },
                                         "success": {
                                             "type": "boolean",
-                                            "example": true
+                                            "example": "1"
                                         },
                                         "token_type": {
                                             "type": "string",
@@ -2307,7 +2307,7 @@
                                     "properties": {
                                         "success": {
                                             "type": "boolean",
-                                            "example": false
+                                            "example": "0"
                                         },
                                         "errors": {
                                             "type": "object",
@@ -6441,6 +6441,67 @@
                         "apiAuth": []
                     }
                 ]
+            },
+            "delete": {
+                "tags": [
+                    "Swaps"
+                ],
+                "summary": "Delete Swap.",
+                "operationId": "e8f53adca2752aabffa3b885d98b589a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Delete a swap by ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Swap and related data deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Swap not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/api/swap-approve/{id}": {

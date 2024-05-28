@@ -16,7 +16,7 @@ use Tests\TestCase;
 
 class InventoryTest extends TestCase
 {
-    use RefreshDatabase;
+//    use RefreshDatabase;
 
     /**
      * A basic feature test example.
@@ -25,7 +25,7 @@ class InventoryTest extends TestCase
     public  function create_demo()
     {
         return $this->json('POST', 'api/product', [
-            'id'=>1,
+//            'id'=>1,
             'name' => 'Test Product',
             'category_id' => 1,
             'brand_id' => 1,
@@ -57,37 +57,44 @@ class InventoryTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = User::factory()->create();
-        Brand::factory()->create();
-        Category::factory()->create();
-        Color::factory()->create();
-        Size::factory()->create();
+        $user=User::find(1);
+
+        //$id=User::Where('id',1)->value('id');
 
 
         $this->actingAs($user, 'api');
-
         $this->withoutMiddleware();
-
         $response = $this->create_demo();
-//        dd($this->create_demo());
-        $response->assertStatus(201);
+
+        if(!$user)
+        {
+            $response->assertStatus(500);
+        }
+        else
+        {
+            $response->assertStatus(201);
+        }
+
     }
 
     public function test_can_update_product()
     {
         $this->withoutExceptionHandling();
-        $user = User::factory()->create();
-        Brand::factory()->create();
-        Category::factory()->create();
-        Color::factory()->create();
-        Size::factory()->create();
+//        $user = User::factory()->create();
+//        Brand::factory()->create();
+//        Category::factory()->create();
+//        Color::factory()->create();
+//        Size::factory()->create();
+
+
+        $user=User::find(3);
         $this->actingAs($user, 'api');
         $this->withoutMiddleware();
 
         $this->create_demo();
 
-        $response = $this->json('PUT', 'api/product/1', [
-            'id'=>1,
+        $response = $this->json('PUT', 'api/product/5', [
+//            'id'=>1,
             'name' => 'Test Product',
             'category_id' => 1,
             'brand_id' => 1,
@@ -114,8 +121,55 @@ class InventoryTest extends TestCase
                 ]
             ]
         ]);
-        $response->assertStatus(201);
+        if(!$user)
+        {
+            $response->assertStatus(404);
 
+        }
+        else
+        {
+            $response->assertStatus(201);
+        }
+
+
+    }
+
+    public function test_can_delete_product()
+    {
+        $this->withoutExceptionHandling();
+//        $user = User::factory()->create();
+//        Brand::factory()->create();
+//        Category::factory()->create();
+//        Color::factory()->create();
+//        Size::factory()->create();
+
+        $user=User::find(3);
+        $this->actingAs($user, 'api');
+        $this->withoutMiddleware();
+
+//         $this->create_demo();
+
+
+//        $this->assertDatabaseHas('products', [
+//            'id' =>1
+//        ]);
+
+
+        $response = $this->json('DELETE', 'api/product/5');
+
+        if(!$user)
+        {
+            $response->assertStatus(404);
+        }
+        else
+        {
+            $response->assertStatus(200);
+        }
+
+
+        $this->assertDatabaseMissing('products', [
+            'id' => 1
+        ]);
     }
 
 

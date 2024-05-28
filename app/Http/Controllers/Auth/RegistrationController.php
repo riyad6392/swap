@@ -40,6 +40,9 @@ class RegistrationController extends Controller
      *          name="passord",
      *          required=true,
      *
+     *
+     *
+     *
      *          @OA\Schema(type="string"),
      *          example="Ex123456@",
      *      ),

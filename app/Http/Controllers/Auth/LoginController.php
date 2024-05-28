@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Laravel\Passport\Client as OClient;
+use Illuminate\Support\Facades\Log;
 use Laravel\Passport\Passport;
 use Illuminate\Support\Facades\Http;
 
@@ -59,16 +60,16 @@ class LoginController extends Controller
      *         example="password"
      *     ),
      *
-     *     @OA\Parameter(
-     *         name="remember",
-     *         in="query",
-     *         description="Flag to remember the user on this device. Use 0 or 1 as values.",
-     *         required=false,
-     *         @OA\Schema(
-     *             type="boolean"
-     *         ),
-     *         example=false
-     *     ),
+     *    @OA\Parameter(
+     *          name="remember",
+     *          in="query",
+     *          description="remember option",
+     *          required=true,
+     *          @OA\Schema(
+     *              type="string",
+     *          ),
+     *          example="1"
+     *      ),
      *
      *     @OA\Response(
      *         response=200,
@@ -77,7 +78,7 @@ class LoginController extends Controller
      *             @OA\Property(property="user", type="object",
      *                 example={"id": 2, "name": "Imtiaz Ur Rahman Khan", "email": "k.r.imtiaz@gmail.com", "email_verified_at": null, "created_at": "2022-11-02T12:25:16.000000Z", "updated_at": "2022-11-02T12:25:16.000000Z"}
      *             ),
-     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="success", type="boolean", example="1"),
      *             @OA\Property(property="token_type", type="string", example="Bearer"),
      *             @OA\Property(property="expires_in", type="integer", example=86400),
      *             @OA\Property(property="access_token", type="string", example="eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiw...")
@@ -88,7 +89,7 @@ class LoginController extends Controller
      *         response=422,
      *         description="Invalid user input",
      *         @OA\JsonContent(
-     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="success", type="boolean", example="0"),
      *             @OA\Property(property="errors", type="object",
      *                 example={"message": "Credentials do not match"}
      *             ),
@@ -110,18 +111,24 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
+
+        //Log::info('Remember field:', ['remember' => $request->remember]);
+
+
         $validateData = Validator::make($request->all(), [
             'email' => 'email|required',
             'password' => 'required',
-            'remember' => 'required|boolean'
+            'remember' => 'required'
         ]);
 
-        if ($validateData->fails()) {
 
+        if ($validateData->fails()) {
             return response()->json(['success' => false, 'message' => 'Validation errors', 'errors' => $validateData->errors()], 422);
         }
 
-        if (auth()->attempt($request->only('email', 'password'), (bool)$request->remember)) {
+
+
+        if (auth()->attempt($request->only('email', 'password'), $request->remember)) {
             $user = auth()->user();
             if ($user->is_approved_by_admin) {
                 $token = $this->getTokenAndRefreshToken($request->email, $request->password, 'user');
