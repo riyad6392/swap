@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Spatie\Permission\Models\Role;
 
 class RegistrationController extends Controller
 {
@@ -71,7 +72,8 @@ class RegistrationController extends Controller
         $validateData = Validator::make($request->all(), [
             'name' => 'required|max:255',
             'email' => 'required|email|unique:admins',
-            'password' => 'required'
+            'password' => 'required',
+//            'role_id' => 'required|exists:roles,id'
         ]);
 
         if ($validateData->fails()) {
@@ -79,6 +81,10 @@ class RegistrationController extends Controller
         }else{
             $request->password = bcrypt($request->password);
             Admin::create($request->only('name', 'email', 'password'));
+
+//            $role = Role::findById($request->role_id);
+//
+//            $admin->assignRole($role->name);
 
             return response()->json(['success' => true, 'message' => 'Your registration successfully done'], 200);
         }

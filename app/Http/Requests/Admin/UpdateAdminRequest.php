@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Http\Requests\Admin;
+
+use App\Traits\ValidationErrorMessageTrait;
+use Illuminate\Foundation\Http\FormRequest;
+
+class UpdateAdminRequest extends FormRequest
+{
+    use ValidationErrorMessageTrait;
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'name' => 'required|string',
+            'email' => 'required|email|unique:admins,email,' . $this->admin,
+            'role' => 'required|exists:roles,id'
+        ];
+    }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'Name is required',
+            'email.required' => 'Email is required',
+            'email.email' => 'Email must be a valid email address',
+            'email.unique' => 'Email is already taken',
+            'role.required' => 'Role is required',
+            'role.exists' => 'Role does not exist'
+        ];
+    }
+}

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\RolePermission\StoreRoleRequest;
 use App\Http\Requests\RolePermission\UpdateRoleRequest;
 use Illuminate\Http\JsonResponse;
@@ -25,13 +26,13 @@ class RoleController extends Controller
             $roles = $roles->orderBy('name', $request->sort);
         }
 
-        if($request->has('get_all')){
-            return response()->json(['success'=> true,'roles' => $roles->get()], 200);
+        if ($request->has('get_all')) {
+            return response()->json(['success' => true, 'data' => $roles->get()], 200);
         }
 
-        $roles = $roles->paginate( $request->paginate ?? 10);
+        $roles = $roles->paginate($request->paginate ?? 10);
 
-        return response()->json(['success'=> true,'roles' => $roles], 200);
+        return response()->json(['success' => true, 'data' => $roles], 200);
     }
 
     /**
@@ -47,9 +48,11 @@ class RoleController extends Controller
      */
     public function store(StoreRoleRequest $request): JsonResponse
     {
-        $role = Role::create(['name' => $request->name]);
+        $role = Role::create([
+            'name' => $request->name,
+        ]);
 
-        return response()->json(['success'=> true,'message' => 'Role created successfully', 'role' => $role], 201);
+        return response()->json(['success' => true, 'message' => 'Role created successfully', 'data' => $role], 201);
     }
 
     /**
@@ -76,13 +79,13 @@ class RoleController extends Controller
         $role = Role::find($id);
 
         if (!$role) {
-            return response()->json(['success'=> false,'message' => 'Role not found'], 404);
+            return response()->json(['success' => false, 'message' => 'Role not found'], 404);
         }
 
         $role->update([
-           'name' => $request->name ?? ''
+            'name' => $request->name ?? ''
         ]);
-        return response()->json(['success'=> true,'message' => 'Role updated successfully', 'role' => $role], 200);
+        return response()->json(['success' => true, 'message' => 'Role updated successfully', 'role' => $role], 200);
     }
 
     /**
@@ -93,12 +96,12 @@ class RoleController extends Controller
         $role = Role::find($id);
 
         if (!$role) {
-            return response()->json(['success'=> false,'message' => 'Role not found'], 404);
+            return response()->json(['success' => false, 'message' => 'Role not found'], 404);
         }
 
         $role->revokePermissionTo($role->permissions);
         $role->delete();
-        return response()->json(['success'=> true,'message' => 'Role deleted successfully'], 200);
+        return response()->json(['success' => true, 'message' => 'Role deleted successfully'], 200);
     }
 
     public function syncPermissions(Request $request, string $id): JsonResponse
@@ -106,11 +109,11 @@ class RoleController extends Controller
         $role = Role::find($id);
 
         if (!$role) {
-            return response()->json(['success'=> false,'message' => 'Role not found'], 404);
+            return response()->json(['success' => false, 'message' => 'Role not found'], 404);
         }
 
         $role->syncPermissions($request->permissions);
 
-        return response()->json(['success'=> true,'message' => 'Permissions synced successfully', 'role' => $role], 200);
+        return response()->json(['success' => true, 'message' => 'Permissions synced successfully', 'role' => $role], 200);
     }
 }

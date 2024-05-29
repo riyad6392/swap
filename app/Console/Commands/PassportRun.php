@@ -29,9 +29,8 @@ class PassportRun extends Command
      */
     public function handle(ClientRepository $clients)
     {
-        ;
+        Artisan::call('passport:install');
         $this->createPasswordClient($clients);
-
     }
 
     protected function createPasswordClient(ClientRepository $clients)
