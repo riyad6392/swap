@@ -5,8 +5,12 @@ namespace App\Http\Controllers;
 use App\Facades\StripePaymentFacade;
 use App\Http\Requests\User\ListUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
+use App\Http\Requests\User\StoreUserRequest;
+use App\Http\Requests\User\UpdateUserForAdminRequest;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\UserResource;
+use App\Models\Brand;
+use Illuminate\Http\JsonResponse;
 use App\Models\User;
 use App\Services\FileUploadService;
 use Illuminate\Http\Request;
@@ -125,11 +129,92 @@ class UserController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * New User created.
+     *
+     * @OA\Post(
+     *     path="/api/user-list",
+     *     tags={"User"},
+     *     security={{ "apiAuth": {} }},
+     *
+     *     @OA\MediaType(mediaType="multipart/form-data"),
+     *
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="search",
+     *         required=false,
+     *         @OA\Schema(type="string"),
+     *         example="Imtiaz Ur Rahman",
+     *     ),
+     *
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="sort",
+     *         required=false,
+     *         @OA\Schema(type="string"),
+     *         example="asc,desc",
+     *     ),
+     *
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="pagination",
+     *         required=true,
+     *         @OA\Schema(type="number"),
+     *         example="10"
+     *     ),
+     *
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="get_all",
+     *         required=false,
+     *         @OA\Schema(type="boolean"),
+     *         example="1"
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="success",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", type="json", example={}),
+     *             @OA\Property(property="links", type="json", example={}),
+     *             @OA\Property(property="meta", type="json", example={}),
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=401,
+     *         description="Invalid user",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example="false"),
+     *             @OA\Property(property="errors", type="json", example={"message": {"Unauthenticated"}}),
+     *         )
+     *     )
+     * )
      */
-    public function store(Request $request)
+    public function store(StoreUserRequest $request): JsonResponse
     {
-        //
+        try {
+            //dd($request->all());
+            DB::beginTransaction();
+
+            $user = User::create([
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'email' => $request->email,
+                'password' => bcrypt('password'),
+                'is_approved_by_admin' => $request->is_approved_by_admin ?? false,
+                'phone' => $request->phone,
+
+            ]);
+
+            DB::commit();
+
+            return response()->json(['success' => true, 'user' => $user], 201);
+        } catch (\Exception $exception) {
+
+            DB::rollBack();
+
+            return response()->json(['success' => false, 'errors' => ['message' => [$exception->getMessage()]]], 404);
+        }
     }
 
     /**
@@ -157,15 +242,41 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $user = User::findOrFail($id);
+        return view('users.edit', compact('user'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateUserForAdminRequest $request, string $id): JsonResponse
     {
-        //
+        try {
+            $user = User::findOrFail($id);
+
+            $user->update([
+                'first_name' => $request->first_name ?? $user->first_name,
+                'last_name' => $request->last_name ?? $user->last_name,
+                'email' => $request->email ?? $user->email,
+                'password' => bcrypt('password'),
+//                'subscription_is_active' => $request->subscription_is_active ?? $user->subscription_is_active,
+                'is_approved_by_admin' => $request->is_approved_by_admin ?? $user->is_approved_by_admin,
+//                'business_name' => $request->business_name ?? $user->business_name,
+                'phone' => $request->phone ?? $user->phone,
+//                'business_address' => $request->business_address ?? $user->business_address,
+//                'online_store_url' => $request->online_store_url ?? $user->online_store_url,
+//                'ein' => $request->ein ?? $user->ein,
+//                'resale_license' => $request->resale_license ?? $user->resale_license,
+//                'photo_of_id' => $request->photo_of_id ?? $user->photo_of_id,
+//                'stripe_customer_id' => $request->stripe_customer_id ?? $user->stripe_customer_id,
+//                'is_super_swapper' => $request->is_super_swapper ?? $user->is_super_swapper,
+//                'about_me' => $request->about_me ?? $user->about_me,
+            ]);
+
+            return response()->json(['success' => true, 'user' => $user], 200);
+        } catch (\Exception $exception) {
+            return response()->json(['success' => false, 'errors' => ['message' => [$exception->getMessage()]]], 404);
+        }
     }
     /**
      * Admin Delete.

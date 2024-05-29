@@ -5,13 +5,120 @@
         "version": "latest"
     },
     "paths": {
+        "/api/admin": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Admin List.",
+                "operationId": "046c7091772f915f91d32b972e6bffdc",
+                "parameters": [
+                    {
+                        "name": "pagination",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        },
+                        "example": "10"
+                    },
+                    {
+                        "name": "get_all",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "example": "1"
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "John Doe"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "asc"
+                    },
+                    {
+                        "name": "role",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "admin"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "data": {
+                                            "type": "json",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Unauthenticated"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
         "/api/admin/approve-user/{user}": {
             "post": {
                 "tags": [
                     "Admin Authentication"
                 ],
                 "summary": "User Approved by Admin.",
-                "operationId": "0e42eb587295fcc741c3745f0189468d",
+                "operationId": "54a017171db3db5918b7c44b1f21cedd",
                 "responses": {
                     "200": {
                         "description": "success",
@@ -8132,62 +8239,6 @@
                 ]
             }
         },
-        "/api/admin/user/destroy/{id}": {
-            "delete": {
-                "tags": [
-                    "Admin User"
-                ],
-                "summary": "Admin Delete.",
-                "operationId": "e4ada1c7ff9476d5b24ba711e0a8a8b9",
-                "responses": {
-                    "200": {
-                        "description": "success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": "true"
-                                        },
-                                        "message": {
-                                            "type": "json",
-                                            "example": "User Deleted successfully"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Invalid user",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": "false"
-                                        },
-                                        "message": {
-                                            "type": "json",
-                                            "example": "Unauthenticated"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "apiAuth": []
-                    }
-                ]
-            }
-        },
         "/api/user-list": {
             "get": {
                 "tags": [
@@ -8275,6 +8326,162 @@
                                                     "Unauthenticated"
                                                 ]
                                             }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "New User created.",
+                "operationId": "1653a58b26fcf096d17734cda6c973d5",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Imtiaz Ur Rahman"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "asc,desc"
+                    },
+                    {
+                        "name": "pagination",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "number"
+                        },
+                        "example": "10"
+                    },
+                    {
+                        "name": "get_all",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "example": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "json",
+                                            "example": []
+                                        },
+                                        "links": {
+                                            "type": "json",
+                                            "example": []
+                                        },
+                                        "meta": {
+                                            "type": "json",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "type": "json",
+                                            "example": {
+                                                "message": [
+                                                    "Unauthenticated"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/user/destroy/{id}": {
+            "delete": {
+                "tags": [
+                    "Admin User"
+                ],
+                "summary": "Admin Delete.",
+                "operationId": "e4ada1c7ff9476d5b24ba711e0a8a8b9",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        },
+                                        "message": {
+                                            "type": "json",
+                                            "example": "User Deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "message": {
+                                            "type": "json",
+                                            "example": "Unauthenticated"
                                         }
                                     },
                                     "type": "object"
