@@ -2269,7 +2269,7 @@
                                         "user": {
                                             "type": "object",
                                             "example": {
-                                                "id": 25,
+                                                "id": 2,
                                                 "name": "Imtiaz Ur Rahman Khan",
                                                 "email": "k.r.imtiaz@gmail.com",
                                                 "email_verified_at": null,
