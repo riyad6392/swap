@@ -73,18 +73,18 @@ class RegistrationController extends Controller
             'name' => 'required|max:255',
             'email' => 'required|email|unique:admins',
             'password' => 'required',
-            'role_id' => 'required|exists:roles,id'
+//            'role_id' => 'required|exists:roles,id'
         ]);
 
         if ($validateData->fails()) {
             return response()->json(['success' => false, 'message' => 'Validation errors', 'errors' => $validateData->errors()], 422);
         }else{
             $request->password = bcrypt($request->password);
-            $admin = Admin::create($request->only('name', 'email', 'password'));
+            Admin::create($request->only('name', 'email', 'password'));
 
-            $role = Role::findById($request->role_id);
-
-            $admin->assignRole($role->name);
+//            $role = Role::findById($request->role_id);
+//
+//            $admin->assignRole($role->name);
 
             return response()->json(['success' => true, 'message' => 'Your registration successfully done'], 200);
         }
