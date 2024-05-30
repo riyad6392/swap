@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Facades\StripePaymentFacade;
 use App\Http\Requests\User\ListUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
@@ -16,11 +15,10 @@ use App\Services\FileUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-
 class UserController extends Controller
 {
-    const PER_PAGE = 10;
 
+    const PER_PAGE = 10;
     /**
      * User List.
      *
@@ -916,7 +914,7 @@ class UserController extends Controller
     {
         $user = User::find($id);
         if ($user) {
-            $user->is_active = !$user->is_active;
+            $user->is_approved_by_admin = !$user->is_approved_by_admin;
             $user->save();
             return response()->json(['success' => true, 'message' => 'User updated successfully', 'data' => $user]);
         }

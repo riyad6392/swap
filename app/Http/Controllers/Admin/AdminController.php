@@ -93,11 +93,20 @@ class AdminController extends Controller
             $admins = $admins->orderBy('name', $request->sort);
         }
 
+
         if ($request->has('role')) {
             $admins = $admins->whereHas('roles', function ($query) use ($request) {
                 $query->where('name', $request->role);
             });
         }
+
+        if ($request->has('id')) {
+            $admins = $admins->whereHas('roles', function ($query) use ($request) {
+                $query->where('id', $request->id);
+            });
+        }
+
+
 
         $admins = $admins->with('roles');
 
