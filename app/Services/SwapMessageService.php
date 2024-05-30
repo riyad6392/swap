@@ -3,13 +3,48 @@
 namespace App\Services;
 
 use App\Models\Conversation;
+use App\Models\Message;
 use App\Models\Participant;
 use App\Models\Swap;
 use Illuminate\Support\Facades\DB;
 
 class SwapMessageService
 {
-    public static function createPrivateConversation($sender_id, $receiver_id, $conversation_type, $last_message_id = null, $last_message = null)
+    public static function messageGenerate(
+        $sender_id,
+        $receiver_id,
+        $conversation_type,
+        $message_type,
+        $message,
+        $swap
+    )
+    {
+        $conversation = (new SwapMessageService)->findOrCreateConversation(
+            $sender_id, $receiver_id, $conversation_type,
+        );
+
+        $message = Message::create([
+            'message' => $message,
+            'receiver_id' => $receiver_id,
+            'swap_id' => $swap->id,
+            'sender_id' => auth()->id(),
+            'conversation_id' => $conversation->id,
+            'message_type' => $message_type,
+        ]);
+
+        $conversation->last_message_id = $message->id;
+        $conversation->last_message = $message->message;
+        $conversation->save();
+
+        return $message;
+    }
+
+
+    public function findOrCreateConversation(
+        $sender_id,
+        $receiver_id,
+        $conversation_type,
+    )
     {
         $sender_id = (int)$sender_id;
         $receiver_id = (int)$receiver_id;
@@ -31,19 +66,14 @@ class SwapMessageService
                         'conversation_type' => 'private',
                         'composite_id' => $sender_id . ':' . $receiver_id,
                         'reverse_composite_id' => $receiver_id . ':' . $sender_id,
-                        'last_message_id' => $last_message_id,
-                        'last_message' => $last_message,
+                        'last_message_id' => '',
+                        'last_message' => '',
                     ]);
 
                     (new SwapMessageService)->insertParticipant(
                         $conversation,
                         [$sender_id, $receiver_id]
                     );
-                }else{
-
-                    $conversation->last_message_id = $last_message_id;
-                    $conversation->last_message = $last_message;
-                    $conversation->save();
                 }
 
                 DB::commit();
@@ -71,6 +101,11 @@ class SwapMessageService
         }
 
         Participant::insert($insertDataForParticipant);
+    }
+
+    public function withNotify(): static
+    {
+        return $this;
     }
 
 }

@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SwapInitiate\StoreSwapInitiateRequest;
+use App\Jobs\SwapJob;
+use App\Models\Message;
 use App\Models\Swap;
 use App\Models\SwapInitiateDetails;
+use App\Services\SwapMessageService;
+use App\Services\SwapNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -117,6 +121,21 @@ class SwapInitiateDetailsController extends Controller
             }
 
             SwapInitiateDetails::insert($insertData);
+
+            $conversation = SwapMessageService::messageGenerate(
+                auth()->id(),
+                $swap->exchanged_user_id,
+                'private',
+                'notification',
+                'You have a new swap request ' . $swap->uid,
+                $swap
+            )->withNotify();
+
+
+
+//            $message = $message->load('sender', 'receiver', 'swap');
+//
+//            dispatch(new SwapJob($swap, $conversation, $message));
 
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Swap initiated successfully'], 200);

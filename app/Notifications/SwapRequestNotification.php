@@ -43,7 +43,7 @@ class SwapRequestNotification extends Notification
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage([
-            'id' => $this->id,
+            'id' => $this->message->id,
             'swap_id' => $this->swap->id,
             'data' => $this->message,
             'requester_id' => $this->swap->requested_user_id,
