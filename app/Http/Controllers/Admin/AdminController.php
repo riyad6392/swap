@@ -173,7 +173,10 @@ class AdminController extends Controller
             $admin->syncRoles([$role->name]);
         }
 
-        $admin->update($request->all());
+        $admin->update([
+            'name' => $request->name,
+            'email' => $request->email
+        ]);
 
 
         return response()->json(['success'=> true,'message' => 'Admin updated successfully', 'data' => $admin], 200);
