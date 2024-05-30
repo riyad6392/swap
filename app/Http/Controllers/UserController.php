@@ -5,8 +5,12 @@ namespace App\Http\Controllers;
 use App\Facades\StripePaymentFacade;
 use App\Http\Requests\User\ListUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
+use App\Http\Requests\User\StoreUserRequest;
+use App\Http\Requests\User\UpdateUserForAdminRequest;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\UserResource;
+use App\Models\Brand;
+use Illuminate\Http\JsonResponse;
 use App\Models\User;
 use App\Services\FileUploadService;
 use Illuminate\Http\Request;
@@ -125,11 +129,81 @@ class UserController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * New User created.
+     *
+     * @OA\Post(
+     *     path="/api/user-list",
+     *     tags={"User"},
+     *     security={{ "apiAuth": {} }},
+     *
+     *     @OA\MediaType(mediaType="multipart/form-data"),
+     *
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="search",
+     *         required=false,
+     *         @OA\Schema(type="string"),
+     *         example="Imtiaz Ur Rahman",
+     *     ),
+     *
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="sort",
+     *         required=false,
+     *         @OA\Schema(type="string"),
+     *         example="asc,desc",
+     *     ),
+     *
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="pagination",
+     *         required=true,
+     *         @OA\Schema(type="number"),
+     *         example="10"
+     *     ),
+     *
+     *     @OA\Parameter(
+     *         in="query",
+     *         name="get_all",
+     *         required=false,
+     *         @OA\Schema(type="boolean"),
+     *         example="1"
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="success",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", type="json", example={}),
+     *             @OA\Property(property="links", type="json", example={}),
+     *             @OA\Property(property="meta", type="json", example={}),
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=401,
+     *         description="Invalid user",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example="false"),
+     *             @OA\Property(property="errors", type="json", example={"message": {"Unauthenticated"}}),
+     *         )
+     *     )
+     * )
      */
-    public function store(Request $request)
+    public function store(StoreUserRequest $request): JsonResponse
     {
-        //
+
+        $user = User::create([
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'email' => $request->email,
+            'password' => bcrypt('password'),
+            'is_approved_by_admin' => $request->is_approved_by_admin ?? false,
+            'phone' => $request->phone,
+        ]);
+
+        return response()->json(['success' => true, 'user' => $user], 201);
+
     }
 
     /**
@@ -157,16 +231,33 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $user = User::findOrFail($id);
+        return view('users.edit', compact('user'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateUserForAdminRequest $request, string $id): JsonResponse
     {
-        //
+
+        $user = User::findOrFail($id);
+
+        $user->update([
+            'first_name' => $request->first_name ?? $user->first_name,
+            'last_name' => $request->last_name ?? $user->last_name,
+            'email' => $request->email ?? $user->email,
+            'password' => bcrypt('password'),
+            'is_approved_by_admin' => $request->is_approved_by_admin ?? $user->is_approved_by_admin,
+            'phone' => $request->phone ?? $user->phone,
+
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'User updated successfully']);
+
+
     }
+
     /**
      * Admin Delete.
      *
@@ -492,8 +583,7 @@ class UserController extends Controller
             ], 404);
         }
 
-        $inventory = $user
-            ->store()
+        $inventory = $user->store()
             ->with(
                 'image',
                 'category',

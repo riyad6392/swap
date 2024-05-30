@@ -12,7 +12,7 @@ use Tests\TestCase;
 
 class LoginTest extends TestCase
 {
-    use RefreshDatabase;
+//    use RefreshDatabase;
     /**
      * A basic feature test example.
      */
@@ -32,19 +32,20 @@ class LoginTest extends TestCase
 
         $clients = new \Laravel\Passport\ClientRepository();
 
-        for ($i = 0; $i < 2; $i++) {
-            $clients->createPasswordGrantClient(
-                null, $name[$i], 'http://localhost', $provider[$i]
-            );
-        }
 
-        User::create([
-            'first_name' => 'Imtiaz Ur',
-            'last_name' => 'Rahman Khan',
-            'email' => 'k.r.imtiaz@gmail.com',
-            'password' => bcrypt('password'),
-
-        ]);
+//        for ($i = 0; $i < 2; $i++) {
+//            $clients->createPasswordGrantClient(
+//                null, $name[$i], 'http://localhost', $provider[$i]
+//            );
+//        }
+//
+//        User::create([
+//            'first_name' => 'Imtiaz Ur',
+//            'last_name' => 'Rahman Khan',
+//            'email' => 'k.r.imtiaz@gmail.com',
+//            'password' => bcrypt('password'),
+//
+//        ]);
 
 
         $client = OClient::where('password_client', 1)->where('provider', 'users')->first();
@@ -57,6 +58,9 @@ class LoginTest extends TestCase
             'password' => 'password',
             'scope' => 'user'
         ]);
+       // dd(1);
+
+       // dd($response->getContent());
 
         $response->assertStatus(200);
     }

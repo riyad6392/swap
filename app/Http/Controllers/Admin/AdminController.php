@@ -12,8 +12,74 @@ use Spatie\Permission\Models\Role;
 
 class AdminController extends Controller
 {
+    //const PER_PAGE = 10;
+
     /**
-     * Display a listing of the resource.
+     * Admin List.
+     *
+     * @OA\Get(
+     *     path="/api/admin",
+     *     tags={"Admin"},
+     *     security={{ "apiAuth": {} }},
+     *
+     *     @OA\Parameter(
+     *          in="query",
+     *          name="pagination",
+     *          required=false,
+     *          @OA\Schema(type="number"),
+     *          example="10"
+     *      ),
+     *
+     *      @OA\Parameter(
+     *          in="query",
+     *          name="get_all",
+     *          required=false,
+     *          @OA\Schema(type="boolean"),
+     *          example="1"
+     *      ),
+     *
+     *     @OA\Parameter(
+     *           in="query",
+     *           name="search",
+     *           required=false,
+     *           @OA\Schema(type="string"),
+     *           example="John Doe"
+     *       ),
+     *
+     *     @OA\Parameter(
+     *           in="query",
+     *           name="sort",
+     *           required=false,
+     *           @OA\Schema(type="string"),
+     *           example="asc"
+     *       ),
+     *
+     *     @OA\Parameter(
+     *           in="query",
+     *           name="role",
+     *           required=false,
+     *           @OA\Schema(type="string"),
+     *           example="admin"
+     *       ),
+     *
+     *     @OA\Response(
+     *           response=200,
+     *           description="success",
+     *           @OA\JsonContent(
+     *               @OA\Property(property="success", type="boolean", example="true"),
+     *               @OA\Property(property="data", type="json", example={}),
+     *           )
+     *       ),
+     *
+     *       @OA\Response(
+     *           response=401,
+     *           description="Invalid user",
+     *           @OA\JsonContent(
+     *               @OA\Property(property="success", type="boolean", example="false"),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Unauthenticated"}}),
+     *           )
+     *       )
+     * )
      */
     public function index(Request $request)
     {
@@ -46,6 +112,7 @@ class AdminController extends Controller
 
     /**
      * Show the form for creating a new resource.
+     *
      */
     public function create()
     {
@@ -106,7 +173,10 @@ class AdminController extends Controller
             $admin->syncRoles([$role->name]);
         }
 
-        $admin->update($request->all());
+        $admin->update([
+            'name' => $request->name,
+            'email' => $request->email
+        ]);
 
 
         return response()->json(['success'=> true,'message' => 'Admin updated successfully', 'data' => $admin], 200);

@@ -10,7 +10,7 @@ use Tests\TestCase;
 
 class RegisterTest extends TestCase
 {
-    use RefreshDatabase;
+//    use RefreshDatabase;
 
     /**
      * A basic feature test example.
@@ -27,7 +27,8 @@ class RegisterTest extends TestCase
         $response = $this->post('api/register', [
             'first_name' => 'Imtiaz Ur',
             'last_name' => 'Rahman Khan',
-            'email' => 'k.r.imtiaz@gmail.com',
+//           'email' => 'k.r.imtiaz@gmail.com',
+            'email'=>'riyad1@gmail.com',
             'password' => 'password',
         ]);
         $response->assertStatus(200);

@@ -24,7 +24,7 @@ class BrandController extends Controller
      *     @OA\Parameter(
      *          in="query",
      *          name="pagination",
-     *          required=true,
+     *          required=false,
      *
      *          @OA\Schema(type="number"),
      *          example="10"
@@ -39,6 +39,18 @@ class BrandController extends Controller
      *          example="1"
      *
      *      ),
+     *
+     *     @OA\Parameter(
+     *           in="query",
+     *           name="search",
+     *           required=false,
+     *
+     *           @OA\Schema(type="string"),
+     *           example="T-shirt"
+     *
+     *       ),
+     *
+     *
      *     @OA\Response(
      *           response=200,
      *           description="success",
