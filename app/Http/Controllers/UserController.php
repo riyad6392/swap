@@ -217,13 +217,8 @@ class UserController extends Controller
             return response()->json(['success' => false, 'message' => 'User not found'], 404);
         }
 
-        if ($request->get('get_all')) {
-            return response()->json(['success' => true, 'data' => $user->products()->get()]);
-        }
 
-        $inventory = $user->products()->paginate($request->pagination ?? self::PER_PAGE);
-
-        return response()->json(['success' => true, 'data' => $inventory]);
+        return response()->json(['success' => true, 'data' => $user]);
     }
 
     /**
