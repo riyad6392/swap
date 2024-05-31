@@ -16,6 +16,7 @@ class PermissionController extends Controller
     {
         $permissions = Permission::query();
 
+
         if ($request->has('search')) {
             $permissions = $permissions->where('name', 'like', '%' . $request->search . '%');
         }

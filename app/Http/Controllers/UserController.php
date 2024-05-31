@@ -14,9 +14,26 @@ use App\Models\User;
 use App\Services\FileUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Models\Role;
+
 class UserController extends Controller
 {
+
+//    public function __construct()
+//    {
+//        $this->middleware(['auth:sanctum', 'permission:admin'])->only(['index', 'store', 'show', 'update', 'destroy']);
+//    }
+
+
+    public function __construct()
+    {
+        $this->middleware(['auth:admin-api', 'permission:user.index'])->only('index');
+        $this->middleware(['auth:admin-api', 'permission:user.show'])->only('show');
+        $this->middleware(['auth:admin-api', 'permission:user.edit'])->only('update');
+        $this->middleware(['auth:admin-api', 'permission:user.delete'])->only('destroy');
+    }
 
     const PER_PAGE = 10;
     /**
@@ -879,6 +896,8 @@ class UserController extends Controller
             return response()->json(['success' => false, 'message' => $exception->getMessage()], 500);
         }
     }
+
+
 
     /**
      * Admin Approve.
