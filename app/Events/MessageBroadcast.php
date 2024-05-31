@@ -23,7 +23,7 @@ class MessageBroadcast implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct(Conversation $conversation, Message $message)
+    public function __construct(Conversation $conversation,Message $message)
     {
         $this->conversation = $conversation;
         $this->message = $message;
@@ -36,6 +36,7 @@ class MessageBroadcast implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
+        info('conversation.'.$this->conversation->channel_name);
         return [
             new PrivateChannel('conversation.'.$this->conversation->channel_name),
         ];
