@@ -128,7 +128,10 @@ class CategoryController extends Controller
      */
     public function store(StoreCategoryRequest $request)
     {
-        Category::create($request->only('name'));
+        Category::create([
+            'name' => $request->name,
+            'description' => $request->description
+        ]);
         return response()->json(['success' => true, 'message' => 'Category created successfully.']);
     }
 
@@ -225,7 +228,10 @@ class CategoryController extends Controller
         $category = Category::findOrFail($id);
         if ($category) {
 
-            $category->update($updateCategory->only('name'));
+            $category->update([
+                'name' => $updateCategory->name,
+                'description' => $updateCategory->description
+            ]);
             return response()->json(['success' => true, 'message' => 'Category updated successfully.']);
 
         }
