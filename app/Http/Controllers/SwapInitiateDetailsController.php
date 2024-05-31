@@ -123,6 +123,8 @@ class SwapInitiateDetailsController extends Controller
 
             SwapInitiateDetails::insert($insertData);
 
+            
+
             MessageFacade::prepareData(
                 auth()->id(),
                 $swap->exchanged_user_id,
@@ -131,7 +133,7 @@ class SwapInitiateDetailsController extends Controller
                 'You have a new swap request ' . $swap->uid,
                 $swap
             )->messageGenerate()->withNotify();
-
+            
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Swap initiated successfully'], 200);
 

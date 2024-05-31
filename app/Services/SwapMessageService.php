@@ -82,8 +82,8 @@ class SwapMessageService
                         'conversation_type' => 'private',
                         'composite_id' => $sender_id . ':' . $receiver_id,
                         'reverse_composite_id' => $receiver_id . ':' . $sender_id,
-                        'last_message_id' => '',
-                        'last_message' => '',
+                        // 'last_message_id' => '',
+                        // 'last_message' => '',
                     ]);
 
                     $this->insertParticipant(
