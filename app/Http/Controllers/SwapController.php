@@ -573,9 +573,12 @@ class SwapController extends Controller
      *     )
      * )
      */
-    public function swapApprove($id): \Illuminate\Http\JsonResponse
+    public function swapApprove($uid): \Illuminate\Http\JsonResponse
     {
-        $swap = Swap::find($id);
+        $swap = Swap::where(function ($query) use ($uid) {
+            $query->where('exchanged_user_id', auth()->id())
+                ->orWhere('requested_user_id', auth()->id());
+        })->where('uid', $uid)->first();
 
         if (!$swap) {
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
@@ -636,9 +639,12 @@ class SwapController extends Controller
      *     )
      * )
      */
-    public function swapDecline($id): \Illuminate\Http\JsonResponse
+    public function swapDecline($uid): \Illuminate\Http\JsonResponse
     {
-        $swap = Swap::find($id);
+        $swap = Swap::where(function ($query) use ($uid) {
+            $query->where('exchanged_user_id', auth()->id())
+                ->orWhere('requested_user_id', auth()->id());
+        })->where('uid', $uid)->first();
 
         if (!$swap) {
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
@@ -667,9 +673,12 @@ class SwapController extends Controller
         return response()->json(['success' => true, 'message' => 'You are not allow to change the swap status'], 200);
     }
 
-    public function swapComplete($id): \Illuminate\Http\JsonResponse
+    public function swapComplete($uid): \Illuminate\Http\JsonResponse
     {
-        $swap = Swap::find($id);
+        $swap = Swap::where(function ($query) use ($uid) {
+            $query->where('exchanged_user_id', auth()->id())
+                ->orWhere('requested_user_id', auth()->id());
+        })->where('uid', $uid)->first();
 
         if (!$swap) {
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
