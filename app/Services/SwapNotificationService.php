@@ -20,12 +20,14 @@ enum SwapNotificationService: string
             ],
         ]);
 
+       info('Notification created successfully', [$insertNotification]);
+
         $users = User::whereIn('id', $id)->get();
 
         $users->each(function ($user) use ($insertNotification, $swap, $message) {
 
             $user->notifications()->attach($insertNotification->id);
-            Notification::send($user, new SwapRequestNotification($swap, $message));
+            Notification::send($user, new SwapRequestNotification($insertNotification));
         });
 
     }

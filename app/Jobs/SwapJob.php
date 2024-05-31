@@ -42,7 +42,7 @@ class SwapJob implements ShouldQueue
             'You have a new swap request ' . $this->swap->uid
         );
 
-        event(new MessageBroadcast($this->conversation, $this->message));
+        event(new MessageBroadcast($this->conversation,$this->message));
 
     }
 }
