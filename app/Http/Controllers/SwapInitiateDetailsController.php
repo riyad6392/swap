@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\MessageFacade;
 use App\Http\Requests\SwapInitiate\StoreSwapInitiateRequest;
 use App\Jobs\SwapJob;
 use App\Models\Message;
@@ -122,20 +123,14 @@ class SwapInitiateDetailsController extends Controller
 
             SwapInitiateDetails::insert($insertData);
 
-            $conversation = SwapMessageService::messageGenerate(
+            MessageFacade::prepareData(
                 auth()->id(),
                 $swap->exchanged_user_id,
                 'private',
                 'notification',
                 'You have a new swap request ' . $swap->uid,
                 $swap
-            )->withNotify();
-
-
-
-//            $message = $message->load('sender', 'receiver', 'swap');
-//
-//            dispatch(new SwapJob($swap, $conversation, $message));
+            )->messageGenerate()->withNotify();
 
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Swap initiated successfully'], 200);
@@ -149,9 +144,21 @@ class SwapInitiateDetailsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(SwapInitiateDetails $swapInitiateDetails)
+    public function show($uid)
     {
-        //
+        $swap = Swap::where(function ($query) use ($uid) {
+            $query->where('exchanged_user_id', auth()->id())
+                ->orWhere('requested_user_id', auth()->id());
+        })->where('uid', $uid)->first();
+
+
+        if (!$swap) {
+            return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
+        }
+
+        $swap = $swap->load('initiateDetails','requestDetail','exchangeDetails');
+
+        return response()->json(['success' => true, 'data' => $swap], 200);
     }
 
     /**
