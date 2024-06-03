@@ -27,6 +27,8 @@ class UserResource extends JsonResource
             'business_name' => $this->business_name,
             'business_address' => $this->business_address,
             'image' => new ImageResource($this->image),
+            'about_me' => $this->about_me,
+            'a'
         ];
     }
 }

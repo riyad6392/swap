@@ -68,5 +68,7 @@ class Kernel extends HttpKernel
         'check.subscription' => \App\Http\Middleware\checkSubscription::class,
         'scopes' => \Laravel\Passport\Http\Middleware\CheckScopes::class,
         'scope' => \Laravel\Passport\Http\Middleware\CheckForAnyScope::class,
+        'admin.approval' => \App\Http\Middleware\AdminApproval::class,
+        'unverified.super.swapper' => \App\Http\Middleware\UnverifiedSuperSwapper::class,
     ];
 }

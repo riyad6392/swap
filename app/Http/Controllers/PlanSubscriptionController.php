@@ -139,7 +139,7 @@ class PlanSubscriptionController extends Controller
                 'business_name' => $planSubscriptionRequest->business_name,
                 'business_address' => $planSubscriptionRequest->business_address,
                 'subscription_is_active' => 1,
-                'is_super_swapper' => $plan->interval == 'month' ? 1 : 0
+                'is_super_swapper' => $plan->is_super_swapper ?? 0,
             ]);
 
             Billing::create([

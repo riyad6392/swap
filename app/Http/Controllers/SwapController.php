@@ -117,7 +117,7 @@ class SwapController extends Controller
         }
 
         if ($request->sort) {
-            $swaps->orderBy('created_at', $request->sort);
+            $swaps->orderBy('created_at', $request->sort ?? 'desc');
         }
 
 
