@@ -12,16 +12,16 @@ class SwapRequestNotification extends Notification
 {
     use Queueable;
 
-    protected object $swap;
+    protected object $insertNotification;
     protected string $message;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(object $swap, string $message)
+    public function __construct(object $insertNotification)
     {
-        $this->swap = $swap;
-        $this->message = $message;
+        $this->insertNotification = $insertNotification;
+//        $this->message = $message;
     }
 
     /**
@@ -42,12 +42,6 @@ class SwapRequestNotification extends Notification
 
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
-        return new BroadcastMessage([
-            'id' => $this->id,
-            'swap_id' => $this->swap->id,
-            'data' => $this->message,
-            'requester_id' => $this->swap->requested_user_id,
-            'exchanger_id' => (int) $this->swap->exchanged_user_id,
-        ]);
+        return new BroadcastMessage((array)$this->insertNotification->toArray());
     }
 }

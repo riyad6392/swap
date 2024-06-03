@@ -2,14 +2,65 @@
 
 namespace App\Services;
 
+use App\Jobs\SwapJob;
 use App\Models\Conversation;
+use App\Models\Message;
 use App\Models\Participant;
 use App\Models\Swap;
 use Illuminate\Support\Facades\DB;
 
 class SwapMessageService
 {
-    public static function createPrivateConversation($sender_id, $receiver_id, $conversation_type, $last_message_id = null, $last_message = null)
+    public $sender_id = null;
+    public $receiver_id = null;
+    public $conversation_type = null;
+    public $message_type = null;
+    public $message = null;
+    public $swap = null;
+    public $conversation = null;
+
+    public function prepareData($sender_id, $receiver_id, $conversation_type, $message_type, $message, $swap): static
+    {
+        $this->sender_id = $sender_id;
+        $this->receiver_id = $receiver_id;
+        $this->conversation_type = $conversation_type;
+        $this->message_type = $message_type;
+        $this->message = $message;
+        $this->swap = $swap;
+
+        return $this;
+    }
+
+    public function messageGenerate()
+    {
+        $this->conversation = $this->findOrCreateConversation(
+            $this->sender_id, $this->receiver_id, $this->conversation_type,
+        );
+
+        $message = Message::create([
+            'message' => $this->message,
+            'receiver_id' => $this->receiver_id,
+            'swap_id' => $this->swap->id,
+            'sender_id' => auth()->id(),
+            'conversation_id' => $this->conversation->id,
+            'message_type' => $this->message_type,
+        ]);
+
+        $this->conversation->last_message_id = $message->id;
+        $this->conversation->last_message = $message->message;
+        $this->conversation->save();
+
+        $this->message = $message->load('conversation');
+
+        return $this;
+    }
+
+
+    public function findOrCreateConversation(
+        $sender_id,
+        $receiver_id,
+        $conversation_type,
+    )
     {
         $sender_id = (int)$sender_id;
         $receiver_id = (int)$receiver_id;
@@ -31,19 +82,14 @@ class SwapMessageService
                         'conversation_type' => 'private',
                         'composite_id' => $sender_id . ':' . $receiver_id,
                         'reverse_composite_id' => $receiver_id . ':' . $sender_id,
-                        'last_message_id' => $last_message_id,
-                        'last_message' => $last_message,
+                        // 'last_message_id' => '',
+                        // 'last_message' => '',
                     ]);
 
-                    (new SwapMessageService)->insertParticipant(
+                    $this->insertParticipant(
                         $conversation,
                         [$sender_id, $receiver_id]
                     );
-                }else{
-
-                    $conversation->last_message_id = $last_message_id;
-                    $conversation->last_message = $last_message;
-                    $conversation->save();
                 }
 
                 DB::commit();
@@ -71,6 +117,13 @@ class SwapMessageService
         }
 
         Participant::insert($insertDataForParticipant);
+    }
+
+    public function withNotify()
+    {
+        dispatch(new SwapJob($this->swap, $this->conversation, $this->message));
+
+        return $this;
     }
 
 }

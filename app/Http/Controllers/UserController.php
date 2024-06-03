@@ -207,29 +207,18 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request): JsonResponse
     {
-        try {
-            //dd($request->all());
-            DB::beginTransaction();
 
-            $user = User::create([
-                'first_name' => $request->first_name,
-                'last_name' => $request->last_name,
-                'email' => $request->email,
-                'password' => bcrypt('password'),
-                'is_approved_by_admin' => $request->is_approved_by_admin ?? false,
-                'phone' => $request->phone,
+        $user = User::create([
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'email' => $request->email,
+            'password' => bcrypt('password'),
+            'is_approved_by_admin' => $request->is_approved_by_admin ?? false,
+            'phone' => $request->phone,
+        ]);
 
-            ]);
+        return response()->json(['success' => true, 'user' => $user], 201);
 
-            DB::commit();
-
-            return response()->json(['success' => true, 'user' => $user], 201);
-        } catch (\Exception $exception) {
-
-            DB::rollBack();
-
-            return response()->json(['success' => false, 'errors' => ['message' => [$exception->getMessage()]]], 404);
-        }
     }
 
     /**
@@ -243,13 +232,8 @@ class UserController extends Controller
             return response()->json(['success' => false, 'message' => 'User not found'], 404);
         }
 
-        if ($request->get('get_all')) {
-            return response()->json(['success' => true, 'data' => $user->products()->get()]);
-        }
 
-        $inventory = $user->products()->paginate($request->pagination ?? self::PER_PAGE);
-
-        return response()->json(['success' => true, 'data' => $inventory]);
+        return response()->json(['success' => true, 'data' => $user]);
     }
 
     /**
@@ -266,33 +250,24 @@ class UserController extends Controller
      */
     public function update(UpdateUserForAdminRequest $request, string $id): JsonResponse
     {
-        try {
-            $user = User::findOrFail($id);
 
-            $user->update([
-                'first_name' => $request->first_name ?? $user->first_name,
-                'last_name' => $request->last_name ?? $user->last_name,
-                'email' => $request->email ?? $user->email,
-                'password' => bcrypt('password'),
-//                'subscription_is_active' => $request->subscription_is_active ?? $user->subscription_is_active,
-                'is_approved_by_admin' => $request->is_approved_by_admin ?? $user->is_approved_by_admin,
-//                'business_name' => $request->business_name ?? $user->business_name,
-                'phone' => $request->phone ?? $user->phone,
-//                'business_address' => $request->business_address ?? $user->business_address,
-//                'online_store_url' => $request->online_store_url ?? $user->online_store_url,
-//                'ein' => $request->ein ?? $user->ein,
-//                'resale_license' => $request->resale_license ?? $user->resale_license,
-//                'photo_of_id' => $request->photo_of_id ?? $user->photo_of_id,
-//                'stripe_customer_id' => $request->stripe_customer_id ?? $user->stripe_customer_id,
-//                'is_super_swapper' => $request->is_super_swapper ?? $user->is_super_swapper,
-//                'about_me' => $request->about_me ?? $user->about_me,
-            ]);
+        $user = User::findOrFail($id);
 
-            return response()->json(['success' => true, 'user' => $user], 200);
-        } catch (\Exception $exception) {
-            return response()->json(['success' => false, 'errors' => ['message' => [$exception->getMessage()]]], 404);
-        }
+        $user->update([
+            'first_name' => $request->first_name ?? $user->first_name,
+            'last_name' => $request->last_name ?? $user->last_name,
+            'email' => $request->email ?? $user->email,
+            'password' => bcrypt('password'),
+            'is_approved_by_admin' => $request->is_approved_by_admin ?? $user->is_approved_by_admin,
+            'phone' => $request->phone ?? $user->phone,
+
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'User updated successfully']);
+
+
     }
+
     /**
      * Admin Delete.
      *
@@ -618,8 +593,7 @@ class UserController extends Controller
             ], 404);
         }
 
-        $inventory = $user
-            ->store()
+        $inventory = $user->store()
             ->with(
                 'image',
                 'category',

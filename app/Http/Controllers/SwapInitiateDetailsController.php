@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\MessageFacade;
 use App\Http\Requests\SwapInitiate\StoreSwapInitiateRequest;
+use App\Jobs\SwapJob;
+use App\Models\Message;
 use App\Models\Swap;
 use App\Models\SwapInitiateDetails;
+use App\Services\SwapMessageService;
+use App\Services\SwapNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -118,6 +123,17 @@ class SwapInitiateDetailsController extends Controller
 
             SwapInitiateDetails::insert($insertData);
 
+            
+
+            MessageFacade::prepareData(
+                auth()->id(),
+                $swap->exchanged_user_id,
+                'private',
+                'notification',
+                'You have a new swap request ' . $swap->uid,
+                $swap
+            )->messageGenerate()->withNotify();
+            
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Swap initiated successfully'], 200);
 
@@ -130,9 +146,21 @@ class SwapInitiateDetailsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(SwapInitiateDetails $swapInitiateDetails)
+    public function show($uid)
     {
-        //
+        $swap = Swap::where(function ($query) use ($uid) {
+            $query->where('exchanged_user_id', auth()->id())
+                ->orWhere('requested_user_id', auth()->id());
+        })->where('uid', $uid)->first();
+
+
+        if (!$swap) {
+            return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
+        }
+
+        $swap = $swap->load('initiateDetails.product.image','requestDetail.product.image','exchangeDetails.product.image');
+
+        return response()->json(['success' => true, 'data' => $swap], 200);
     }
 
     /**
@@ -182,21 +210,24 @@ class SwapInitiateDetailsController extends Controller
      *      )
      * )
      */
-    public function destroy($id)
+    public function destroy($uid)
     {
-        $swaps = Swap::find($id);
+        $swap = Swap::where(function ($query) use ($uid) {
+            $query->where('exchanged_user_id', auth()->id())
+                ->orWhere('requested_user_id', auth()->id());
+        })->where('uid', $uid)->first();
 
-        if (!$swaps) {
+        if (!$swap) {
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
         }
 
-        if ($swaps->requested_user_id != auth()->id()) {
+        if ($swap->requested_user_id != auth()->id()) {
             return response()->json(['success' => false, 'message' => 'You are not authorized to delete this swap'], 401);
         }
 
-        if ($swaps->exchanged_user_status == 'pending' && $swaps->requested_user_status == 'requested') {
-            $swaps->initiateDetails()->delete();
-            $swaps->delete();
+        if ($swap->exchanged_user_status == 'pending' && $swap->requested_user_status == 'requested') {
+            $swap->initiateDetails()->delete();
+            $swap->delete();
 
             return response()->json(['success' => true, 'message' => 'Swap deleted successfully'], 200);
         }
@@ -237,9 +268,13 @@ class SwapInitiateDetailsController extends Controller
      * )
      */
 
-    public function swapAccept($id)
+    public function swapAccept($uid)
     {
-        $swap = Swap::find($id);
+        $swap = Swap::where(function ($query) use ($uid) {
+            $query->where('exchanged_user_id', auth()->id())
+                ->orWhere('requested_user_id', auth()->id());
+        })->where('uid', $uid)->first();
+
         if (!$swap) {
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
         }

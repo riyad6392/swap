@@ -185,6 +185,7 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
         'StripePaymentFacade' => App\Facades\StripePaymentFacade::class,
+        'MessageFacade' => App\Facades\MessageFacade::class,
     ])->toArray(),
 
 ];
