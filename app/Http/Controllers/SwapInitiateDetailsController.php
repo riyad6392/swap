@@ -213,7 +213,8 @@ class SwapInitiateDetailsController extends Controller
     public function destroy($uid)
     {
         $swap = Swap::where(function ($query) use ($uid) {
-            $query->where('exchanged_user_id', auth()->id())
+            $query
+//                ->where('exchanged_user_id', auth()->id())
                 ->orWhere('requested_user_id', auth()->id());
         })->where('uid', $uid)->first();
 
