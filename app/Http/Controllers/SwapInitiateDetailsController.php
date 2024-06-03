@@ -152,14 +152,12 @@ class SwapInitiateDetailsController extends Controller
             $query->where('exchanged_user_id', auth()->id())
                 ->orWhere('requested_user_id', auth()->id());
         })->where('uid', $uid)->first();
-
-        $swap = $swap->load('user');
-
+        
         if (!$swap) {
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
         }
 
-        $swap = $swap->load('initiateDetails.product.image','requestDetail.product.image','exchangeDetails.product.image');
+        $swap = $swap->load('user','initiateDetails.product.image','requestDetail.product.image','exchangeDetails.product.image');
 
         return response()->json(['success' => true, 'data' => $swap], 200);
     }
