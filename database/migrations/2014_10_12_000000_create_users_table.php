@@ -22,6 +22,7 @@ return new class extends Migration
             $table->boolean('subscription_is_active')->default(0);
             $table->string('stripe_customer_id')->nullable();
             $table->boolean('is_approved_by_admin')->default(0);
+            $table->string('approved_by')->nullable();
             $table->boolean('is_super_swapper')->default(0);
             $table->string('business_name')->nullable();
             $table->string('business_address')->nullable();

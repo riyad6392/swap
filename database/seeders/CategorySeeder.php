@@ -22,6 +22,7 @@ class CategorySeeder extends Seeder
                 'description' => 'T-shirt',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Shirt',
@@ -30,6 +31,7 @@ class CategorySeeder extends Seeder
                 'description' => 'Shirt',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Pants',
@@ -38,6 +40,7 @@ class CategorySeeder extends Seeder
                 'description' => 'Pants',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Jacket',
@@ -46,6 +49,7 @@ class CategorySeeder extends Seeder
                 'description' => 'Jacket',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Shoes',
@@ -54,6 +58,7 @@ class CategorySeeder extends Seeder
                 'description' => 'Shoes',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Accessories',
@@ -62,6 +67,7 @@ class CategorySeeder extends Seeder
                 'description' => 'Accessories',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Hat',
@@ -70,6 +76,7 @@ class CategorySeeder extends Seeder
                 'description' => 'Hat',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
 
             ],
             [
@@ -79,6 +86,7 @@ class CategorySeeder extends Seeder
                 'description' => 'Bag',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Socks',
@@ -87,6 +95,7 @@ class CategorySeeder extends Seeder
                 'description' => 'Socks',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Underwear',
@@ -95,6 +104,7 @@ class CategorySeeder extends Seeder
                 'description' => 'Underwear',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Swimwear',
@@ -103,6 +113,7 @@ class CategorySeeder extends Seeder
                 'description' => 'Swimwear',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Sportswear',
@@ -111,6 +122,7 @@ class CategorySeeder extends Seeder
                 'description' => 'Sportswear',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Sleepwear',
@@ -119,6 +131,7 @@ class CategorySeeder extends Seeder
                 'description' => 'Sleepwear',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Formalwear',
@@ -127,6 +140,7 @@ class CategorySeeder extends Seeder
                 'description' => 'Formalwear',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Casualwear',
@@ -135,6 +149,7 @@ class CategorySeeder extends Seeder
                 'description' => 'Casualwear',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Outerwear',
@@ -143,6 +158,7 @@ class CategorySeeder extends Seeder
                 'description' => 'Outerwear',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Loungewear',
@@ -151,6 +167,7 @@ class CategorySeeder extends Seeder
                 'description' => 'Loungewear',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Maternitywear',
@@ -159,6 +176,7 @@ class CategorySeeder extends Seeder
                 'description' => 'Maternitywear',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Petite',
@@ -167,6 +185,7 @@ class CategorySeeder extends Seeder
                 'description' => 'Petite',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Plus Size',
@@ -175,6 +194,7 @@ class CategorySeeder extends Seeder
                 'description' => 'Plus Size',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ]
 
         ];

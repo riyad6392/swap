@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Brand\StoreBrandRequest;
 use App\Http\Requests\Brand\UpdateBrandRequest;
 use App\Models\Brand;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class BrandController extends Controller
@@ -145,6 +146,7 @@ class BrandController extends Controller
         $brand = Brand::create([
             'name' => $brandRequest->name,
             'description' => $brandRequest->description ?? '',
+            'is_published'=>$brandRequest->is_published,
         ]);
 
 //        if ($brandRequest->has('logo')){
@@ -296,6 +298,17 @@ class BrandController extends Controller
     public function destroy(string $id)
     {
         $brand = Brand::find($id);
+
+        if (!$brand) {
+            return response()->json(['success' => false, 'message' => 'Brand not found']);
+        }
+
+        $isBrandUsedInProducts =Product::where('brand_id', $id)->exists();
+
+        if ($isBrandUsedInProducts) {
+            return response()->json(['success' => false, 'message' => 'Brand is in use in product and cannot be deleted'], 403);
+        }
+
         $brand->delete();
         return response()->json(['success' => true, 'message' => 'Brand deleted successfully']);
     }

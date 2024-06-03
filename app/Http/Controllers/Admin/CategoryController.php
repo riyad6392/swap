@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Category\StoreCategoryRequest;
 use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 
@@ -130,7 +131,8 @@ class CategoryController extends Controller
     {
         Category::create([
             'name' => $request->name,
-            'description' => $request->description
+            'description' => $request->description,
+            'is_published'=>$request->is_published,
         ]);
         return response()->json(['success' => true, 'message' => 'Category created successfully.']);
     }
@@ -230,7 +232,8 @@ class CategoryController extends Controller
 
             $category->update([
                 'name' => $updateCategory->name,
-                'description' => $updateCategory->description
+                'description' => $updateCategory->description,
+                'is_published'=>$updateCategory->is_published,
             ]);
             return response()->json(['success' => true, 'message' => 'Category updated successfully.']);
 
@@ -271,10 +274,18 @@ class CategoryController extends Controller
     public function destroy(string $id)
     {
         $category = Category::findOrFail($id);
-        if ($category) {
-            $category->delete();
-            return response()->json(['success' => true, 'message' => 'Category deleted successfully.']);
+        if (!$category) {
+            return response()->json(['success' => false, 'message' => 'Category not found']);
         }
-        return response()->json(['success' => false, 'message' => 'Category not found.'], 404);
+
+        $isCategoryUsedInProducts =Product::where('category_id', $id)->exists();
+
+        if ($isCategoryUsedInProducts) {
+            return response()->json(['success' => false, 'message' => 'Category is in use in product and cannot be deleted'], 403);
+        }
+
+        $category->delete();
+
+        return response()->json(['success' => true, 'message' => 'Category deleted successfully']);
     }
 }

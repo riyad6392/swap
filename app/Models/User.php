@@ -34,6 +34,7 @@ class User extends Authenticatable
         'password',
         'subscription_is_active',
         'is_approved_by_admin',
+        'approved_by',
         'business_name',
         'phone',
         'business_address',

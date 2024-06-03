@@ -19,7 +19,7 @@ class Permission
 
     public function handle(Request $request, Closure $next, $role)
     {
-        if (Auth::check() && Auth::user()->hasRole($role)) {
+        if (Auth::check()) {
             return $next($request);
         }
 

@@ -29,10 +29,16 @@ class UserController extends Controller
 
     public function __construct()
     {
-        $this->middleware(['auth:admin-api', 'permission:user.index'])->only('index');
-        $this->middleware(['auth:admin-api', 'permission:user.show'])->only('show');
-        $this->middleware(['auth:admin-api', 'permission:user.edit'])->only('update');
-        $this->middleware(['auth:admin-api', 'permission:user.delete'])->only('destroy');
+
+//        $this->middleware(['auth:admin-api', 'permission:user.index'])->only('index');
+//        $this->middleware(['auth:admin-api', 'permission:user.show'])->only('show');
+//        $this->middleware(['auth:admin-api', 'permission:user.edit'])->only('update');
+//        $this->middleware(['auth:admin-api', 'permission:user.delete'])->only('destroy');
+
+        $this->middleware('permission:brand-list|brand-create|brand-edit|brand-delete', ['only' => ['index','store']]);
+        $this->middleware('permission:brand-create', ['only' => ['create','store']]);
+        $this->middleware('permission:brand-edit', ['only' => ['edit','update']]);
+        $this->middleware('permission:brand-delete', ['only' => ['destroy']]);
     }
 
     const PER_PAGE = 10;
@@ -207,6 +213,7 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request): JsonResponse
     {
+        $admin_id = auth()->user()->id;
 
         $user = User::create([
             'first_name' => $request->first_name,
@@ -215,6 +222,7 @@ class UserController extends Controller
             'password' => bcrypt('password'),
             'is_approved_by_admin' => $request->is_approved_by_admin ?? false,
             'phone' => $request->phone,
+            'approved_by' => $admin_id,
         ]);
 
         return response()->json(['success' => true, 'user' => $user], 201);
