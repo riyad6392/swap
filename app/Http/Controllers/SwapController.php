@@ -85,15 +85,15 @@ class SwapController extends Controller
         $swaps->where('requested_user_id', auth()->id())
             ->orWhere('exchanged_user_id', auth()->id());
 
-        if ($request->name){
+        if ($request->search){
             $swaps
                 ->whereHas('user', function ($query) use ($request) {
-                $query->where('first_name', 'like', '%' . $request->name . '%');
+                $query->where('first_name', 'like', '%' . $request->search . '%');
             })
                 ->orWhereHas('exchangeDetails', function ($query) use ($request) {
                 $query->whereHas('product', function ($query) use ($request) {
-                    $query->where('name', 'like', '%' . $request->name . '%')
-                        ->orWhere('description', 'like', '%' . $request->name . '%');
+                    $query->where('name', 'like', '%' . $request->search . '%')
+                        ->orWhere('description', 'like', '%' . $request->search . '%');
                 });
             });
         }
