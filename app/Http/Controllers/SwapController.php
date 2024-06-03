@@ -654,7 +654,7 @@ class SwapController extends Controller
             return response()->json(['success' => false, 'message' => 'You are not authorized to decline this swap'], 401);
         }
 
-        if ($swap->exchanged_user_status == 'pending') {
+        if ($swap->exchanged_user_status == 'accepted') {
 
             $swap->update([
                 'exchanged_user_status' => 'decline',
@@ -667,10 +667,9 @@ class SwapController extends Controller
                 'your swap request has been declined'
             );
 
-            return response()->json(['success' => true, 'message' => 'You decline the swap request'], 200);
         }
 
-        return response()->json(['success' => true, 'message' => 'You are not allow to change the swap status'], 200);
+        return response()->json(['success' => true, 'message' => 'You decline the swap request'], 200);
     }
 
     public function swapComplete($uid): \Illuminate\Http\JsonResponse
