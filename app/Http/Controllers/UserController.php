@@ -477,7 +477,7 @@ class UserController extends Controller
             $inventory->orderBy('created_at', $listUserRequest->sort);
         }
 
-        $user = new UserResource($user);
+//        $user = new UserResource($user);
 
         if ($listUserRequest->get('get_all')) {
 
