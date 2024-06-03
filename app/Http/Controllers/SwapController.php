@@ -599,13 +599,13 @@ class SwapController extends Controller
             SwapNotificationService::sendNotification(
                 $swap,
                 [$swap->requested_user_id],
-                'Swap request has been accepted'
+                'Swap request has been approved'
             );
 
-            return response()->json(['success' => true, 'message' => 'You accept the swap request'], 200);
+            return response()->json(['success' => true, 'message' => 'You approved the swap request'], 200);
         }
 
-        return response()->json(['success' => true, 'message' => 'You are not allow to change the swap status'], 200);
+        return response()->json(['success' => false, 'message' => 'You are not allow to change the swap status'], 403);
     }
 
     /**
