@@ -123,7 +123,7 @@ class SwapInitiateDetailsController extends Controller
 
             SwapInitiateDetails::insert($insertData);
 
-            
+
 
             MessageFacade::prepareData(
                 auth()->id(),
@@ -133,7 +133,7 @@ class SwapInitiateDetailsController extends Controller
                 'You have a new swap request ' . $swap->uid,
                 $swap
             )->messageGenerate()->withNotify();
-            
+
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Swap initiated successfully'], 200);
 
@@ -213,8 +213,8 @@ class SwapInitiateDetailsController extends Controller
     public function destroy($uid)
     {
         $swap = Swap::where(function ($query) use ($uid) {
-            $query->where('exchanged_user_id', auth()->id())
-                ->orWhere('requested_user_id', auth()->id());
+            $query->where('exchanged_user_id', auth()->id());
+//                ->orWhere('requested_user_id', auth()->id());
         })->where('uid', $uid)->first();
 
         if (!$swap) {
@@ -227,6 +227,8 @@ class SwapInitiateDetailsController extends Controller
 
         if ($swap->exchanged_user_status == 'pending' && $swap->requested_user_status == 'requested') {
             $swap->initiateDetails()->delete();
+            $swap->requestDetail()->delete();
+            $swap->exchangeDetails()->delete();
             $swap->delete();
 
             return response()->json(['success' => true, 'message' => 'Swap deleted successfully'], 200);
