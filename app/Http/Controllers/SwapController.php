@@ -100,6 +100,18 @@ class SwapController extends Controller
                             $query->where('name', 'like', $searchTerm)
                                 ->orWhere('description', 'like', $searchTerm);
                         });
+                    })
+                    ->orWhereHas('requestDetail', function ($query) use ($searchTerm) {
+                        $query->whereHas('product', function ($query) use ($searchTerm) {
+                            $query->where('name', 'like', $searchTerm)
+                                ->orWhere('description', 'like', $searchTerm);
+                        });
+                    })
+                    ->orWhereHas('initiateDetails', function ($query) use ($searchTerm) {
+                        $query->whereHas('product', function ($query) use ($searchTerm) {
+                            $query->where('name', 'like', $searchTerm)
+                                ->orWhere('description', 'like', $searchTerm);
+                        });
                     });
             });
         }
