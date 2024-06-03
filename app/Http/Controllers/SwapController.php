@@ -82,25 +82,32 @@ class SwapController extends Controller
     {
         $swaps = Swap:: query();
 
-        $swaps->where('requested_user_id', auth()->id())
-            ->orWhere('exchanged_user_id', auth()->id());
+        $swaps->where(function($query) {
+            $userId = auth()->id();
+            $query->where('requested_user_id', $userId)
+                ->orWhere('exchanged_user_id', $userId);
+        });
 
-        if ($request->search){
-            $swaps
-                ->whereHas('user', function ($query) use ($request) {
-                $query->where('first_name', 'like', '%' . $request->search . '%');
-            })
-                ->orWhereHas('exchangeDetails', function ($query) use ($request) {
-                $query->whereHas('product', function ($query) use ($request) {
-                    $query->where('name', 'like', '%' . $request->search . '%')
-                        ->orWhere('description', 'like', '%' . $request->search . '%');
-                });
+        if ($request->has('search')) {
+            $searchTerm = '%' . $request->search . '%';
+            $swaps->where(function ($query) use ($searchTerm) {
+                $query->whereHas('user', function ($query) use ($searchTerm) {
+                    $query->where('first_name', 'like', $searchTerm)
+                        ->orWhere('last_name', 'like', $searchTerm);
+                })
+                    ->orWhereHas('exchangeDetails', function ($query) use ($searchTerm) {
+                        $query->whereHas('product', function ($query) use ($searchTerm) {
+                            $query->where('name', 'like', $searchTerm)
+                                ->orWhere('description', 'like', $searchTerm);
+                        });
+                    });
             });
         }
 
         if ($request->sort) {
             $swaps->orderBy('created_at', $request->sort);
         }
+
 
         $swaps = $swaps->with(
             'initiateDetails',
@@ -434,7 +441,7 @@ class SwapController extends Controller
      */
     public function update(UpdateSwapRequest        $updateSwapRequest,
                            UpdateSwapDetailsRequest $swapExchangeDetailsRequest,
-                           $id): \Illuminate\Http\JsonResponse
+                                                    $id): \Illuminate\Http\JsonResponse
     {
 
         $swap = Swap::find($id);
@@ -450,9 +457,9 @@ class SwapController extends Controller
 
                 $defineType = $swapExchangeDetailsRequest->define_type;
 
-               if (is_null($swapExchangeDetailsRequest->$defineType)) {
-                   return response()->json(['success' => false , 'message' => str_replace('_',' ', $defineType).' is empty']);
-               }
+                if (is_null($swapExchangeDetailsRequest->$defineType)) {
+                    return response()->json(['success' => false, 'message' => str_replace('_', ' ', $defineType) . ' is empty']);
+                }
 
                 $prepareData = SwapRequestService::prepareDetailsData(
                     $swapExchangeDetailsRequest,
@@ -495,7 +502,7 @@ class SwapController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'Failed to update swap' , 'errors'=>$e->getMessage()], 500);
+            return response()->json(['success' => false, 'message' => 'Failed to update swap', 'errors' => $e->getMessage()], 500);
         }
     }
 
@@ -584,7 +591,7 @@ class SwapController extends Controller
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
         }
 
-        if ($swap->exchanged_user_id != auth()->id()){
+        if ($swap->exchanged_user_id != auth()->id()) {
             return response()->json(['success' => false, 'message' => 'You are not authorized to approve this swap'], 401);
         }
 
@@ -650,7 +657,7 @@ class SwapController extends Controller
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
         }
 
-        if ($swap->exchanged_user_id != auth()->id()){
+        if ($swap->exchanged_user_id != auth()->id()) {
             return response()->json(['success' => false, 'message' => 'You are not authorized to decline this swap'], 401);
         }
 
