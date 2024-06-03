@@ -152,7 +152,7 @@ class SwapInitiateDetailsController extends Controller
             $query->where('exchanged_user_id', auth()->id())
                 ->orWhere('requested_user_id', auth()->id());
         })->where('uid', $uid)->first();
-        
+
         if (!$swap) {
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
         }
