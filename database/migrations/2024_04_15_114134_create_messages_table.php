@@ -27,7 +27,7 @@ return new class extends Migration {
             $table->foreign('conversation_id')->references('id')->on('conversations');
             $table->foreign('sender_id')->references('id')->on('users');
             $table->foreign('receiver_id')->references('id')->on('users');
-            $table->foreign('swap_id')->references('id')->on('swaps');
+//            $table->foreign('swap_id')->references('id')->on('swaps');
         });
     }
 
