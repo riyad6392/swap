@@ -214,8 +214,8 @@ class SwapInitiateDetailsController extends Controller
     {
         $swap = Swap::where(function ($query) use ($uid) {
             $query
-//                ->where('exchanged_user_id', auth()->id())
-                ->where('requested_user_id', auth()->id());
+                ->where('exchanged_user_id', auth()->id())
+                ->orWhere('requested_user_id', auth()->id());
         })->where('uid', $uid)->first();
 
         if (!$swap) {
