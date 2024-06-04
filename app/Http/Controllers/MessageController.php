@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\MessageBroadcast;
+use App\Facades\MessageFacade;
 use App\Http\Requests\Conversation\StoreConversationRequest;
 use App\Http\Requests\Message\StoreMessageRequest;
 use App\Models\Conversation;
@@ -99,6 +100,17 @@ class MessageController extends Controller
      */
     public function prepareConversation(StoreConversationRequest $conversationRequest): JsonResponse
     {
+
+        MessageFacade::prepareData(
+            auth()->id(),
+            $conversationRequest->receiver_id,
+            'private',
+            'message',
+            'You have a new swap request ' . $swap->uid,
+            $swap
+        )->messageGenerate()->withNotify();
+
+
         $conversation = SwapMessageService::createPrivateConversation(
             $conversationRequest->sender_id,
             $conversationRequest->receiver_id,
@@ -190,27 +202,16 @@ class MessageController extends Controller
      */
     public function sendMessages(StoreMessageRequest $messageRequest): JsonResponse
     {
-        $conversation = Conversation::whereHas('participants', function ($query) use ($messageRequest) {
-            $query->where('user_id', $messageRequest->sender_id);
-        })->where('id', $messageRequest->conversation_id)->first();
-
-        if (!$conversation) {
-            return response()->json(['success' => false, 'message' => 'Conversation not found'], 404);
-        }
-
-        $message = $conversation->messages()->create($messageRequest->only(
-            'receiver_id',
-            'conversation_id',
-            'swap_id',
+        MessageFacade::prepareData(
+            auth()->id(),
+            $messageRequest->receiver_id,
+            'private',
             'message',
-            'sender_id')
-        );
+            $messageRequest->message,
+            null
+        )->messageGenerate()->doBroadcast();
 
-        $message = $message->load('sender', 'receiver', 'swap');
-
-        event(new MessageBroadcast($conversation, $message));
-
-        return response()->json(['success' => true, 'message' => 'Message sent successfully', 'data' => $message]);
+        return response()->json(['success' => true, 'message' => 'Message sent successfully']);
     }
 
     /**

@@ -132,7 +132,9 @@ class SwapInitiateDetailsController extends Controller
                 'notification',
                 'You have a new swap request ' . $swap->uid,
                 $swap
-            )->messageGenerate()->withNotify();
+            )->messageGenerate()
+                ->doBroadcast()
+                ->withNotify();
 
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Swap initiated successfully'], 200);
