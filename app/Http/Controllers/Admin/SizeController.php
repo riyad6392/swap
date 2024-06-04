@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Size\CreateSizeRequest;
 use App\Http\Requests\Size\UpdateSizeRequest;
+use App\Models\ProductVariation;
 use App\Models\Size;
 use Illuminate\Http\Request;
 
@@ -152,6 +153,7 @@ class SizeController extends Controller
         $size = Size::create([
             'name' => $sizeRequest->name,
             'description' => $sizeRequest->description,
+            'is_published'=>$sizeRequest->is_published,
         ]);
 
         return response()->json(['success' => true, 'message' => 'Size created successfully', 'data' => $size]);
@@ -265,6 +267,8 @@ class SizeController extends Controller
         $size->update([
             'name' => $sizeRequest->name,
             'description' => $sizeRequest->description,
+            'is_published'=>$sizeRequest->is_published,
+
         ]);
 
         return response()->json(['success' => true, 'message' => 'Size updated successfully', 'data' => $size]);
@@ -306,6 +310,12 @@ class SizeController extends Controller
 
         if (!$size) {
             return response()->json(['success' => false, 'message' => 'Size not found']);
+        }
+
+        $isSizeUsedInProductVariations =ProductVariation::where('size_id', $id)->exists();
+
+        if ($isSizeUsedInProductVariations) {
+            return response()->json(['success' => false, 'message' => 'Size is in use in product variations and cannot be deleted'], 403);
         }
 
         $size->delete();

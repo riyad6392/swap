@@ -13,7 +13,7 @@ class Category extends Model
     protected $fillable = [
         'name',
         'status',
-        'is_publish',
+        'is_published',
     ];
 
     public static function boot(): void

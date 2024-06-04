@@ -3,12 +3,17 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
+
 use App\Http\Requests\Admin\StoreAdminRequest;
 use App\Http\Requests\Admin\UpdateAdminRequest;
 use App\Models\Admin;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Traits\HasRoles;
 
 class AdminController extends Controller
 {
@@ -93,11 +98,20 @@ class AdminController extends Controller
             $admins = $admins->orderBy('name', $request->sort);
         }
 
+
         if ($request->has('role')) {
             $admins = $admins->whereHas('roles', function ($query) use ($request) {
                 $query->where('name', $request->role);
             });
         }
+
+        if ($request->has('id')) {
+            $admins = $admins->whereHas('roles', function ($query) use ($request) {
+                $query->where('id', $request->id);
+            });
+        }
+
+
 
         $admins = $admins->with('roles');
 
@@ -135,6 +149,32 @@ class AdminController extends Controller
         return response()->json(['success'=> true,'message' => 'Admin created successfully', 'data' => $admin], 201);
     }
 
+
+    public function syncPermissions(int $user_id,int $role_id): JsonResponse
+    {
+        $user = Admin::findOrFail($user_id);
+
+        $role= Role::findOrFail($role_id);
+
+        $user->assignRole($role->name);
+
+
+        return response()->json(['success'=> true,'message' => 'Permissions synced successfully', 'data' => $role], 201);
+    }
+
+    public function listPermissions(int $role_id): JsonResponse
+    {
+        $permissions = Permission::get();
+        $permissions = $permissions->groupBy('group', true)->toArray();
+        $role = Role::findOrFail($role_id);
+        $rolePermissions = DB::table('role_has_permissions')
+            ->where('role_has_permissions.role_id', $role->id)
+            ->pluck('role_has_permissions.permission_id','role_has_permissions.permission_id')
+            ->all();
+        return response()->json(['success'=> true,'data' => $permissions, 'rolePermissions' => $rolePermissions], 200);
+
+    }
+
     /**
      * Display the specified resource.
      */
@@ -155,6 +195,7 @@ class AdminController extends Controller
     public function edit(string $id)
     {
         //
+
     }
 
     /**

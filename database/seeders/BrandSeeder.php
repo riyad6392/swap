@@ -23,6 +23,7 @@ class BrandSeeder extends Seeder
                 'logo' => 'zara.jpg',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'H&M',
@@ -31,6 +32,7 @@ class BrandSeeder extends Seeder
                 'logo' => 'h-m.jpg',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Uniqlo',
@@ -39,6 +41,7 @@ class BrandSeeder extends Seeder
                 'logo' => 'uniqlo.jpg',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Levi\'s',
@@ -47,6 +50,7 @@ class BrandSeeder extends Seeder
                 'logo' => 'levis.jpg',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Nike',
@@ -55,6 +59,7 @@ class BrandSeeder extends Seeder
                 'logo' => 'nike.jpg',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Adidas',
@@ -63,6 +68,7 @@ class BrandSeeder extends Seeder
                 'logo' => 'adidas.jpg',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Puma',
@@ -71,6 +77,7 @@ class BrandSeeder extends Seeder
                 'logo' => 'puma.jpg',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ], [
                 'name' => 'Converse',
                 'slug' => 'converse',
@@ -78,6 +85,7 @@ class BrandSeeder extends Seeder
                 'logo' => 'converse.jpg',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ], [
                 'name' => 'Vans',
                 'slug' => 'vans',
@@ -85,6 +93,7 @@ class BrandSeeder extends Seeder
                 'logo' => 'vans.jpg',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ], [
                 'name' => 'New Balance',
                 'slug' => 'new-balance',
@@ -92,6 +101,7 @@ class BrandSeeder extends Seeder
                 'logo' => 'new-balance.jpg',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ], [
                 'name' => 'Reebok',
                 'slug' => 'reebok',
@@ -99,6 +109,7 @@ class BrandSeeder extends Seeder
                 'logo' => 'reebok.jpg',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ], [
                 'name' => 'Under Armour',
                 'slug' => 'under-armour',
@@ -106,6 +117,7 @@ class BrandSeeder extends Seeder
                 'logo' => 'under-armour.jpg',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ], [
                 'name' => 'The North Face',
                 'slug' => 'the-north-face',
@@ -113,6 +125,7 @@ class BrandSeeder extends Seeder
                 'logo' => 'the-north-face.jpg',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ], [
                 'name' => 'Columbia',
                 'slug' => 'columbia',
@@ -120,6 +133,7 @@ class BrandSeeder extends Seeder
                 'logo' => 'columbia.jpg',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ], [
                 'name' => 'Patagonia',
                 'slug' => 'patagonia',
@@ -127,6 +141,7 @@ class BrandSeeder extends Seeder
                 'logo' => 'patagonia.jpg',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ]
 
         ];

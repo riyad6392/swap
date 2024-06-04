@@ -15,7 +15,8 @@ class Size extends Model
         'slug',
         'description',
         'created_by',
-        'updated_by'
+        'updated_by',
+        'is_published'
     ];
 
     public static function boot(){

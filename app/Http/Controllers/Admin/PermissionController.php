@@ -16,6 +16,7 @@ class PermissionController extends Controller
     {
         $permissions = Permission::query();
 
+
         if ($request->has('search')) {
             $permissions = $permissions->where('name', 'like', '%' . $request->search . '%');
         }
@@ -48,7 +49,7 @@ class PermissionController extends Controller
      */
     public function store(StorePermissionRequest $request)
     {
-        $permission = Permission::create(['name' => $request->name]);
+        $permission = Permission::create(['name' => $request->name, 'guard_name' => $request->guard_name,'group'=>$request->group]);
         return response()->json(['success'=> true,'message' => 'Permission created successfully', 'permission' => $permission], 201);
 
     }

@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->foreign('parent_id')->references('id')->on('categories')->onDelete('cascade');
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
+            $table->boolean('is_published')->default(false);
             $table->timestamps();
         });
     }

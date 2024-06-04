@@ -16,10 +16,11 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Cashier\Billable;
 use Laravel\Passport\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, Billable, ModelAttributeTrait;
+    use HasApiTokens, HasFactory, Notifiable, Billable, ModelAttributeTrait, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -33,6 +34,7 @@ class User extends Authenticatable
         'password',
         'subscription_is_active',
         'is_approved_by_admin',
+        'approved_by',
         'business_name',
         'phone',
         'business_address',
@@ -70,6 +72,7 @@ class User extends Authenticatable
     protected $appends = [
         'average_rating', 'resale_license_info', 'photo_of_id_info'
     ];
+
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
@@ -110,7 +113,7 @@ class User extends Authenticatable
                 'path' => asset('storage/' . $this->resale_license),
                 'exist' => file_exists(public_path('storage/' . $this->resale_license))
             ];
-        }else{
+        } else {
             return $this->nullFileInfo();
         }
 
@@ -127,12 +130,13 @@ class User extends Authenticatable
                 'path' => asset('storage/' . $this->photo_of_id),
                 'exist' => file_exists(public_path('storage/' . $this->photo_of_id))
             ];
-        }else{
+        } else {
             return $this->nullFileInfo();
         }
     }
 
-    protected function nullFileInfo(){
+    protected function nullFileInfo()
+    {
         return [
             'size' => null,
             'extension' => null,
@@ -183,4 +187,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Billing::class);
     }
+
+//     $role = Role::create(['name' => 'admin']);
+//     $permission = Permission::create(['name' => 'user.index']);
+//     $role->givePermissionTo($permission);
+//     $user = User::find(1);
+//     $user->assignRole('admin');
 }
