@@ -21,6 +21,7 @@ class SizeSeeder extends Seeder
                 'description' => 'Extra Small',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'S',
@@ -28,6 +29,7 @@ class SizeSeeder extends Seeder
                 'description' => 'Small',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'M',
@@ -35,6 +37,7 @@ class SizeSeeder extends Seeder
                 'description' => 'Medium',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'L',
@@ -42,6 +45,7 @@ class SizeSeeder extends Seeder
                 'description' => 'Large',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'XL',
@@ -49,6 +53,7 @@ class SizeSeeder extends Seeder
                 'description' => 'Extra Large',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'XXL',
@@ -56,6 +61,7 @@ class SizeSeeder extends Seeder
                 'description' => 'Extra Extra Large',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
         ];
 

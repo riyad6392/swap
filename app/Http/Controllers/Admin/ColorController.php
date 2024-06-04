@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Color\CreateColorRequest;
 use App\Http\Requests\Color\UpdateColorRequest;
 use App\Models\Color;
+use App\Models\ProductVariation;
 use Illuminate\Http\Request;
 
 class ColorController extends Controller
@@ -152,6 +153,7 @@ class ColorController extends Controller
         $color = Color::create([
             'name' => $coloLRequest->name,
             'color_code' => $coloLRequest->color_code,
+            'is_published'=>$coloLRequest->is_published,
         ]);
 
         return response()->json(['success' => true, 'message'=>'Color created successfully', 'data' => $color]);
@@ -254,13 +256,14 @@ class ColorController extends Controller
      *      )
      * )
      */
-    public function update(UpdateColorRequest $coloLRequest, string $id)
+    public function update(UpdateColorRequest $colorLRequest, string $id)
     {
         $color = Color::find($id);
 
         $color->update([
-            'name' => $coloLRequest->name,
-            'color_code' => $coloLRequest->color_code,
+            'name' => $colorLRequest->name,
+            'color_code' => $colorLRequest->color_code,
+            'is_published'=>$colorLRequest->is_published,
         ]);
 
         return response()->json(['success' => true, 'message' => 'Color updated successfully', 'data' => $color]);
@@ -302,6 +305,12 @@ class ColorController extends Controller
 
         if (!$color) {
             return response()->json(['success' => false, 'message' => 'Color not found']);
+        }
+
+        $isColorUsedInProductVariations =ProductVariation::where('color_id', $id)->exists();
+
+        if ($isColorUsedInProductVariations) {
+            return response()->json(['success' => false, 'message' => 'Color is in use in product variations and cannot be deleted'], 403);
         }
 
         $color->delete();

@@ -15,6 +15,7 @@ class Color extends Model
         'color_code',
         'created_by',
         'updated_by',
+        'is_published',
     ];
 
     public function products()

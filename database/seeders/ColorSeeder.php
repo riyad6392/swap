@@ -22,6 +22,7 @@ class ColorSeeder extends Seeder
                 'color_code' => '#FF0000',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Green',
@@ -29,6 +30,7 @@ class ColorSeeder extends Seeder
                 'color_code' => '#008000',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Blue',
@@ -36,6 +38,7 @@ class ColorSeeder extends Seeder
                 'color_code' => '#0000FF',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Yellow',
@@ -43,6 +46,7 @@ class ColorSeeder extends Seeder
                 'color_code' => '#FFFF00',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Orange',
@@ -50,6 +54,7 @@ class ColorSeeder extends Seeder
                 'color_code' => '#FFA500',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Purple',
@@ -57,6 +62,7 @@ class ColorSeeder extends Seeder
                 'color_code' => '#800080',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Pink',
@@ -64,6 +70,7 @@ class ColorSeeder extends Seeder
                 'color_code' => '#FFC0CB',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Brown',
@@ -71,6 +78,7 @@ class ColorSeeder extends Seeder
                 'color_code' => '#A52A2A',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Black',
@@ -78,6 +86,7 @@ class ColorSeeder extends Seeder
                 'color_code' => '#000000',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'White',
@@ -85,6 +94,7 @@ class ColorSeeder extends Seeder
                 'color_code' => '#FFFFFF',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Gray',
@@ -92,6 +102,7 @@ class ColorSeeder extends Seeder
                 'color_code' => '#808080',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Beige',
@@ -99,6 +110,7 @@ class ColorSeeder extends Seeder
                 'color_code' => '#F5F5DC',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Maroon',
@@ -106,6 +118,7 @@ class ColorSeeder extends Seeder
                 'color_code' => '#800000',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Navy',
@@ -113,6 +126,7 @@ class ColorSeeder extends Seeder
                 'color_code' => '#000080',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Teal',
@@ -120,6 +134,7 @@ class ColorSeeder extends Seeder
                 'color_code' => '#008080',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Olive',
@@ -127,6 +142,7 @@ class ColorSeeder extends Seeder
                 'color_code' => '#808000',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Lime',
@@ -134,6 +150,7 @@ class ColorSeeder extends Seeder
                 'color_code' => '#00FF00',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Cyan',
@@ -141,6 +158,7 @@ class ColorSeeder extends Seeder
                 'color_code' => '#00FFFF',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Magenta',
@@ -148,6 +166,7 @@ class ColorSeeder extends Seeder
                 'color_code' => '#FF00FF',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Silver',
@@ -155,6 +174,7 @@ class ColorSeeder extends Seeder
                 'color_code' => '#C0C0C0',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
             [
                 'name' => 'Gold',
@@ -162,6 +182,7 @@ class ColorSeeder extends Seeder
                 'color_code' => '#FFD700',
                 'created_by' => '1',
                 'updated_by' => '1',
+                'is_published' =>false,
             ],
         ];
 

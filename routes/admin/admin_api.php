@@ -35,6 +35,12 @@ Route::group(['prefix' => 'admin'], function () {
 
         //User
         Route::resource('user', UserController::class);
+
+        //admin
+        Route::get('sync-permission/{user_id}/{role_id}', [AdminController::class, 'syncPermissions']);
+        Route::get('role-permission/{user_id}', [AdminController::class, 'listPermissions']);
+
+
         Route::post('approve-user/{user}', [AdminController::class, 'approveUser'])->name('admin.approve-user');
         Route::resource('admin-user', AdminController::class);
         Route::resource('category', CategoryController::class);
@@ -51,10 +57,7 @@ Route::group(['prefix' => 'admin'], function () {
         //Role
         Route::resource('role', RoleController::class);
         Route::post('sync-permission/{id}', [RoleController::class, 'syncPermissions']);
-
         Route::resource('permission', PermissionController::class);
-
-
 //    Route::resource('product', \App\Http\Controllers\ProductController::class);
 
     });
