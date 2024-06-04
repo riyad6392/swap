@@ -729,7 +729,10 @@ class SwapController extends Controller
         $swap->update([$approvalField => 'completed']);
 
         $this->sendSwapNotification($swap);
-        $this->handlePayment($swap, $user);
+
+        if ($user->is_super_swaper == 0){
+            $this->handlePayment($swap, $user);
+        }
 
         return response()->json(['success' => true, 'message' => 'You completed the swap request'], 200);
     }
