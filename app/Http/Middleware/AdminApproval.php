@@ -18,7 +18,7 @@ class AdminApproval
         if (auth()->guard('api')->check()) {
             $user = auth()->guard('api')->user();
 
-            if ($user->is_admin_approved == 0) {
+            if ($user->is_approved_by_admin == 0) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Your account is not approved by admin.'
