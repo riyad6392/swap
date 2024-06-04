@@ -63,6 +63,8 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::get('user-inventory/{id}', [UserController::class, 'userInventory']);
         Route::get('user-store/{id}', [UserController::class, 'userStore']);
         Route::post('update-profile', [UserController::class, 'updateProfile']);
+        Route::get('user-dashboard', [UserController::class, 'userDashboard']);
+
 
         //Inventory
         Route::resource('category', CategoryController::class)->only(['index', 'show']);
@@ -118,6 +120,7 @@ Route::group(['middleware' => 'auth:api'], function () {
 
         //shipping
         Route::resource('shipment', ShipmentController::class);
+        Route::get('shipment/{id}', [ShipmentController::class , 'show']);
 
     });
 
@@ -133,6 +136,9 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('payment-method', [PaymentMethodController::class, 'store']);
     //user profile
     Route::get('user-profile', [UserController::class, 'userProfile']);
+
+
+
 
 
 });
