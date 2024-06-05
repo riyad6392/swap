@@ -6,6 +6,7 @@ use App\Events\MessageBroadcast;
 use App\Facades\MessageFacade;
 use App\Http\Requests\Conversation\StoreConversationRequest;
 use App\Http\Requests\Message\StoreMessageRequest;
+use App\Http\Resources\ConversationResources;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Services\SwapMessageService;
@@ -269,7 +270,7 @@ class MessageController extends Controller
 
         $conversation = $conversation->whereHas('participants', function ($query) {
             $query->where('user_id', auth()->id());
-        })->with('participants');
+        })->with('participants.user');
 
         if (request()->get_all) {
 
@@ -278,7 +279,7 @@ class MessageController extends Controller
             return response()->json(['success' => true, 'data' => $conversation]);
         }
 
-        $conversation = $conversation->paginate($request->pagination ?? self::PER_PAGE);
+        $conversation = ConversationResources::collection($conversation->paginate($request->pagination ?? self::PER_PAGE));
 
         return response()->json(['success' => true, 'data' => $conversation]);
     }
