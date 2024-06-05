@@ -284,6 +284,20 @@ class MessageController extends Controller
         return response()->json(['success' => true, 'data' => $conversation]);
     }
 
+    public function messageList($id){
+        $conversation = Conversation::whereHas('participants', function ($query) {
+            $query->where('user_id', auth()->id());
+        })->with('participants.user')->where('id', $id)->first();
+
+        if (!$conversation) {
+            return response()->json(['success' => false, 'message' => 'Conversation not found'], 404);
+        }
+
+        $conversation = $conversation->load('messages');
+
+        return response()->json(['success' => true, 'data' => $conversation]);
+    }
+
     /**
      * Update Message.
      *

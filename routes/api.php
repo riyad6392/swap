@@ -99,6 +99,7 @@ Route::group(['middleware' => 'auth:api'], function () {
 
             //Message
             Route::get('messages', [MessageController::class , 'index']);
+            Route::get('messages-list/{conversation_id}', [MessageController::class , 'messageList']);
             Route::post('prepare-conversation', [MessageController::class , 'prepareConversation']);
             Route::post('send-messages', [MessageController::class , 'sendMessages']);
             Route::put('update-message/{id}', [MessageController::class , 'updateMessage']);
