@@ -23,9 +23,11 @@ class UpdateAdminRequest extends FormRequest
      */
     public function rules(): array
     {
+        $admin_id = $this->route('admin_user');
+
         return [
             'name' => 'required|string',
-            'email' => 'required|email|unique:admins,email,' . $this->admin,
+            'email' => 'required|email|unique:admins,email,' . $admin_id,
             'role' => 'required|exists:roles,id'
         ];
     }

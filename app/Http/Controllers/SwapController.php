@@ -85,17 +85,17 @@ class SwapController extends Controller
         $swaps->where('requested_user_id', auth()->id())
             ->orWhere('exchanged_user_id', auth()->id());
 
-        if ($request->name){
+        if ($request->name) {
             $swaps
                 ->whereHas('user', function ($query) use ($request) {
-                $query->where('first_name', 'like', '%' . $request->name . '%');
-            })
+                    $query->where('first_name', 'like', '%' . $request->name . '%');
+                })
                 ->orWhereHas('exchangeDetails', function ($query) use ($request) {
-                $query->whereHas('product', function ($query) use ($request) {
-                    $query->where('name', 'like', '%' . $request->name . '%')
-                        ->orWhere('description', 'like', '%' . $request->name . '%');
+                    $query->whereHas('product', function ($query) use ($request) {
+                        $query->where('name', 'like', '%' . $request->name . '%')
+                            ->orWhere('description', 'like', '%' . $request->name . '%');
+                    });
                 });
-            });
         }
 
         if ($request->sort) {
@@ -434,7 +434,7 @@ class SwapController extends Controller
      */
     public function update(UpdateSwapRequest        $updateSwapRequest,
                            UpdateSwapDetailsRequest $swapExchangeDetailsRequest,
-                           $id): \Illuminate\Http\JsonResponse
+                                                    $id): \Illuminate\Http\JsonResponse
     {
 
         $swap = Swap::find($id);
@@ -450,9 +450,9 @@ class SwapController extends Controller
 
                 $defineType = $swapExchangeDetailsRequest->define_type;
 
-               if (is_null($swapExchangeDetailsRequest->$defineType)) {
-                   return response()->json(['success' => false , 'message' => str_replace('_',' ', $defineType).' is empty']);
-               }
+                if (is_null($swapExchangeDetailsRequest->$defineType)) {
+                    return response()->json(['success' => false, 'message' => str_replace('_', ' ', $defineType) . ' is empty']);
+                }
 
                 $prepareData = SwapRequestService::prepareDetailsData(
                     $swapExchangeDetailsRequest,
@@ -495,7 +495,7 @@ class SwapController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'Failed to update swap' , 'errors'=>$e->getMessage()], 500);
+            return response()->json(['success' => false, 'message' => 'Failed to update swap', 'errors' => $e->getMessage()], 500);
         }
     }
 
@@ -584,7 +584,7 @@ class SwapController extends Controller
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
         }
 
-        if ($swap->exchanged_user_id != auth()->id()){
+        if ($swap->exchanged_user_id != auth()->id()) {
             return response()->json(['success' => false, 'message' => 'You are not authorized to approve this swap'], 401);
         }
 
@@ -650,7 +650,7 @@ class SwapController extends Controller
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
         }
 
-        if ($swap->exchanged_user_id != auth()->id()){
+        if ($swap->exchanged_user_id != auth()->id()) {
             return response()->json(['success' => false, 'message' => 'You are not authorized to decline this swap'], 401);
         }
 

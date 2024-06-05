@@ -68,8 +68,9 @@ class ForgetPasswordController extends Controller
             try {
 
                 $token = Str::random(64);
+                $user = User::where('email', $request->email)->firstOrFail();
 
-                Mail::send('email.forgetPassword', ['token' => $token], function($message) use($request){
+                Mail::send('email.forgetPassword', ['token' => $token,'first_name' => $user->first_name, 'last_name' => $user->last_name], function($message) use($request){
                     $message->to($request->email);
                     $message->subject('Reset Password');
 

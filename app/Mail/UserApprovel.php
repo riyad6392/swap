@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class OrderShipped extends Mailable
+class UserApprovel extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -22,7 +22,7 @@ class OrderShipped extends Mailable
 
     public function build()
     {
-        return $this->view('email.sendMail')
+        return $this->view('email.approveMail')
             ->with('data', $this->data);
     }
 }
