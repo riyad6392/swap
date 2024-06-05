@@ -73,6 +73,8 @@ class SwapMessageService
                 DB::beginTransaction();
 
                 $conversation = Conversation::where('composite_id', $sender_id . ':' . $receiver_id)
+                    ->orWhere('composite_id', $receiver_id . ':' . $sender_id)
+                    ->orWhere('reverse_composite_id', $sender_id . ':' . $receiver_id)
                     ->orWhere('reverse_composite_id', $receiver_id . ':' . $sender_id)
                     ->first();
 
