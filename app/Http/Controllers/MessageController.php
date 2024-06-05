@@ -284,6 +284,17 @@ class MessageController extends Controller
         return response()->json(['success' => true, 'data' => $conversation]);
     }
 
+    public function messageList($id){
+
+        $message = Message::whereHas('conversation', function ($query) use ($id){
+            $query->whereHas('participants', function ($query) {
+                $query->where('user_id', auth()->id());
+            })->where('id', $id);
+        })->get();
+
+        return response()->json(['success' => true, 'data' => $message]);
+    }
+
     /**
      * Update Message.
      *
