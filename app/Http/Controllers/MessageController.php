@@ -285,17 +285,14 @@ class MessageController extends Controller
     }
 
     public function messageList($id){
-        $conversation = Conversation::whereHas('participants', function ($query) {
-            $query->where('user_id', auth()->id());
-        })->with('participants.user')->where('id', $id)->first();
 
-        if (!$conversation) {
-            return response()->json(['success' => false, 'message' => 'Conversation not found'], 404);
-        }
+        $message = Message::whereHas('conversation', function ($query) use ($id){
+            $query->whereHas('participants', function ($query) {
+                $query->where('user_id', auth()->id());
+            })->where('id', $id);
+        })->get();
 
-        $conversation = $conversation->load('messages');
-
-        return response()->json(['success' => true, 'data' => $conversation]);
+        return response()->json(['success' => true, 'data' => $message]);
     }
 
     /**
