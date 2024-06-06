@@ -127,30 +127,16 @@ class SwapInitiateDetailsController extends Controller
 
             SwapInitiateDetails::insert($insertData);
 
-
             $exchangedUser = User::findOrFail($swapInitiateRequest->exchanged_user_id);
             $requestUser = User::findOrFail(auth()->id());
-
-
 
             $data = [
                 'exchanged_user_name' => $exchangedUser->first_name,
                 'requested_user_name' => $requestUser->first_name,
             ];
 
-
             Mail::to($exchangedUser->email)->send(new SwapInitiated($data));
-
-//            $exchangedUser = User::find($swapInitiateRequest->exchanged_user_id);
-//            $requestUser = User::find(auth()->id());
-//
-//            if (!$exchangedUser || !$requestUser) {
-//                // Handle case where user is not found
-//                return response()->json(['success' => false, 'message' => 'One or more users not found'], 404);
-//            }
-
-
-
+            
             MessageFacade::prepareData(
                 auth()->id(),
                 $swap->exchanged_user_id,
