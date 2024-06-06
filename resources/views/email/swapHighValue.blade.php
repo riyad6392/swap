@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Swap Initiated</title>
+    <title>High Value Swap Request</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -58,7 +58,7 @@
         }
 
         .header {
-            background-color: #3498db;
+            background-color: #e74c3c;
             color: #ffffff;
             padding: 20px;
             border-radius: 8px 8px 0 0;
@@ -69,15 +69,36 @@
             margin: 0;
             font-size: 24px;
         }
+
+        .details {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .details p {
+            margin: 5px 0;
+        }
+
+        .details strong {
+            color: #333;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <h1>Swap Request Notification</h1>
+        <h1>High Value Swap Request</h1>
     </div>
-    <h2>Hello {{ $data['exchanged_user_first_name'] }} {{ $data['exchanged_user_last_name'] }},</h2>
-    <p>You have received a swap request from <strong>{{ $data['requested_user_first_name']}} {{ $data['requested_user_last_name']}}</strong>.</p>
+    <h2>Hello Adam,</h2>
+    <p>You have received a high value swap request from <strong>{{ $data['requested_user_first_name'] }} {{ $data['requested_user_last_name'] }}</strong> to <strong>{{ $data['exchanged_user_first_name'] }} {{ $data['exchanged_user_last_name'] }}</strong>.</p>
+    <div class="details">
+        <p><strong>Item Details: T-shirt</strong></p>
+        <p><strong>Item Name: Full-T</strong> </p>
+        <p><strong>Item Value: $100</strong></p>
+        <p><strong>Swap Offer: $20</strong> </p>
+    </div>
     <p>Please log in to your account to view and respond to the swap request.</p>
     <a href="https://www.swap.com/login" class="button">Log In</a>
     <p>Thank you,</p>

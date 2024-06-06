@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Swap Initiated</title>
+    <title>Admin Request Notification</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -31,6 +31,7 @@
         p {
             line-height: 1.6;
             margin: 10px 0;
+            color: #555;
         }
 
         .footer {
@@ -69,19 +70,39 @@
             margin: 0;
             font-size: 24px;
         }
+
+        .details {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .details p {
+            margin: 5px 0;
+        }
+
+        .details strong {
+            color: #333;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <h1>Swap Request Notification</h1>
+        <h1>Admin Request Notification</h1>
     </div>
-    <h2>Hello {{ $data['exchanged_user_first_name'] }} {{ $data['exchanged_user_last_name'] }},</h2>
-    <p>You have received a swap request from <strong>{{ $data['requested_user_first_name']}} {{ $data['requested_user_last_name']}}</strong>.</p>
-    <p>Please log in to your account to view and respond to the swap request.</p>
+    <h2>Hello {{ $data['received_user_name'] }},</h2>
+    <p>You have received an admin request from <strong>{{ $data['requested_admin_first_name'] }} {{ $data['requested_admin_last_name'] }}</strong>.</p>
+    <div class="details">
+        <p><strong>Role Name:</strong> {{$data['role']}}</p>
+        <p><strong>Email:</strong> {{$data['email']}}</p>
+        <p><strong>Password:</strong> {{$data['password']}}</p>
+    </div>
+    <p>Please log in to your account to view and respond to the admin request.</p>
     <a href="https://www.swap.com/login" class="button">Log In</a>
     <p>Thank you,</p>
-    <p>SWAP</p>
+    <p>Your Swap</p>
 
     <div class="footer">
         <p>This is an automated email. Please do not reply.</p>

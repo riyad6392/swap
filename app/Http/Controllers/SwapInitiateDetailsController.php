@@ -16,6 +16,7 @@ use App\Services\SwapNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Mail\SwapInitiated;
+use App\Mail\SwapHighValue;
 
 class SwapInitiateDetailsController extends Controller
 {
@@ -131,8 +132,10 @@ class SwapInitiateDetailsController extends Controller
             $requestUser = User::findOrFail(auth()->id());
 
             $data = [
-                'exchanged_user_name' => $exchangedUser->first_name,
-                'requested_user_name' => $requestUser->first_name,
+                'exchanged_user_first_name' => $exchangedUser->first_name,
+                'exchanged_user_last_name' => $exchangedUser->last_name,
+                'requested_user_first_name' => $requestUser->first_name,
+                'requested_user_last_name' => $requestUser->last_name,
             ];
 
             Mail::to($exchangedUser->email)->send(new SwapInitiated($data));
@@ -147,6 +150,12 @@ class SwapInitiateDetailsController extends Controller
             )->messageGenerate()
                 ->doBroadcast()
                 ->withNotify();
+
+
+            // implementation  incomplete
+            $super_admin = 'riyadstudent80@gmail.com';
+            Mail::to($super_admin)->send(new SwapHighValue($data));
+
 
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Swap initiated successfully'], 200);
