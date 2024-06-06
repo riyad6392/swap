@@ -152,18 +152,23 @@ class AdminController extends Controller
         ]);
         $admin->assignRole($role->name);
 
-        $requestAdmin = User::findOrFail(auth()->id());
+        $requestAdmin = User::find(auth()->id());
 
-        $data = [
-            'received_user_name' => $request->name,
-            'requested_admin_first_name' => $requestAdmin->first_name,
-            'requested_admin_last_name' => $requestAdmin->last_name,
-            'role' => $role->name,
-            'password' => 'password',
-            'email'=>$request->email,
-        ];
+        if($requestAdmin)
+        {
+            $data = [
+                'received_user_name' => $request->name,
+                'requested_admin_first_name' => $requestAdmin->first_name,
+                'requested_admin_last_name' => $requestAdmin->last_name,
+                'role' => $role->name,
+                'password' => 'password',
+                'email'=>$request->email,
+            ];
 
-        Mail::to($request->email)->send(new AdminRequest($data));
+            Mail::to($request->email)->send(new AdminRequest($data));
+        }
+
+
 
         return response()->json(['success'=> true,'message' => 'Admin created successfully', 'data' => $admin], 201);
     }
