@@ -91,6 +91,7 @@ Route::group(['middleware' => 'auth:api'], function () {
 
         //Swap Initiate
         Route::resource('swap-initiate', SwapInitiateDetailsController::class);
+
         Route::get('swap-accept/{id}', [SwapInitiateDetailsController::class, 'swapAccept']);
 
 //        Broadcast::routes();

@@ -54,7 +54,7 @@ class PermissionSeeder extends Seeder
                 Permission::create([
                     'name' => $name,
                     'group' => $group,
-                    'guard_name' => 'web',
+                    'guard_name' => 'admin-api',
                 ]);
             }
         }

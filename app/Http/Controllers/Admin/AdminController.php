@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasRoles;
-use App\Mail\OrderShipped;
+use App\Mail\RegistrationSuccess;
 use Illuminate\Support\Facades\Mail;
 use Exception;
 
@@ -295,7 +295,7 @@ class AdminController extends Controller
                 'name' => 'required|string|max:255',
             ]);
 
-            Mail::to($data['email'])->send(new OrderShipped($data));
+            Mail::to($data['email'])->send(new RegistrationSuccess($data));
 
             return response()->json(['message' => 'Email sent successfully!'], 200);
         } catch (Exception $e) {

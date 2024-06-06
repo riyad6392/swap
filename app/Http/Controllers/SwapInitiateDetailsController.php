@@ -134,8 +134,10 @@ class SwapInitiateDetailsController extends Controller
 
 
             $data = [
-                'exchanged_user_name' => $exchangedUser->first_name,
-                'requested_user_name' => $requestUser->first_name,
+                'exchanged_user_first_name' => $exchangedUser->first_name,
+                'exchanged_user_last_name' => $exchangedUser->last_name,
+                'requested_user_first_name' => $requestUser->first_name,
+                'requested_user_last_name' => $requestUser->last_name,
             ];
 
 
