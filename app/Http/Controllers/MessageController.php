@@ -290,7 +290,7 @@ class MessageController extends Controller
             $query->whereHas('participants', function ($query) {
                 $query->where('user_id', auth()->id());
             })->where('id', $id);
-        })->orderBy('created_at', 'desc')->get();
+        })->orderBy('created_at', 'asc')->get();
 
         return response()->json(['success' => true, 'data' => $message]);
     }
