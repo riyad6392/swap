@@ -58,10 +58,6 @@ Route::group(['middleware' => 'auth:api'], function () {
             return response()->json(['success' => true, 'message' => 'You are subscribed to a plan.'], 200);
         });
 
-
-
-
-
         //User
         Route::get('user-list', [UserController::class, 'userList']);
         Route::get('user-inventory/{id}', [UserController::class, 'userInventory']);
