@@ -136,7 +136,7 @@ class SwapInitiateDetailsController extends Controller
             ];
 
             Mail::to($exchangedUser->email)->send(new SwapInitiated($data));
-            
+
             MessageFacade::prepareData(
                 auth()->id(),
                 $swap->exchanged_user_id,
