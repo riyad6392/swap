@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\AdminRequest;
+use App\Mail\SwapInitiated;
 use App\Mail\UserApprovel;
 use Illuminate\Support\Facades\DB;
 
@@ -149,6 +151,19 @@ class AdminController extends Controller
             'password' => bcrypt('password')
         ]);
         $admin->assignRole($role->name);
+
+        $requestAdmin = User::findOrFail(auth()->id());
+
+        $data = [
+            'received_user_name' => $request->name,
+            'requested_admin_first_name' => $requestAdmin->first_name,
+            'requested_admin_last_name' => $requestAdmin->last_name,
+            'role' => $role->name,
+            'password' => 'password',
+            'email'=>$request->email,
+        ];
+
+        Mail::to($request->email)->send(new AdminRequest($data));
 
         return response()->json(['success'=> true,'message' => 'Admin created successfully', 'data' => $admin], 201);
     }
