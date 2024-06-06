@@ -16,10 +16,9 @@ class ParticipantsResources extends JsonResource
     {
         return [
             'id' => $this->id,
-            'user_id' => $this->first_name,
-            'conversation_id' => $this->last_name,
-            'created_at' => $this->subscription_is_active,
-            'updated_at' => $this->stripe_customer_id,
+            'conversation_id' => $this->conversation_id,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
             'user' => new UserResourceForMessage($this->user),
         ];
     }
