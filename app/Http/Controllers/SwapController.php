@@ -82,24 +82,42 @@ class SwapController extends Controller
     {
         $swaps = Swap:: query();
 
-        $swaps->where('requested_user_id', auth()->id())
-            ->orWhere('exchanged_user_id', auth()->id());
+        $swaps->where(function($query) {
+            $userId = auth()->id();
+            $query->where('requested_user_id', $userId)
+                ->orWhere('exchanged_user_id', $userId);
+        });
 
-        if ($request->name) {
-            $swaps
-                ->whereHas('user', function ($query) use ($request) {
-                    $query->where('first_name', 'like', '%' . $request->name . '%');
+        if ($request->has('search')) {
+            $searchTerm = '%' . $request->search . '%';
+            $swaps->where(function ($query) use ($searchTerm) {
+                $query->whereHas('user', function ($query) use ($searchTerm) {
+                    $query->where('first_name', 'like', $searchTerm)
+                        ->orWhere('last_name', 'like', $searchTerm);
                 })
-                ->orWhereHas('exchangeDetails', function ($query) use ($request) {
-                    $query->whereHas('product', function ($query) use ($request) {
-                        $query->where('name', 'like', '%' . $request->name . '%')
-                            ->orWhere('description', 'like', '%' . $request->name . '%');
+                    ->orWhereHas('exchangeDetails', function ($query) use ($searchTerm) {
+                        $query->whereHas('product', function ($query) use ($searchTerm) {
+                            $query->where('name', 'like', $searchTerm)
+                                ->orWhere('description', 'like', $searchTerm);
+                        });
+                    })
+                    ->orWhereHas('requestDetail', function ($query) use ($searchTerm) {
+                        $query->whereHas('product', function ($query) use ($searchTerm) {
+                            $query->where('name', 'like', $searchTerm)
+                                ->orWhere('description', 'like', $searchTerm);
+                        });
+                    })
+                    ->orWhereHas('initiateDetails', function ($query) use ($searchTerm) {
+                        $query->whereHas('product', function ($query) use ($searchTerm) {
+                            $query->where('name', 'like', $searchTerm)
+                                ->orWhere('description', 'like', $searchTerm);
+                        });
                     });
-                });
+            });
         }
 
         if ($request->sort) {
-            $swaps->orderBy('created_at', $request->sort);
+            $swaps->orderBy('created_at', $request->sort ?? 'desc');
         }
 
         $swaps = $swaps->with(
@@ -599,13 +617,13 @@ class SwapController extends Controller
             SwapNotificationService::sendNotification(
                 $swap,
                 [$swap->requested_user_id],
-                'Swap request has been accepted'
+                'Swap request has been approved'
             );
 
-            return response()->json(['success' => true, 'message' => 'You accept the swap request'], 200);
+            return response()->json(['success' => true, 'message' => 'You approved the swap request'], 200);
         }
 
-        return response()->json(['success' => true, 'message' => 'You are not allow to change the swap status'], 200);
+        return response()->json(['success' => false, 'message' => 'You are not allow to change the swap status'], 403);
     }
 
     /**
@@ -670,7 +688,7 @@ class SwapController extends Controller
             return response()->json(['success' => true, 'message' => 'You decline the swap request'], 200);
         }
 
-        return response()->json(['success' => true, 'message' => 'You are not allow to change the swap status'], 200);
+        return response()->json(['success' => false, 'message' => 'You are not allow to change the swap status'], 403);
     }
 
     public function swapComplete($uid): \Illuminate\Http\JsonResponse
@@ -710,7 +728,10 @@ class SwapController extends Controller
         $swap->update([$approvalField => 'completed']);
 
         $this->sendSwapNotification($swap);
-        $this->handlePayment($swap, $user);
+
+        if ($user->is_super_swaper == 0){
+            $this->handlePayment($swap, $user);
+        }
 
         return response()->json(['success' => true, 'message' => 'You completed the swap request'], 200);
     }

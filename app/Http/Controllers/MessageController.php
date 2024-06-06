@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Events\MessageBroadcast;
+use App\Facades\MessageFacade;
 use App\Http\Requests\Conversation\StoreConversationRequest;
 use App\Http\Requests\Message\StoreMessageRequest;
+use App\Http\Resources\ConversationResources;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Services\SwapMessageService;
@@ -99,6 +101,17 @@ class MessageController extends Controller
      */
     public function prepareConversation(StoreConversationRequest $conversationRequest): JsonResponse
     {
+
+        MessageFacade::prepareData(
+            auth()->id(),
+            $conversationRequest->receiver_id,
+            'private',
+            'message',
+            'You have a new swap request ' . $swap->uid,
+            $swap
+        )->messageGenerate()->withNotify();
+
+
         $conversation = SwapMessageService::createPrivateConversation(
             $conversationRequest->sender_id,
             $conversationRequest->receiver_id,
@@ -190,27 +203,16 @@ class MessageController extends Controller
      */
     public function sendMessages(StoreMessageRequest $messageRequest): JsonResponse
     {
-        $conversation = Conversation::whereHas('participants', function ($query) use ($messageRequest) {
-            $query->where('user_id', $messageRequest->sender_id);
-        })->where('id', $messageRequest->conversation_id)->first();
-
-        if (!$conversation) {
-            return response()->json(['success' => false, 'message' => 'Conversation not found'], 404);
-        }
-
-        $message = $conversation->messages()->create($messageRequest->only(
-            'receiver_id',
-            'conversation_id',
-            'swap_id',
+        MessageFacade::prepareData(
+            auth()->id(),
+            $messageRequest->receiver_id,
+            'private',
             'message',
-            'sender_id')
-        );
+            $messageRequest->message,
+            null
+        )->messageGenerate()->doBroadcast();
 
-        $message = $message->load('sender', 'receiver', 'swap');
-
-        event(new MessageBroadcast($conversation, $message));
-
-        return response()->json(['success' => true, 'message' => 'Message sent successfully', 'data' => $message]);
+        return response()->json(['success' => true, 'message' => 'Message sent successfully']);
     }
 
     /**
@@ -268,7 +270,7 @@ class MessageController extends Controller
 
         $conversation = $conversation->whereHas('participants', function ($query) {
             $query->where('user_id', auth()->id());
-        })->with('participants');
+        })->with('participants.user');
 
         if (request()->get_all) {
 
@@ -277,9 +279,20 @@ class MessageController extends Controller
             return response()->json(['success' => true, 'data' => $conversation]);
         }
 
-        $conversation = $conversation->paginate($request->pagination ?? self::PER_PAGE);
+        $conversation = ConversationResources::collection($conversation->paginate($request->pagination ?? self::PER_PAGE));
 
         return response()->json(['success' => true, 'data' => $conversation]);
+    }
+
+    public function messageList($id){
+
+        $message = Message::whereHas('conversation', function ($query) use ($id){
+            $query->whereHas('participants', function ($query) {
+                $query->where('user_id', auth()->id());
+            })->where('id', $id);
+        })->orderBy('created_at', 'desc')->get();
+
+        return response()->json(['success' => true, 'data' => $message]);
     }
 
     /**

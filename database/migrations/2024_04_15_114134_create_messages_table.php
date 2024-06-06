@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('receiver_id');
             $table->unsignedBigInteger('conversation_id');
             $table->unsignedBigInteger('sender_id');
-            $table->unsignedBigInteger('swap_id');
+            $table->unsignedBigInteger('swap_id')->nullable();
             $table->enum('message_type', ['message', 'notification', 'image', 'video', 'audio']);
             $table->longText('message');
             $table->json('data')->nullable();
@@ -27,7 +27,7 @@ return new class extends Migration {
             $table->foreign('conversation_id')->references('id')->on('conversations');
             $table->foreign('sender_id')->references('id')->on('users');
             $table->foreign('receiver_id')->references('id')->on('users');
-            $table->foreign('swap_id')->references('id')->on('swaps');
+//            $table->foreign('swap_id')->references('id')->on('swaps');
         });
     }
 

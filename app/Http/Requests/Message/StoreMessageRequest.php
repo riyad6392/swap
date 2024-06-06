@@ -27,7 +27,7 @@ class StoreMessageRequest extends FormRequest
         return [
             'message' => 'required|string',
             'receiver_id' => 'required|integer|exists:users,id',
-            'swap_id' => 'required|integer|exists:swaps,id',
+//            'swap_id' => 'required|integer|exists:swaps,id',
             'sender_id' => 'required|integer|exists:users,id',
             'conversation_id' => 'nullable|integer|exists:conversations,id',
         ];

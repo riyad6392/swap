@@ -127,11 +127,8 @@ class SwapInitiateDetailsController extends Controller
 
             SwapInitiateDetails::insert($insertData);
 
-
             $exchangedUser = User::findOrFail($swapInitiateRequest->exchanged_user_id);
             $requestUser = User::findOrFail(auth()->id());
-
-
 
             $data = [
                 'exchanged_user_first_name' => $exchangedUser->first_name,
@@ -140,18 +137,7 @@ class SwapInitiateDetailsController extends Controller
                 'requested_user_last_name' => $requestUser->last_name,
             ];
 
-
             Mail::to($exchangedUser->email)->send(new SwapInitiated($data));
-
-//            $exchangedUser = User::find($swapInitiateRequest->exchanged_user_id);
-//            $requestUser = User::find(auth()->id());
-//
-//            if (!$exchangedUser || !$requestUser) {
-//                // Handle case where user is not found
-//                return response()->json(['success' => false, 'message' => 'One or more users not found'], 404);
-//            }
-
-
 
             MessageFacade::prepareData(
                 auth()->id(),
@@ -160,7 +146,9 @@ class SwapInitiateDetailsController extends Controller
                 'notification',
                 'You have a new swap request ' . $swap->uid,
                 $swap
-            )->messageGenerate()->withNotify();
+            )->messageGenerate()
+                ->doBroadcast()
+                ->withNotify();
 
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Swap initiated successfully'], 200);
@@ -186,7 +174,7 @@ class SwapInitiateDetailsController extends Controller
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
         }
 
-        $swap = $swap->load('initiateDetails.product.image','requestDetail.product.image','exchangeDetails.product.image');
+        $swap = $swap->load('user','initiateDetails.product.image','requestDetail.product.image','exchangeDetails.product.image');
 
         return response()->json(['success' => true, 'data' => $swap], 200);
     }
@@ -255,6 +243,8 @@ class SwapInitiateDetailsController extends Controller
 
         if ($swap->exchanged_user_status == 'pending' && $swap->requested_user_status == 'requested') {
             $swap->initiateDetails()->delete();
+            $swap->requestDetail()->delete();
+            $swap->exchangeDetails()->delete();
             $swap->delete();
 
             return response()->json(['success' => true, 'message' => 'Swap deleted successfully'], 200);

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\MessageBroadcast;
 use App\Jobs\SwapJob;
 use App\Models\Conversation;
 use App\Models\Message;
@@ -19,7 +20,7 @@ class SwapMessageService
     public $swap = null;
     public $conversation = null;
 
-    public function prepareData($sender_id, $receiver_id, $conversation_type, $message_type, $message, $swap): static
+    public function prepareData($sender_id, $receiver_id, $conversation_type, $message_type, $message, $swap = null): static
     {
         $this->sender_id = $sender_id;
         $this->receiver_id = $receiver_id;
@@ -31,26 +32,27 @@ class SwapMessageService
         return $this;
     }
 
+
     public function messageGenerate()
     {
         $this->conversation = $this->findOrCreateConversation(
             $this->sender_id, $this->receiver_id, $this->conversation_type,
         );
 
-        $message = Message::create([
+        $this->message = Message::create([
             'message' => $this->message,
             'receiver_id' => $this->receiver_id,
-            'swap_id' => $this->swap->id,
+            'swap_id' => $this->swap->id ?? null,
             'sender_id' => auth()->id(),
             'conversation_id' => $this->conversation->id,
             'message_type' => $this->message_type,
         ]);
 
-        $this->conversation->last_message_id = $message->id;
-        $this->conversation->last_message = $message->message;
+        $this->conversation->last_message_id = $this->message->id;
+        $this->conversation->last_message = $this->message->message;
         $this->conversation->save();
 
-        $this->message = $message->load('conversation');
+//        $this->message = $message->load('conversation');
 
         return $this;
     }
@@ -71,6 +73,8 @@ class SwapMessageService
                 DB::beginTransaction();
 
                 $conversation = Conversation::where('composite_id', $sender_id . ':' . $receiver_id)
+                    ->orWhere('composite_id', $receiver_id . ':' . $sender_id)
+                    ->orWhere('reverse_composite_id', $sender_id . ':' . $receiver_id)
                     ->orWhere('reverse_composite_id', $receiver_id . ':' . $sender_id)
                     ->first();
 
@@ -95,12 +99,14 @@ class SwapMessageService
                 DB::commit();
 
                 return $conversation;
+
             } catch (\Exception $e) {
 
                 DB::rollBack();
-
                 return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
             }
+        }else if ($conversation_type == 'group') {
+
         }
         return null;
     }
@@ -113,6 +119,8 @@ class SwapMessageService
             $insertDataForParticipant[] = [
                 'conversation_id' => $messageRequest->id,
                 'user_id' => $participant,
+                'created_at' => now(),
+                'updated_at' => now(),
             ];
         }
 
@@ -121,8 +129,20 @@ class SwapMessageService
 
     public function withNotify()
     {
-        dispatch(new SwapJob($this->swap, $this->conversation, $this->message));
+        SwapNotificationService::sendNotification(
+            $this->swap,
+            [$this->swap->exchanged_user_id],
+            $this->message
+        );
 
+//        dispatch(new SwapJob($this->swap, $this->conversation, $this->message));
+
+        return $this;
+    }
+
+    public function doBroadcast()
+    {
+        event(new MessageBroadcast($this->conversation,$this->message));
         return $this;
     }
 

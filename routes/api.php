@@ -71,43 +71,57 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::resource('brand', BrandController::class)->only(['index', 'show']);
         Route::resource('size', SizeController::class)->only(['index', 'show']);
         Route::resource('color', ColorController::class)->only(['index', 'show']);
-        Route::resource('product', ProductController::class);
-        Route::get('change-product-status/{id}', [ProductController::class, 'changeStatus']);
-        Route::post('delete-product-variation', [ProductController::class, 'destroyProductVariation']);
+
 //        Route::resource('plan', PlanController::class);
 
-        //rating
-        Route::apiResource('ratings', RatingController::class);
-        Route::get('ratings/given-to-me', [RatingController::class, 'ratingsGivenToMe']);
-        Route::get('ratings/given-by-me', [RatingController::class, 'ratingsGivenByMe']);
+        Route::group(['middleware' => 'unverified.super.swapper'], function () {
+            Route::get('admin-approval', function () {
+                return response()->json(['success' => true, 'message' => 'You are approved by admin.'], 200);
+            });
+            //Product
+            Route::resource('product', ProductController::class);
+            Route::get('change-product-status/{id}', [ProductController::class, 'changeStatus']);
+            Route::post('delete-product-variation', [ProductController::class, 'destroyProductVariation']);
 
-        //swap
-        Route::resource('swap', SwapController::class);
-        Route::resource('swap-request-details', SwapRequestDetailsController::class);
-        Route::resource('swap-exchange-details', SwapExchangeDetailsController::class);
-        Route::get('swap-approve/{id}', [SwapController::class, 'swapApprove']);
-        Route::get('swap-decline/{id}', [SwapController::class, 'swapDecline']);
-        Route::get('swap-complete/{id}', [SwapController::class, 'swapComplete']);
+        });
 
-        //Swap Initiate
-        Route::resource('swap-initiate', SwapInitiateDetailsController::class);
+        Route::group(['middleware' => 'admin.approval'], function () {
+            Route::get('super-swapper', function () {
+                return response()->json(['success' => true, 'message' => 'You are a super swapper.'], 200);
+            });
 
-        Route::get('swap-accept/{id}', [SwapInitiateDetailsController::class, 'swapAccept']);
+            //rating
+            Route::apiResource('ratings', RatingController::class);
+            Route::get('ratings/given-to-me', [RatingController::class, 'ratingsGivenToMe']);
+            Route::get('ratings/given-by-me', [RatingController::class, 'ratingsGivenByMe']);
 
-//        Broadcast::routes();
+            //Message
+            Route::get('messages', [MessageController::class , 'index']);
+            Route::get('messages-list/{conversation_id}', [MessageController::class , 'messageList']);
+            Route::post('prepare-conversation', [MessageController::class , 'prepareConversation']);
+            Route::post('send-messages', [MessageController::class , 'sendMessages']);
+            Route::put('update-message/{id}', [MessageController::class , 'updateMessage']);
+            Route::delete('delete-message/{id}', [MessageController::class , 'deleteMessage']);
 
-        //Message
-        Route::get('messages', [MessageController::class , 'index']);
-        Route::post('prepare-conversation', [MessageController::class , 'prepareConversation']);
-        Route::post('send-messages', [MessageController::class , 'sendMessages']);
-        Route::put('update-message/{id}', [MessageController::class , 'updateMessage']);
-        Route::delete('delete-message/{id}', [MessageController::class , 'deleteMessage']);
+            //Notification
+            Route::get('notifications', [NotificationController::class , 'index']);
+            Route::get('notification-show/{id}', [NotificationController::class , 'show']);
+            Route::post('mark-as-read', [NotificationController::class , 'markAllAsRead']);
+            Route::post('mark-as-unread', [NotificationController::class , 'markAllAsUnRead']);
 
-        //Notification
-        Route::get('notifications', [NotificationController::class , 'index']);
-        Route::get('notification-show/{id}', [NotificationController::class , 'show']);
-        Route::post('mark-as-read', [NotificationController::class , 'markAllAsRead']);
-        Route::post('mark-as-unread', [NotificationController::class , 'markAllAsUnRead']);
+            //swap
+            Route::resource('swap', SwapController::class);
+
+            Route::resource('swap-request-details', SwapRequestDetailsController::class);
+            Route::resource('swap-exchange-details', SwapExchangeDetailsController::class);
+            Route::get('swap-approve/{id}', [SwapController::class, 'swapApprove']);
+            Route::get('swap-decline/{id}', [SwapController::class, 'swapDecline']);
+            Route::get('swap-complete/{id}', [SwapController::class, 'swapComplete']);
+
+            //Swap Initiate
+            Route::resource('swap-initiate', SwapInitiateDetailsController::class);
+            Route::get('swap-accept/{id}', [SwapInitiateDetailsController::class, 'swapAccept']);
+        });
 
         //Payment Method
         Route::get('default-payment-method/{id}', [PaymentMethodController::class, 'defaultPaymentMethod']);

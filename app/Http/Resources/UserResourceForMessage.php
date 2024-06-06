@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class UserResource extends JsonResource
+class UserResourceForMessage extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,16 +18,11 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'first_name' => $this->first_name,
             'last_name' => $this->last_name,
-            'email' => $this->email,
-            'phone' => $this->phone,
             'subscription_is_active' => $this->subscription_is_active,
             'stripe_customer_id' => $this->stripe_customer_id,
             'is_approved_by_admin' => $this->is_approved_by_admin,
             'is_super_swapper' => $this->is_super_swapper,
-            'business_name' => $this->business_name,
-            'business_address' => $this->business_address,
             'image' => new ImageResource($this->image),
-            'about_me' => $this->about_me,
         ];
     }
 }
