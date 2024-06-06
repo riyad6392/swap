@@ -120,7 +120,6 @@ class SwapController extends Controller
             $swaps->orderBy('created_at', $request->sort ?? 'desc');
         }
 
-
         $swaps = $swaps->with(
             'initiateDetails',
             'exchangeDetails',

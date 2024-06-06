@@ -4,14 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Facades\MessageFacade;
 use App\Http\Requests\SwapInitiate\StoreSwapInitiateRequest;
+use App\Mail\UserApprovel;
+use Illuminate\Support\Facades\Mail;
 use App\Jobs\SwapJob;
 use App\Models\Message;
 use App\Models\Swap;
+use App\Models\User;
 use App\Models\SwapInitiateDetails;
 use App\Services\SwapMessageService;
 use App\Services\SwapNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Mail\SwapInitiated;
 
 class SwapInitiateDetailsController extends Controller
 {
@@ -124,6 +128,28 @@ class SwapInitiateDetailsController extends Controller
             SwapInitiateDetails::insert($insertData);
 
 
+            $exchangedUser = User::findOrFail($swapInitiateRequest->exchanged_user_id);
+            $requestUser = User::findOrFail(auth()->id());
+
+
+
+            $data = [
+                'exchanged_user_name' => $exchangedUser->first_name,
+                'requested_user_name' => $requestUser->first_name,
+            ];
+
+
+            Mail::to($exchangedUser->email)->send(new SwapInitiated($data));
+
+//            $exchangedUser = User::find($swapInitiateRequest->exchanged_user_id);
+//            $requestUser = User::find(auth()->id());
+//
+//            if (!$exchangedUser || !$requestUser) {
+//                // Handle case where user is not found
+//                return response()->json(['success' => false, 'message' => 'One or more users not found'], 404);
+//            }
+
+
 
             MessageFacade::prepareData(
                 auth()->id(),
@@ -154,6 +180,7 @@ class SwapInitiateDetailsController extends Controller
             $query->where('exchanged_user_id', auth()->id())
                 ->orWhere('requested_user_id', auth()->id());
         })->where('uid', $uid)->first();
+
 
         if (!$swap) {
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
@@ -214,8 +241,7 @@ class SwapInitiateDetailsController extends Controller
     public function destroy($uid)
     {
         $swap = Swap::where(function ($query) use ($uid) {
-            $query
-                ->where('exchanged_user_id', auth()->id())
+            $query->where('exchanged_user_id', auth()->id())
                 ->orWhere('requested_user_id', auth()->id());
         })->where('uid', $uid)->first();
 

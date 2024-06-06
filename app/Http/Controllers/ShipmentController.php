@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Shipment\StoreShipmentRequest;
 use App\Http\Requests\Shipment\UpdateShipmentRequest;
 use App\Models\Shipment;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class ShipmentController extends Controller
@@ -231,7 +232,13 @@ class ShipmentController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $shipments = Shipment::find($id);
+
+        if (!$shipments) {
+            return response()->json(['success' => false, 'message' => 'Shipments not found'], 404);
+        }
+
+        return response()->json(['success' => true, 'data' => $shipments]);
     }
 
 //    /**
@@ -394,8 +401,14 @@ class ShipmentController extends Controller
     public function destroy(string $id)
     {
         $shipment = Shipment::find($id);
-        $shipment->delete();
 
-        return response()->json(['success' => true, 'data' => 'Shipment deleted successfully']);
+        if ($shipment) {
+            $shipment ->delete();
+            return response()->json(['success' => true, 'data' => 'Shipment deleted successfully']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Shipment not found'], 404);
+
+
     }
 }

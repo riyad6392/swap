@@ -39,6 +39,7 @@ Route::group(['prefix' => 'admin'], function () {
         //admin
         Route::get('sync-permission/{user_id}/{role_id}', [AdminController::class, 'syncPermissions']);
         Route::get('role-permission/{user_id}', [AdminController::class, 'listPermissions']);
+        Route::post('/send-email', [AdminController::class, 'sendEmail']);
 
 
         Route::post('approve-user/{user}', [AdminController::class, 'approveUser'])->name('admin.approve-user');
