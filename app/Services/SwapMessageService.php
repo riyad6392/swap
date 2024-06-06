@@ -119,6 +119,8 @@ class SwapMessageService
             $insertDataForParticipant[] = [
                 'conversation_id' => $messageRequest->id,
                 'user_id' => $participant,
+                'created_at' => now(),
+                'updated_at' => now(),
             ];
         }
 
