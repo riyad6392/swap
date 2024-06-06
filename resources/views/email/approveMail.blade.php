@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Password Reset Request</title>
+    <title>Account Approved</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -32,11 +31,15 @@
 
         .header h1 {
             margin: 0;
-            color: #FF5722;
+            color: #4CAF50;
         }
 
         .content {
             padding: 20px 0;
+        }
+
+        .content h2 {
+            color: #333;
         }
 
         .content p {
@@ -51,7 +54,7 @@
         }
 
         .button a {
-            background-color: #FF5722;
+            background-color: #4CAF50;
             color: #fff;
             padding: 10px 20px;
             text-decoration: none;
@@ -76,13 +79,13 @@
 <body>
 <div class="container">
     <div class="header">
-        <h1>Password Reset Request</h1>
+        <h1>Account Approved</h1>
     </div>
     <div class="content">
-        <h2>Hello, {{ $first_name }} {{ $last_name }}</h2>
-        <p>We received a request to reset your password. Please click the button below to reset your password:</p>
+        <h2>Hello, {{ $data['first_name'] }} {{ $data['last_name'] }}</h2>
+        <p>You have been approved by the admin. You can now access your account and explore our services.</p>
         <div class="button">
-            <a href="{{ env('FRONT_APP_URL') . '/reset-password?token=' . $token }}">Reset Password</a>
+            <a href="{{ env('APP_URL') }}">Go to Your Account</a>
         </div>
     </div>
     <div class="footer">

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\OrderShipped;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -95,6 +97,16 @@ class RegistrationController extends Controller
                 ]);
 
                 DB::commit();
+
+                $data = $request->validate([
+                    'email' => 'required|email',
+                    'first_name' => 'required|string|max:255',
+                    'last_name' => 'required|string|max:255',
+                ]);
+
+                Mail::to($data['email'])->send(new OrderShipped($data));
+
+
                 return response()->json(['success' => true, 'message' => 'Your registration successfully done'], 200);
 
             } catch (\Exception $e) {

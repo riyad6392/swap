@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\UserApprovel;
 use Illuminate\Support\Facades\DB;
 
 use App\Http\Requests\Admin\StoreAdminRequest;
@@ -14,6 +15,9 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasRoles;
+use App\Mail\OrderShipped;
+use Illuminate\Support\Facades\Mail;
+use Exception;
 
 class AdminController extends Controller
 {
@@ -266,10 +270,38 @@ class AdminController extends Controller
      */
     public function approveUser(User $user)
     {
+        //dd($user);
         if (!$user) {
             return response()->json(['success' => false, 'message' => 'User not found'], 404);
         }
         $user->update(['is_approved_by_admin' => true]);
+
+        $data = [
+            'email' => $user->email,
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name,
+        ];
+
+        Mail::to($data['email'])->send(new UserApprovel($data));
+
         return response()->json(['success' => true, 'message' => 'User approved by admin'], 200);
     }
+
+    public function sendEmail(Request $request): JsonResponse
+    {
+        try {
+            $data = $request->validate([
+                'email' => 'required|email',
+                'name' => 'required|string|max:255',
+            ]);
+
+            Mail::to($data['email'])->send(new OrderShipped($data));
+
+            return response()->json(['message' => 'Email sent successfully!'], 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Failed to send email: ' . $e->getMessage()], 500);
+        }
+    }
+
+
 }

@@ -9,6 +9,10 @@ use App\Http\Requests\User\UpdateUserForAdminRequest;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\UserResource;
 use App\Models\Brand;
+use App\Models\Conversation;
+use App\Models\Product;
+use App\Models\Swap;
+use App\Models\SwapExchangeDetails;
 use Illuminate\Http\JsonResponse;
 use App\Models\User;
 use App\Services\FileUploadService;
@@ -921,4 +925,72 @@ class UserController extends Controller
         }
         return response()->json(['success' => false, 'message' => 'User not found'], 404);
     }
+
+
+
+    /**
+     * User Dashboard.
+     *
+     * @OA\Get(
+     *     path="/api/user-dashboard",
+     *     tags={"User"},
+     *     security={{ "apiAuth": {} }},
+     *
+     *     @OA\Response(
+     *           response=200,
+     *           description="success",
+     *
+     *           @OA\JsonContent(
+     *               @OA\Property(property="data", type="json", example={}),
+     *               @OA\Property(property="links", type="json", example={}),
+     *               @OA\Property(property="meta", type="json", example={}),
+     *           )
+     *       ),
+     *
+     *       @OA\Response(
+     *           response=401,
+     *           description="Invalid user",
+     *
+     *           @OA\JsonContent(
+     *               @OA\Property(property="success", type="boolean", example="false"),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Unauthenticated"}}),
+     *           )
+     *       )
+     * )
+     */
+
+
+    public function userDashboard()
+    {
+        $user = User::find(auth()->id());
+
+        if ($user) {
+            $swap_count = Swap::where('user_id', $user->id)->count();
+            $product_count = Product::where('user_id', $user->id)->count();
+            $swap_exchange_amount = SwapExchangeDetails::where('user_id', $user->id)->sum('amount');
+            $swapExchangeDetails = SwapExchangeDetails::where('user_id', $user->id)->get();
+            $conversation_list = Conversation::where('user_id', $user->id)->get();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'User data retrieved successfully',
+                'data' => [
+                    'user' => $user,
+                    'swap_count' => $swap_count,
+                    'product_count' => $product_count,
+                    'swap_exchange_amount' => $swap_exchange_amount,
+                    'swap_exchange_details' => $swapExchangeDetails,
+                    'conversation_list' => $conversation_list
+                ]
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'User not found'
+        ]);
+    }
+
+
+
 }
