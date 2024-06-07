@@ -11,14 +11,17 @@ use Illuminate\Http\Request;
 
 class BrandController extends Controller
 {
-    public function __construct() {
+    public function __construct()
+    {
         $this->middleware('permission:brand.index,brand.create,brand.edit,brand.delete', ['only' => ['index']]);
         $this->middleware('permission:brand.create', ['only' => ['store']]);
         $this->middleware('permission:brand.edit', ['only' => ['update']]);
         $this->middleware('permission:brand.delete', ['only' => ['destroy']]);
 
-}
+    }
+
     const PER_PAGE = 10;
+
     /**
      * Brand List.
      *
@@ -153,7 +156,7 @@ class BrandController extends Controller
         $brand = Brand::create([
             'name' => $brandRequest->name,
             'description' => $brandRequest->description ?? '',
-            'is_published'=>$brandRequest->is_published,
+            'is_published' => $brandRequest->is_published,
         ]);
 
 //        if ($brandRequest->has('logo')){
@@ -310,7 +313,7 @@ class BrandController extends Controller
             return response()->json(['success' => false, 'message' => 'Brand not found']);
         }
 
-        $isBrandUsedInProducts =Product::where('brand_id', $id)->exists();
+        $isBrandUsedInProducts = Product::where('brand_id', $id)->exists();
 
         if ($isBrandUsedInProducts) {
             return response()->json(['success' => false, 'message' => 'Brand is in use in product and cannot be deleted'], 403);
