@@ -8,6 +8,7 @@ use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserForAdminRequest;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\UserResource;
+use App\Mail\UserApprovel;
 use App\Models\Brand;
 use App\Models\Conversation;
 use App\Models\Product;
@@ -19,6 +20,7 @@ use App\Services\FileUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
 
@@ -31,18 +33,12 @@ class UserController extends Controller
 //    }
 
 
-    public function __construct()
-    {
+    public function __construct() {
+        $this->middleware('permission:user.index,user.create,user.edit,user.delete', ['only' => ['index']]);
+        $this->middleware('permission:user.create', ['only' => ['store']]);
+        $this->middleware('permission:user.edit', ['only' => ['update']]);
+        $this->middleware('permission:user.delete', ['only' => ['destroy']]);
 
-//        $this->middleware(['auth:admin-api', 'permission:user.index'])->only('index');
-//        $this->middleware(['auth:admin-api', 'permission:user.show'])->only('show');
-//        $this->middleware(['auth:admin-api', 'permission:user.edit'])->only('update');
-//        $this->middleware(['auth:admin-api', 'permission:user.delete'])->only('destroy');
-
-        $this->middleware('permission:brand-list|brand-create|brand-edit|brand-delete', ['only' => ['index','store']]);
-        $this->middleware('permission:brand-create', ['only' => ['create','store']]);
-        $this->middleware('permission:brand-edit', ['only' => ['edit','update']]);
-        $this->middleware('permission:brand-delete', ['only' => ['destroy']]);
     }
 
     const PER_PAGE = 10;
@@ -274,6 +270,19 @@ class UserController extends Controller
             'phone' => $request->phone ?? $user->phone,
 
         ]);
+
+        $data = [
+            'email' => $user->email,
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name,
+        ];
+
+        if($request->is_approved_by_admin==true)
+        {
+            Mail::to($data['email'])->send(new UserApprovel($data));
+        }
+
+
 
         return response()->json(['success' => true, 'message' => 'User updated successfully']);
 
