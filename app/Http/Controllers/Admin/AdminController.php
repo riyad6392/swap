@@ -327,11 +327,11 @@ class AdminController extends Controller
 
         $roles = $user->roles->first();
 
-        $roles->role_permissions =  DB::table('role_has_permissions')
+        $roles->role_permissions = $roles ? DB::table('role_has_permissions')
            ->where('role_has_permissions.role_id', $roles->id)
            ->join('permissions','role_has_permissions.permission_id','=','permissions.id')
            ->select('role_has_permissions.permission_id', 'role_has_permissions.permission_id', 'permissions.name', 'permissions.name')
-              ->get();
+              ->get() : [];
 
         return response()->json(['success' => true, 'message' => 'Role assigned successfully', 'data' => $roles], 201);
     }
