@@ -47,6 +47,18 @@ class PermissionSeeder extends Seeder
                 'user.edit',
                 'user.delete',
             ],
+            'admin' => [
+                'admin.index',
+                'admin.create',
+                'admin.edit',
+                'admin.delete',
+            ],
+            'role' => [
+                'role.index',
+                'role.create',
+                'role.edit',
+                'role.delete',
+            ],
         ];
 
         foreach ($permissions as $group => $permission) {
