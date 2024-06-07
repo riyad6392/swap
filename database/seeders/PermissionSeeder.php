@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Admin;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\User;
@@ -72,24 +73,17 @@ class PermissionSeeder extends Seeder
         }
 
 
-
 //            // Create admin User and assign the role to him.
-//            $user = User::create([
-//                'first_name' => 'riyad',
-//                'last_name' => 'riyad',
-//                'phone' => '017777777',
-//                'email' => 'riyadgp@gmail.com',
-//                'is_approved_by_admin'=>true,
-//                'password' => Hash::make('password')
-//            ]);
+        $user = Admin::create([
+            'name' => 'Imtiaz Ur Rahman Khan',
+//            'phone' => '01516174119',
+            'email' => 'k.r.imtiaz@gmail.com',
+            'password' => Hash::make('password')
+        ]);
 //
-//            $role = Role::create(['name' => 'Admin']);
-//
-//            $permissions = Permission::pluck('id', 'id')->all();
-//
-//            $role->syncPermissions($permissions);
-//
-//            $user->assignRole([$role->id]);
+        $role = Role::create(['name' => 'Super Admin', 'guard_name' => 'admin-api']);
+        $role->givePermissionTo(Permission::all());
+        $user->assignRole($role);
     }
 
 
