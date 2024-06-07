@@ -128,7 +128,9 @@ return [
          * Passphrase for your local_cert file.
          */
         'passphrase' => env('LARAVEL_WEBSOCKETS_SSL_PASSPHRASE', null),
-//        'verify_peer' => env('LARAVEL_WEBSOCKETS_VERIFY_PEER', false),
+        'verify_peer' => env('LARAVEL_WEBSOCKETS_VERIFY_PEER', false),
+        'verify_peer_name' => env('LARAVEL_WEBSOCKETS_VERIFY_PEER_NAME', false),
+
     ],
 
     /*
