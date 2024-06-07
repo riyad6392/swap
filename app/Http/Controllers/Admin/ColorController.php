@@ -11,6 +11,14 @@ use Illuminate\Http\Request;
 
 class ColorController extends Controller
 {
+
+    public function __construct() {
+        $this->middleware('permission:color.index,color.create,color.edit,color.delete', ['only' => ['index']]);
+        $this->middleware('permission:color.create', ['only' => ['store']]);
+        $this->middleware('permission:color.edit', ['only' => ['update']]);
+        $this->middleware('permission:color.delete', ['only' => ['destroy']]);
+
+    }
     const PER_PAGE = 10;
 
     /**

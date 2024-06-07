@@ -11,6 +11,13 @@ use Illuminate\Http\Request;
 
 class SizeController extends Controller
 {
+    public function __construct() {
+        $this->middleware('permission:size.index,size.create,size.edit,size.delete', ['only' => ['index']]);
+        $this->middleware('permission:size.create', ['only' => ['store']]);
+        $this->middleware('permission:size.edit', ['only' => ['update']]);
+        $this->middleware('permission:size.delete', ['only' => ['destroy']]);
+
+    }
     const PER_PAGE = 10;
 
     /**
