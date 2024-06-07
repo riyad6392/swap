@@ -11,6 +11,13 @@ use Illuminate\Http\Request;
 
 class BrandController extends Controller
 {
+    public function __construct() {
+        $this->middleware('permission:brand.index,brand.create,brand.edit,brand.delete', ['only' => ['index']]);
+        $this->middleware('permission:brand.create', ['only' => ['store']]);
+        $this->middleware('permission:brand.edit', ['only' => ['update']]);
+        $this->middleware('permission:brand.delete', ['only' => ['destroy']]);
+
+}
     const PER_PAGE = 10;
     /**
      * Brand List.

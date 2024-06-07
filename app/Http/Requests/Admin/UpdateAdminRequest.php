@@ -28,7 +28,7 @@ class UpdateAdminRequest extends FormRequest
         return [
             'name' => 'required|string',
             'email' => 'required|email|unique:admins,email,' . $admin_id,
-            'role' => 'required|exists:roles,id'
+            'role_id' => 'required|exists:roles,id'
         ];
     }
 

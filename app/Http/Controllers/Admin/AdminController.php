@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Mail\AdminRequest;
+use App\Mail\AdminInvitation;
 use App\Mail\SwapInitiated;
 use App\Mail\UserApprovel;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +23,12 @@ use Exception;
 
 class AdminController extends Controller
 {
+    public function __construct() {
+        $this->middleware('permission:admin.index,admin.create,admin.edit,admin.delete', ['only' => ['index']]);
+        $this->middleware('permission:admin.create', ['only' => ['store']]);
+        $this->middleware('permission:admin.edit', ['only' => ['update']]);
+        $this->middleware('permission:admin.delete', ['only' => ['destroy']]);
+    }
     //const PER_PAGE = 10;
 
     /**
@@ -118,16 +124,15 @@ class AdminController extends Controller
         }
 
 
-
         $admins = $admins->with('roles');
 
-        if($request->has('get_all')){
-            return response()->json(['success'=> true,'admins' => $admins->get()], 200);
+        if ($request->has('get_all')) {
+            return response()->json(['success' => true, 'admins' => $admins->get()], 200);
         }
 
-        $admins = $admins->paginate( $request->paginate ?? 10);
+        $admins = $admins->paginate($request->paginate ?? 10);
 
-        return response()->json(['success'=> true,'data' => $admins], 200);
+        return response()->json(['success' => true, 'data' => $admins], 200);
     }
 
     /**
@@ -148,46 +153,36 @@ class AdminController extends Controller
         $admin = Admin::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => bcrypt('password')
+            'password' => bcrypt('password'),
+            'phone' => $request->phone ?? ''
         ]);
         $admin->assignRole($role->name);
 
-        $requestAdmin = Admin::findOrFail(auth()->id());
-        if ($requestAdmin) {
-            $data = [
-                'received_user_name' => $request->name,
-                'requested_admin_first_name' => $requestAdmin->first_name,
-                'requested_admin_last_name' => $requestAdmin->last_name,
-                'role' => $role->name,
-                'password' => 'password',
-                'email' => $request->email,
-            ];
-            try {
-                Mail::to($request->email)->send(new AdminRequest($data));
-            } catch (\Exception $e) {
+        $data = [
+            'received_user_name' => $request->name,
+            'requested_admin_first_name' => auth()->user()->first_name,
+            'requested_admin_last_name' => auth()->user()->last_name,
+            'role' => $role->name,
+            'password' => 'password',
+            'email' => $request->email,
+        ];
 
-                \Log::error('Failed to send admin request email: ' . $e->getMessage());
+        Mail::to($request->email)->send(new AdminInvitation($data));
 
-                return response()->json(['error' => 'Failed to send email. Please try again later.'], 500);
-            }
-        }
-
-
-
-        return response()->json(['success'=> true,'message' => 'Admin created successfully', 'data' => $admin], 201);
+        return response()->json(['success' => true, 'message' => 'Admin created successfully', 'data' => $admin], 201);
     }
 
 
-    public function syncPermissions(int $user_id,int $role_id): JsonResponse
+    public function syncPermissions(int $user_id, int $role_id): JsonResponse
     {
         $user = Admin::findOrFail($user_id);
 
-        $role= Role::findOrFail($role_id);
+        $role = Role::findOrFail($role_id);
 
         $user->assignRole($role->name);
 
 
-        return response()->json(['success'=> true,'message' => 'Permissions synced successfully', 'data' => $role], 201);
+        return response()->json(['success' => true, 'message' => 'Permissions synced successfully', 'data' => $role], 201);
     }
 
     public function listPermissions(int $role_id): JsonResponse
@@ -197,9 +192,9 @@ class AdminController extends Controller
         $role = Role::findOrFail($role_id);
         $rolePermissions = DB::table('role_has_permissions')
             ->where('role_has_permissions.role_id', $role->id)
-            ->pluck('role_has_permissions.permission_id','role_has_permissions.permission_id')
+            ->pluck('role_has_permissions.permission_id', 'role_has_permissions.permission_id')
             ->all();
-        return response()->json(['success'=> true,'data' => $permissions, 'rolePermissions' => $rolePermissions], 200);
+        return response()->json(['success' => true, 'data' => $permissions, 'rolePermissions' => $rolePermissions], 200);
 
     }
 
@@ -214,7 +209,7 @@ class AdminController extends Controller
             return response()->json(['success' => false, 'message' => 'Admin not found'], 404);
         }
 
-        return response()->json(['success'=> true,'data' => $admin], 200);
+        return response()->json(['success' => true, 'data' => $admin], 200);
     }
 
     /**
@@ -234,10 +229,10 @@ class AdminController extends Controller
         $admin = Admin::find($id);
 
         if (!$admin) {
-            return response()->json(['success'=> false,'message' => 'Admin not found'], 404);
+            return response()->json(['success' => false, 'message' => 'Admin not found'], 404);
         }
 
-        if ($request->has('role_id')){
+        if ($request->has('role_id')) {
             $role = Role::find($request->role_id);
             $admin->syncRoles([$role->name]);
         }
@@ -248,7 +243,7 @@ class AdminController extends Controller
         ]);
 
 
-        return response()->json(['success'=> true,'message' => 'Admin updated successfully', 'data' => $admin], 200);
+        return response()->json(['success' => true, 'message' => 'Admin updated successfully', 'data' => $admin], 200);
     }
 
     /**
@@ -259,13 +254,13 @@ class AdminController extends Controller
         $admin = Admin::find($id);
 
         if (!$admin) {
-            return response()->json(['success'=> false,'message' => 'Admin not found'], 404);
+            return response()->json(['success' => false, 'message' => 'Admin not found'], 404);
         }
 
         $admin->removeRole($admin->roles->first());
         $admin->delete();
 
-        return response()->json(['success'=> true,'message' => 'Admin deleted successfully'], 200);
+        return response()->json(['success' => true, 'message' => 'Admin deleted successfully'], 200);
     }
 
     /**
@@ -325,6 +320,20 @@ class AdminController extends Controller
         } catch (Exception $e) {
             return response()->json(['error' => 'Failed to send email: ' . $e->getMessage()], 500);
         }
+    }
+
+    public  function authUserAssignRole(){
+        $user = auth()->user();
+
+        $roles = $user->roles->first();
+
+        $roles->role_permissions =  DB::table('role_has_permissions')
+           ->where('role_has_permissions.role_id', $roles->id)
+           ->join('permissions','role_has_permissions.permission_id','=','permissions.id')
+           ->select('role_has_permissions.permission_id', 'role_has_permissions.permission_id', 'permissions.name', 'permissions.name')
+              ->get();
+
+        return response()->json(['success' => true, 'message' => 'Role assigned successfully', 'data' => $roles], 201);
     }
 
 
