@@ -276,10 +276,10 @@ class MessageController extends Controller
 
             $conversation = $conversation->get();
 
-            return response()->json(['success' => true, 'data' => $conversation]);
+            return response()->json(['success' => true, 'data' => ConversationResources::collection($conversation)]);
         }
 
-        $conversation = ConversationResources::collection($conversation->paginate($request->pagination ?? self::PER_PAGE));
+        $conversation = ConversationResources::collection($conversation->paginate($request->pagination ?? self::PER_PAGE))->resource;
 
         return response()->json(['success' => true, 'data' => $conversation]);
     }
