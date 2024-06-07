@@ -23,6 +23,12 @@ use Exception;
 
 class AdminController extends Controller
 {
+    public function __construct() {
+        $this->middleware('permission:admin.index,admin.create,admin.edit,admin.delete', ['only' => ['index']]);
+        $this->middleware('permission:admin.create', ['only' => ['store']]);
+        $this->middleware('permission:admin.edit', ['only' => ['update']]);
+        $this->middleware('permission:admin.delete', ['only' => ['destroy']]);
+    }
     //const PER_PAGE = 10;
 
     /**
