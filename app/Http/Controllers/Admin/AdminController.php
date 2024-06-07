@@ -152,18 +152,27 @@ class AdminController extends Controller
         ]);
         $admin->assignRole($role->name);
 
-        $requestAdmin = User::findOrFail(auth()->id());
+        $requestAdmin = Admin::findOrFail(auth()->id());
+        if ($requestAdmin) {
+            $data = [
+                'received_user_name' => $request->name,
+                'requested_admin_first_name' => $requestAdmin->first_name,
+                'requested_admin_last_name' => $requestAdmin->last_name,
+                'role' => $role->name,
+                'password' => 'password',
+                'email' => $request->email,
+            ];
+            try {
+                Mail::to($request->email)->send(new AdminRequest($data));
+            } catch (\Exception $e) {
 
-        $data = [
-            'received_user_name' => $request->name,
-            'requested_admin_first_name' => $requestAdmin->first_name,
-            'requested_admin_last_name' => $requestAdmin->last_name,
-            'role' => $role->name,
-            'password' => 'password',
-            'email'=>$request->email,
-        ];
+                \Log::error('Failed to send admin request email: ' . $e->getMessage());
 
-        Mail::to($request->email)->send(new AdminRequest($data));
+                return response()->json(['error' => 'Failed to send email. Please try again later.'], 500);
+            }
+        }
+
+
 
         return response()->json(['success'=> true,'message' => 'Admin created successfully', 'data' => $admin], 201);
     }
