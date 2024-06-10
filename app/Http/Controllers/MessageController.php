@@ -284,13 +284,21 @@ class MessageController extends Controller
         return response()->json(['success' => true, 'data' => $conversation]);
     }
 
-    public function messageList($id){
+    public function messageList(Request $request, $id)
+    {
 
-        $message = Message::whereHas('conversation', function ($query) use ($id){
+        $message = Message::whereHas('conversation', function ($query) use ($id) {
             $query->whereHas('participants', function ($query) {
                 $query->where('user_id', auth()->id());
             })->where('id', $id);
-        })->orderBy('created_at', 'asc')->get();
+        });
+//            ->orderBy('created_at', 'desc');
+
+        if ($request->get_all) {
+            $message = $message->get();
+        }
+
+        $message = $message->latest()->paginate($request->pagination ?? 100);
 
         return response()->json(['success' => true, 'data' => $message]);
     }
