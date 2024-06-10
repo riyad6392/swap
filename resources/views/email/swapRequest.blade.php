@@ -79,7 +79,7 @@
     <h2>Hello {{ $data['exchanged_user_first_name'] }} {{ $data['exchanged_user_last_name'] }},</h2>
     <p>You have received a swap request from <strong>{{ $data['requested_user_first_name']}} {{ $data['requested_user_last_name']}}</strong>.</p>
     <p>Please log in to your account to view and respond to the swap request.</p>
-    <a href="https://www.swap.com/login" class="button">Log In</a>
+    <a href="https://staging.swapshopnow.com/login" class="button">Log In</a>
     <p>Thank you,</p>
     <p>SWAP</p>
 

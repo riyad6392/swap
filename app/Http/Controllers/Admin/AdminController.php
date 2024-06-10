@@ -2,24 +2,25 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Mail\AdminInvitation;
-use App\Mail\SwapInitiated;
+use Exception;
+use App\Models\User;
+use App\Models\Admin;
 use App\Mail\UserApprovel;
-use Illuminate\Support\Facades\DB;
+use App\Mail\SwapInitiated;
 
+use Illuminate\Http\Request;
+use App\Mail\AdminInvitation;
+use App\Mail\RegistrationSuccess;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Role;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Mail;
+use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Models\Permission;
 use App\Http\Requests\Admin\StoreAdminRequest;
 use App\Http\Requests\Admin\UpdateAdminRequest;
-use App\Models\Admin;
-use App\Models\User;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Traits\HasRoles;
-use App\Mail\RegistrationSuccess;
-use Illuminate\Support\Facades\Mail;
-use Exception;
 
 class AdminController extends Controller
 {
@@ -124,7 +125,7 @@ class AdminController extends Controller
         }
 
 
-        $admins = $admins->with('roles');
+        $admins->with(['roles', 'image']);
 
         if ($request->has('get_all')) {
             return response()->json(['success' => true, 'admins' => $admins->get()], 200);
@@ -150,12 +151,28 @@ class AdminController extends Controller
     public function store(StoreAdminRequest $request)
     {
         $role = Role::find($request->role_id);
+
+        $path = null;
+
+        if ($request->hasFile('profile_image')) {
+            $path = $request->file('profile_image')->store('images', 'public');
+        }
+
         $admin = Admin::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt('password'),
             'phone' => $request->phone ?? ''
         ]);
+
+
+        if (isset($path)) {
+            $admin->image()->create([
+                'path' => $path,
+                'created_by' => auth()->id(),
+                'updated_by' => auth()->id(),
+            ]);
+        }
         $admin->assignRole($role->name);
 
         $data = [
@@ -169,7 +186,11 @@ class AdminController extends Controller
 
         Mail::to($request->email)->send(new AdminInvitation($data));
 
-        return response()->json(['success' => true, 'message' => 'Admin created successfully', 'data' => $admin], 201);
+        $responseData = $admin->toArray();
+        $responseData['profile_image'] = $path ? asset('storage/' . $path) : null;
+
+        return response()->json(['success' => true, 'message' => 'Admin created successfully', 'data' => $responseData], 201);
+
     }
 
 
@@ -203,7 +224,7 @@ class AdminController extends Controller
      */
     public function show(string $id)
     {
-        $admin = Admin::with('roles')->find($id);
+        $admin = Admin::with(['roles', 'image'])->find($id);
 
         if (!$admin) {
             return response()->json(['success' => false, 'message' => 'Admin not found'], 404);
@@ -239,8 +260,28 @@ class AdminController extends Controller
 
         $admin->update([
             'name' => $request->name,
-            'email' => $request->email
+            'email' => $request->email,
+            'phone'=> $request->phone,
         ]);
+
+        if ($request->hasFile('profile_image')) {
+            $path = $request->file('profile_image')->store('images', 'public');
+
+            if ($admin->image) {
+                Storage::disk('public')->delete($admin->image->path);
+
+                $admin->image->update([
+                    'path' => $path,
+                    'updated_by' => auth()->id(),
+                ]);
+            } else {
+                $admin->image()->create([
+                    'path' => $path,
+                    'created_by' => auth()->id(),
+                    'updated_by' => auth()->id(),
+                ]);
+            }
+        }
 
 
         return response()->json(['success' => true, 'message' => 'Admin updated successfully', 'data' => $admin], 200);
@@ -255,6 +296,11 @@ class AdminController extends Controller
 
         if (!$admin) {
             return response()->json(['success' => false, 'message' => 'Admin not found'], 404);
+        }
+
+        if ($admin->image) {
+            Storage::disk('public')->delete($admin->image->path);
+            $admin->image->delete();
         }
 
         $admin->removeRole($admin->roles->first());
