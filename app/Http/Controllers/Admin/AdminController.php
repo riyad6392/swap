@@ -125,7 +125,7 @@ class AdminController extends Controller
         }
 
 
-        $admins = $admins->with('roles');
+        $admins->with(['roles', 'image']);
 
         if ($request->has('get_all')) {
             return response()->json(['success' => true, 'admins' => $admins->get()], 200);
@@ -261,6 +261,7 @@ class AdminController extends Controller
         $admin->update([
             'name' => $request->name,
             'email' => $request->email,
+            'phone'=> $request->phone,
         ]);
 
         if ($request->hasFile('profile_image')) {

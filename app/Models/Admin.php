@@ -16,7 +16,7 @@ class Admin extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
-    protected $fillable = ['name', 'email', 'password','profile_image'];
+    protected $fillable = ['name', 'email', 'password','profile_image','phone'];
 
     protected $hidden = [
         'password',
@@ -33,7 +33,7 @@ class Admin extends Authenticatable
     {
         return $this->morphOne(Image::class, 'imageable');
     }
-    
+
 
 
 }
