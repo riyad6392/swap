@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\MessageBroadcast;
 use App\Facades\MessageFacade;
 use App\Http\Requests\Conversation\StoreConversationRequest;
+use App\Http\Requests\Message\MessageListRequest;
 use App\Http\Requests\Message\StoreMessageRequest;
 use App\Http\Resources\ConversationResources;
 use App\Models\Conversation;
@@ -284,7 +285,7 @@ class MessageController extends Controller
         return response()->json(['success' => true, 'data' => $conversation]);
     }
 
-    public function messageList(Request $request, $id)
+    public function messageList(MessageListRequest $messageListRequest, $id)
     {
 
         $message = Message::whereHas('conversation', function ($query) use ($id) {
@@ -292,13 +293,24 @@ class MessageController extends Controller
                 $query->where('user_id', auth()->id());
             })->where('id', $id);
         });
-//            ->orderBy('created_at', 'desc');
 
-        if ($request->get_all) {
-            $message = $message->get();
+
+        $operator = '<';
+        $order = 'desc';
+
+        if ($messageListRequest->sort == 'newest'){
+            $operator = '>';
+            $order = 'asc';
         }
 
-        $message = $message->latest()->paginate($request->pagination ?? 100);
+        if ($messageListRequest->paginate_message_id){
+            $message = $message->where('id', $operator , $messageListRequest->paginate_message_id);
+        }
+
+        $message = $message->orderBy('id', $order);
+
+
+        $message = $message->take(10)->get();
 
         return response()->json(['success' => true, 'data' => $message]);
     }
