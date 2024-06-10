@@ -100,7 +100,7 @@
         <p><strong>Swap Offer: $20</strong> </p>
     </div>
     <p>Please log in to your account to view and respond to the swap request.</p>
-    <a href="https://www.swap.com/login" class="button">Log In</a>
+    <a href="https://staging.swapshopnow.com/login" class="button">Log In</a>
     <p>Thank you,</p>
     <p>SWAP</p>
 

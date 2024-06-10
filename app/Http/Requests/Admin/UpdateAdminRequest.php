@@ -28,7 +28,9 @@ class UpdateAdminRequest extends FormRequest
         return [
             'name' => 'required|string',
             'email' => 'required|email|unique:admins,email,' . $admin_id,
-            'role_id' => 'required|exists:roles,id'
+            'role_id' => 'required|exists:roles,id',
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'phone' => 'required|string',
         ];
     }
 
@@ -41,10 +43,12 @@ class UpdateAdminRequest extends FormRequest
     {
         return [
             'name.required' => 'Name is required',
+            'profile_image.required' => 'Image is required',
             'email.required' => 'Email is required',
             'email.email' => 'Email must be a valid email address',
             'email.unique' => 'Email is already taken',
             'role.required' => 'Role is required',
+            'phone.required' =>  'phone is required',
             'role.exists' => 'Role does not exist'
         ];
     }

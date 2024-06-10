@@ -100,7 +100,7 @@
         <p><strong>Password:</strong> {{$data['password']}}</p>
     </div>
     <p>Please log in to your account to view and respond to the admin request.</p>
-    <a href="https://www.swap.com/login" class="button">Log In</a>
+    <a href="https://staging.swapshopnow.com/login" class="button">Log In</a>
     <p>Thank you,</p>
     <p>Your Swap</p>
 
@@ -108,6 +108,5 @@
         <p>This is an automated email. Please do not reply.</p>
     </div>
 </div>
-
 </body>
 </html>

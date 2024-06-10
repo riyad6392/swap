@@ -27,7 +27,8 @@ class StoreAdminRequest extends FormRequest
             'name' => 'required|string',
             'email' => 'required|email|unique:admins',
             'role_id' => 'required|string|exists:roles,id',
-            'phone' => 'nullable|string',
+            'phone' => 'required|string',
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }
 
@@ -40,9 +41,11 @@ class StoreAdminRequest extends FormRequest
     {
         return [
             'name.required' => 'Name is required',
+            'profile_image.required' => 'Image is required',
             'email.required' => 'Email is required',
             'email.email' => 'Email must be a valid email address',
             'email.unique' => 'Email is already taken',
+            'phone.required' =>  'phone is required',
             'role.required' => 'Role is required',
             'role.exists' => 'Role does not exist'
         ];
