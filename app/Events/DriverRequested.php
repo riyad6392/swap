@@ -33,4 +33,9 @@ class DriverRequested
             new PrivateChannel('channel-name'),
         ];
     }
+
+    public function broadcastAs() :string
+    {
+        return 'ChannelName';
+    }
 }
