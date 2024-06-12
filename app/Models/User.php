@@ -47,6 +47,8 @@ class User extends Authenticatable
         'photo_of_id',
         'stripe_customer_id',
         'about_me',
+        'is_active',
+        'active_at',
     ];
 
     /**

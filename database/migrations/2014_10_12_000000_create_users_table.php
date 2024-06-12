@@ -31,6 +31,8 @@ return new class extends Migration
             $table->string('resale_license')->nullable();
             $table->string('photo_of_id')->nullable();
             $table->longText('about_me')->nullable();
+            $table->boolean('is_active')->default(1);
+            $table->datetime('active_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

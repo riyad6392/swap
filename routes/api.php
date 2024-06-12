@@ -20,6 +20,7 @@ use App\Http\Controllers\SwapExchangeDetailsController;
 use App\Http\Controllers\SwapInitiateDetailsController;
 use App\Http\Controllers\SwapRequestDetailsController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -32,6 +33,24 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
+Route::get('cache-test', function () {
+//    Cache::add('key', 'value', 6);
+
+
+//    $getCacheValue = Cache::store('redis')->put('active_users_1', true, 600); // 10 Minutes
+
+
+//    $value = Cache::store('redis')->put('bar', 'baz', 600); // 10 Minutes
+
+//    dd($getCacheValue);
+
+//    Cache::delete('active_users_1');
+        $getCacheValue = Cache::store('redis')->get('active_users_1');
+    dd($getCacheValue);
+
+});
+
 
 
 Route::post('register', [RegistrationController::class, 'register']);

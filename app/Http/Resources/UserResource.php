@@ -28,6 +28,8 @@ class UserResource extends JsonResource
             'business_address' => $this->business_address,
             'image' => new ImageResource($this->image),
             'about_me' => $this->about_me,
+            'is_active' => $this->is_active,
+            'active_at' => $this->active_at,
         ];
     }
 }
