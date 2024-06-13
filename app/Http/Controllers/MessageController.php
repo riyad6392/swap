@@ -204,7 +204,7 @@ class MessageController extends Controller
      */
     public function sendMessages(StoreMessageRequest $messageRequest): JsonResponse
     {
-        MessageFacade::prepareData(
+        $message = MessageFacade::prepareData(
             auth()->id(),
             $messageRequest->receiver_id,
             'private',
@@ -213,7 +213,7 @@ class MessageController extends Controller
             null
         )->messageGenerate()->doBroadcast();
 
-        return response()->json(['success' => true, 'message' => 'Message sent successfully']);
+        return response()->json(['success' => true, 'message' => 'Message sent successfully', 'data' => $message]);
     }
 
     /**
