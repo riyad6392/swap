@@ -20,7 +20,7 @@ class UserOnlineStatus
             $expireAt = now()->addMinutes(1);
             Cache::store('redis')->put('active_users_' . auth()->id(), true, $expireAt);
             auth()->user()->update([
-                'active_at' => now()
+                'active_at' => now()->addMinutes(1)
             ]);
         }
         return $next($request);
