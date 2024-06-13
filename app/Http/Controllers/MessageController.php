@@ -269,8 +269,14 @@ class MessageController extends Controller
     {
         $conversation = Conversation::query();
 
-        $conversation = $conversation->whereHas('participants', function ($query) {
+        $conversation = $conversation->whereHas('participants', function ($query) use ($request) {
             $query->where('user_id', auth()->id());
+            if ($request->search){
+                $query->whereHas('user', function ($query) use ($request) {
+                    $query->where('first_name', 'like', '%' . $request->search . '%');
+                    $query->orWhere('last_name', 'like', '%' . $request->search . '%');
+                });
+            }
         })->with('participants.user');
 
         if (request()->get_all) {
