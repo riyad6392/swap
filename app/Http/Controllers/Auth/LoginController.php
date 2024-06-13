@@ -137,9 +137,9 @@ class LoginController extends Controller
             }
 
 
-            Cache::store('redis')->remember('active_users_'.auth()->id(), 60, function () {
-                return auth()->user()->update(['active_at' => Carbon::now(),'is_active'=> 1]);
-            });
+//            Cache::store('redis')->remember('active_users_'.auth()->id(), 60, function () {
+//                return auth()->user()->update(['active_at' => Carbon::now(),'is_active'=> 1]);
+//            });
 
             return response()->json([
                 'success' => true,
