@@ -63,7 +63,7 @@ Route::post('refresh-token', [LoginController::class, 'getRefreshToken']);
 
 
 
-Route::group(['middleware' => 'auth:api'], function () {
+Route::group(['middleware' => ['auth:api','user.online.status']], function () {
 
     Route::get('/test' , function(){
         return response()->json(['success' => true, 'message' => 'You are authorized to access this data!'], 200);
