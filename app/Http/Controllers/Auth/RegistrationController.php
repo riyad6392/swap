@@ -104,7 +104,7 @@ class RegistrationController extends Controller
                     'last_name' => 'required|string|max:255',
                 ]);
 
-                Mail::to($data['email'])->send(new RegistrationSuccess($data));
+                Mail::to($data['email'])->send((new RegistrationSuccess($data))->afterCommit());
 
 
                 return response()->json(['success' => true, 'message' => 'Your registration successfully done'], 200);

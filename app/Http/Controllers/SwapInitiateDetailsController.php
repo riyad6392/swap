@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Facades\MessageFacade;
 use App\Http\Requests\SwapInitiate\StoreSwapInitiateRequest;
 use App\Mail\UserApprovel;
-use Illuminate\Support\Facades\Mail;
 use App\Jobs\SwapJob;
 use App\Models\Message;
 use App\Models\Swap;
@@ -17,6 +16,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Mail\SwapInitiated;
 use App\Mail\SwapHighValue;
+use App\Jobs\SendEmailJob;
+use Illuminate\Support\Facades\Mail;
 
 class SwapInitiateDetailsController extends Controller
 {
@@ -131,12 +132,6 @@ class SwapInitiateDetailsController extends Controller
             $exchangedUser = User::findOrFail($swapInitiateRequest->exchanged_user_id);
             $requestUser = User::findOrFail(auth()->id());
 
-            $data = [
-                'exchanged_user_first_name' => $exchangedUser->first_name,
-                'exchanged_user_last_name' => $exchangedUser->last_name,
-                'requested_user_first_name' => $requestUser->first_name,
-                'requested_user_last_name' => $requestUser->last_name,
-            ];
 
 //            Mail::to($exchangedUser->email)->send(new SwapInitiated($data));
 
@@ -152,15 +147,23 @@ class SwapInitiateDetailsController extends Controller
                 ->withNotify();
 
 
-            // implementation  incomplete
-//            $super_admin = 'riyadstudent80@gmail.com';
-//            Mail::to($super_admin)->send(new SwapHighValue($data));
+            $data = [
+                'exchanged_user_first_name' => $exchangedUser->first_name,
+                'exchanged_user_last_name' => $exchangedUser->last_name,
+                'requested_user_first_name' => $requestUser->first_name,
+                'requested_user_last_name' => $requestUser->last_name,
+                'to'=>'riyadstudent80@gmail.com',
+            ];
+
+            $super_admin = 'riyadstudent80@gmail.com';
+            Mail::to($super_admin)->send((new SwapHighValue($data))->afterCommit());
 
 
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Swap initiated successfully'], 200);
 
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
 

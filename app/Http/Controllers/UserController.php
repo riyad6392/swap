@@ -279,7 +279,7 @@ class UserController extends Controller
 
         if($request->is_approved_by_admin==true)
         {
-            Mail::to($data['email'])->send(new UserApprovel($data));
+            Mail::to($data['email'])->send((new UserApprovel($data))->afterCommit());
         }
 
 

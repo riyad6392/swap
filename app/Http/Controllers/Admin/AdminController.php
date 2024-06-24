@@ -184,7 +184,7 @@ class AdminController extends Controller
             'email' => $request->email,
         ];
 
-        Mail::to($request->email)->send(new AdminInvitation($data));
+        Mail::to($request->email)->send((new AdminInvitation($data))->afterCommit());
 
         $responseData = $admin->toArray();
         $responseData['profile_image'] = $path ? asset('storage/' . $path) : null;
@@ -360,7 +360,7 @@ class AdminController extends Controller
                 'name' => 'required|string|max:255',
             ]);
 
-            Mail::to($data['email'])->send(new RegistrationSuccess($data));
+            Mail::to($data['email'])->send((new RegistrationSuccess($data))->afterCommit());
 
             return response()->json(['message' => 'Email sent successfully!'], 200);
         } catch (Exception $e) {
