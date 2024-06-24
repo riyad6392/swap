@@ -281,22 +281,13 @@ class MessageController extends Controller
             }
         })->with('participants.user');
 
-        $operator = '<';
-        $order = 'desc';
 
-        if ($conversationListRequest->sort == 'newest'){
-            $operator = '>';
-            $order = 'asc';
-        }
+        $conversation = $conversation->orderBy('updated_at', 'desc');
 
-        if ($conversationListRequest->paginate_conversation_id){
-            $conversation = $conversation->where('id', $operator , $conversationListRequest->paginate_conversation_id);
-        }
-
-        $conversation = $conversation->orderBy('updated_at', $order);
+        $conversation = ConversationResources::collection($conversation->paginate($request->pagination ?? self::PER_PAGE))->resource;
 
 
-        $conversation = $conversation->take(10)->get();
+//        $conversation = $conversation->take(10)->get();
 
 //        if (request()->get_all) {
 //
@@ -307,7 +298,7 @@ class MessageController extends Controller
 //
 //        $conversation = ConversationResources::collection($conversation->paginate($request->pagination ?? self::PER_PAGE))->resource;
 
-        return response()->json(['success' => true, 'data' => ConversationResources::collection($conversation)]);
+        return response()->json(['success' => true, 'data' =>$conversation]);
     }
 
     public function messageList(MessageListRequest $messageListRequest, $id)
