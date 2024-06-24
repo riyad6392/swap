@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Schedule;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 
@@ -15,5 +16,15 @@ use Illuminate\Support\Facades\Artisan;
 */
 
 Artisan::command('inspire', function () {
+
     $this->comment(Inspiring::quote());
+    Schedule::call(function () {
+        info('Inspiring quote: ' . Inspiring::quote());
+//        DB::table('recent_users')->delete();
+    })->daily();
+
+
+
 })->purpose('Display an inspiring quote');
+
+

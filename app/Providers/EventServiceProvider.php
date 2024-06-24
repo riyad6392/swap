@@ -2,11 +2,16 @@
 
 namespace App\Providers;
 
+use App\Listeners\CacheHitListener;
+use App\Listeners\CacheKeyForgottenListener;
+use App\Listeners\CacheMissListener;
+use App\Listeners\CacheWriteListener;
 use App\Models\User;
 use App\Observers\UserObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider

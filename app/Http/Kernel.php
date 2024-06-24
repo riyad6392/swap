@@ -72,5 +72,6 @@ class Kernel extends HttpKernel
         'scope' => \Laravel\Passport\Http\Middleware\CheckForAnyScope::class,
         'admin.approval' => \App\Http\Middleware\AdminApproval::class,
         'unverified.super.swapper' => \App\Http\Middleware\UnverifiedSuperSwapper::class,
+        'user.online.status' => \App\Http\Middleware\UserOnlineStatus::class,
     ];
 }

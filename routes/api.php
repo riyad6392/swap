@@ -20,6 +20,7 @@ use App\Http\Controllers\SwapExchangeDetailsController;
 use App\Http\Controllers\SwapInitiateDetailsController;
 use App\Http\Controllers\SwapRequestDetailsController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,6 +34,24 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('cache-test', function () {
+//    Cache::add('key', 'value', 6);
+
+
+//    $getCacheValue = Cache::store('redis')->put('active_users_1', true, 600); // 10 Minutes
+
+
+//    $value = Cache::store('redis')->put('bar', 'baz', 600); // 10 Minutes
+
+//    dd($getCacheValue);
+
+//    Cache::delete('active_users_1');
+        $getCacheValue = Cache::store('redis')->get('active_users_1');
+    dd($getCacheValue);
+
+});
+
+
 
 Route::post('register', [RegistrationController::class, 'register']);
 Route::post('login', [LoginController::class, 'login'])->name('login');
@@ -44,7 +63,7 @@ Route::post('refresh-token', [LoginController::class, 'getRefreshToken']);
 
 
 
-Route::group(['middleware' => 'auth:api'], function () {
+Route::group(['middleware' => ['auth:api','user.online.status']], function () {
 
     Route::get('/test' , function(){
         return response()->json(['success' => true, 'message' => 'You are authorized to access this data!'], 200);

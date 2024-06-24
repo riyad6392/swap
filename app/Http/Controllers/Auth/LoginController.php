@@ -7,6 +7,7 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -134,6 +135,11 @@ class LoginController extends Controller
             if (!$token) {
                 return response()->json(['success' => false, 'message' => 'Invalid token.'], 422);
             }
+
+
+//            Cache::store('redis')->remember('active_users_'.auth()->id(), 60, function () {
+//                return auth()->user()->update(['active_at' => Carbon::now(),'is_active'=> 1]);
+//            });
 
             return response()->json([
                 'success' => true,

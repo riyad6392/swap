@@ -138,7 +138,7 @@ class SwapInitiateDetailsController extends Controller
                 'requested_user_last_name' => $requestUser->last_name,
             ];
 
-            Mail::to($exchangedUser->email)->send(new SwapInitiated($data));
+//            Mail::to($exchangedUser->email)->send(new SwapInitiated($data));
 
             MessageFacade::prepareData(
                 auth()->id(),
@@ -153,8 +153,8 @@ class SwapInitiateDetailsController extends Controller
 
 
             // implementation  incomplete
-            $super_admin = 'riyadstudent80@gmail.com';
-            Mail::to($super_admin)->send(new SwapHighValue($data));
+//            $super_admin = 'riyadstudent80@gmail.com';
+//            Mail::to($super_admin)->send(new SwapHighValue($data));
 
 
             DB::commit();

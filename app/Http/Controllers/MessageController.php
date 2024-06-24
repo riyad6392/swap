@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Events\MessageBroadcast;
 use App\Facades\MessageFacade;
 use App\Http\Requests\Conversation\StoreConversationRequest;
+use App\Http\Requests\Message\ConversationListRequest;
+use App\Http\Requests\Message\ConversationLitRequest;
+use App\Http\Requests\Message\MessageListRequest;
 use App\Http\Requests\Message\StoreMessageRequest;
 use App\Http\Resources\ConversationResources;
 use App\Models\Conversation;
@@ -203,7 +206,7 @@ class MessageController extends Controller
      */
     public function sendMessages(StoreMessageRequest $messageRequest): JsonResponse
     {
-        MessageFacade::prepareData(
+        $message = MessageFacade::prepareData(
             auth()->id(),
             $messageRequest->receiver_id,
             'private',
@@ -212,7 +215,7 @@ class MessageController extends Controller
             null
         )->messageGenerate()->doBroadcast();
 
-        return response()->json(['success' => true, 'message' => 'Message sent successfully']);
+        return response()->json(['success' => true, 'message' => 'Message sent successfully', 'data' => $message]);
     }
 
     /**
@@ -264,33 +267,76 @@ class MessageController extends Controller
      * )
      */
 
-    public function index(Request $request): \Illuminate\Http\JsonResponse
+    public function index(ConversationListRequest $conversationListRequest): \Illuminate\Http\JsonResponse
     {
         $conversation = Conversation::query();
 
-        $conversation = $conversation->whereHas('participants', function ($query) {
+        $conversation = $conversation->whereHas('participants', function ($query) use ($conversationListRequest) {
             $query->where('user_id', auth()->id());
+            if ($conversationListRequest->search){
+                $query->whereHas('user', function ($query) use ($conversationListRequest) {
+                    $query->where('first_name', 'like', '%' . $conversationListRequest->search . '%');
+                    $query->orWhere('last_name', 'like', '%' . $conversationListRequest->search . '%');
+                });
+            }
         })->with('participants.user');
 
-        if (request()->get_all) {
+        $operator = '<';
+        $order = 'desc';
 
-            $conversation = $conversation->get();
-
-            return response()->json(['success' => true, 'data' => ConversationResources::collection($conversation)]);
+        if ($conversationListRequest->sort == 'newest'){
+            $operator = '>';
+            $order = 'asc';
         }
 
-        $conversation = ConversationResources::collection($conversation->paginate($request->pagination ?? self::PER_PAGE))->resource;
+        if ($conversationListRequest->paginate_conversation_id){
+            $conversation = $conversation->where('id', $operator , $conversationListRequest->paginate_conversation_id);
+        }
 
-        return response()->json(['success' => true, 'data' => $conversation]);
+        $conversation = $conversation->orderBy('updated_at', $order);
+
+
+        $conversation = $conversation->take(10)->get();
+
+//        if (request()->get_all) {
+//
+//            $conversation = $conversation->get();
+//
+//            return response()->json(['success' => true, 'data' => ConversationResources::collection($conversation)]);
+//        }
+//
+//        $conversation = ConversationResources::collection($conversation->paginate($request->pagination ?? self::PER_PAGE))->resource;
+
+        return response()->json(['success' => true, 'data' => ConversationResources::collection($conversation)]);
     }
 
-    public function messageList($id){
+    public function messageList(MessageListRequest $messageListRequest, $id)
+    {
 
-        $message = Message::whereHas('conversation', function ($query) use ($id){
+        $message = Message::whereHas('conversation', function ($query) use ($id) {
             $query->whereHas('participants', function ($query) {
                 $query->where('user_id', auth()->id());
             })->where('id', $id);
-        })->orderBy('created_at', 'asc')->get();
+        });
+
+
+        $operator = '<';
+        $order = 'desc';
+
+        if ($messageListRequest->sort == 'newest'){
+            $operator = '>';
+            $order = 'asc';
+        }
+
+        if ($messageListRequest->paginate_message_id){
+            $message = $message->where('id', $operator , $messageListRequest->paginate_message_id);
+        }
+
+        $message = $message->orderBy('id', $order);
+
+        $message = $message->take(10)->get();
+
+        $message = $message->load('sender');
 
         return response()->json(['success' => true, 'data' => $message]);
     }

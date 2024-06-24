@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\HasDatabaseNotifications;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Cashier\Billable;
@@ -47,6 +48,8 @@ class User extends Authenticatable
         'photo_of_id',
         'stripe_customer_id',
         'about_me',
+        'is_active',
+        'active_at',
     ];
 
     /**
@@ -70,7 +73,7 @@ class User extends Authenticatable
     ];
 
     protected $appends = [
-        'average_rating', 'resale_license_info', 'photo_of_id_info'
+        'average_rating', 'resale_license_info', 'photo_of_id_info','is_active'
     ];
 
     public function products(): HasMany
@@ -96,6 +99,11 @@ class User extends Authenticatable
     public function receivedRatings(): HasMany
     {
         return $this->hasMany(Rating::class, 'rated_id');
+    }
+
+    public function getIsActiveAttribute()
+    {
+        return (bool)Cache::store('redis')->get('active_users_' . $this->id) ?? false;
     }
 
     public function getAverageRatingAttribute()
