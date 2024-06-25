@@ -76,7 +76,7 @@ class PermissionSeeder extends Seeder
 //            // Create admin User and assign the role to him.
         $user = Admin::create([
             'name' => 'Imtiaz Ur Rahman Khan',
-//            'phone' => '01516174119',
+            'phone' => '01516174119',
             'email' => 'k.r.imtiaz@gmail.com',
             'password' => Hash::make('password')
         ]);

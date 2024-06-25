@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class SwapInitiated extends Mailable
+class SwapInitiated extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -17,6 +17,7 @@ class SwapInitiated extends Mailable
 
     public function __construct($data)
     {
+        //dd($data);
         $this->data = $data;
     }
 
@@ -25,4 +26,6 @@ class SwapInitiated extends Mailable
         return $this->view('email.swapRequest')
             ->with('data', $this->data);
     }
+
+
 }
