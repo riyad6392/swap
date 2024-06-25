@@ -28,3 +28,7 @@ Broadcast::channel('user.{id}', function ($user, $id) {
 Broadcast::channel('conversation.{channel_name}', function ($user, $channel_name) {
     return true;
 });
+
+Broadcast::channel('conversation-broadcast', function ($user) {
+    return true;
+});

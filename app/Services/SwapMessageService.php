@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\ConversationBroadcast;
 use App\Events\MessageBroadcast;
 use App\Jobs\SwapJob;
 use App\Models\Conversation;
@@ -106,7 +107,7 @@ class SwapMessageService
                 return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
             }
         }else if ($conversation_type == 'group') {
-
+            //
         }
         return null;
     }
@@ -134,15 +135,15 @@ class SwapMessageService
             [$this->swap->exchanged_user_id],
             $this->message
         );
-
-//        dispatch(new SwapJob($this->swap, $this->conversation, $this->message));
-
         return $this;
     }
 
     public function doBroadcast()
     {
-        event(new MessageBroadcast($this->conversation,$this->message));
+        event(new MessageBroadcast(
+            $this->conversation,
+            $this->message
+        ));
         return $this;
     }
 

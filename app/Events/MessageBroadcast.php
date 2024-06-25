@@ -36,7 +36,6 @@ class MessageBroadcast implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-        info('conversation.'.$this->conversation->channel_name);
         return [
             new PrivateChannel('conversation.'.$this->conversation->channel_name),
         ];
