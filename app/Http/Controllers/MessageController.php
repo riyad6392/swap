@@ -15,6 +15,7 @@ use App\Models\Message;
 use App\Services\SwapMessageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 
 class MessageController extends Controller
@@ -206,16 +207,28 @@ class MessageController extends Controller
      */
     public function sendMessages(StoreMessageRequest $messageRequest): JsonResponse
     {
-        $message = MessageFacade::prepareData(
-            auth()->id(),
-            $messageRequest->receiver_id,
-            'private',
-            'message',
-            $messageRequest->message,
-            null
-        )->messageGenerate()->doBroadcast();
+        try {
+            DB::beginTransaction();
+            MessageFacade::prepareData(
+                auth()->id(),
+                $messageRequest->receiver_id,
+                'private',
+                'message',
+                $messageRequest->message,
+                null
+            )
+                ->messageGenerate()
+                ->doMessageBroadcast()
+                ->doConversationBroadcast();
 
-        return response()->json(['success' => true, 'message' => 'Message sent successfully', 'data' => $message]);
+            DB::commit();
+
+            return response()->json(['success' => true, 'message' => 'Message sent successfully']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+
     }
 
     /**
@@ -273,7 +286,7 @@ class MessageController extends Controller
 
         $conversation = $conversation->whereHas('participants', function ($query) use ($conversationListRequest) {
             $query->where('user_id', auth()->id());
-            if ($conversationListRequest->search){
+            if ($conversationListRequest->search) {
                 $query->whereHas('user', function ($query) use ($conversationListRequest) {
                     $query->where('first_name', 'like', '%' . $conversationListRequest->search . '%');
                     $query->orWhere('last_name', 'like', '%' . $conversationListRequest->search . '%');
@@ -298,7 +311,7 @@ class MessageController extends Controller
 //
 //        $conversation = ConversationResources::collection($conversation->paginate($request->pagination ?? self::PER_PAGE))->resource;
 
-        return response()->json(['success' => true, 'data' =>$conversation]);
+        return response()->json(['success' => true, 'data' => $conversation]);
     }
 
     public function messageList(MessageListRequest $messageListRequest, $id)
@@ -314,13 +327,13 @@ class MessageController extends Controller
         $operator = '<';
         $order = 'desc';
 
-        if ($messageListRequest->sort == 'newest'){
+        if ($messageListRequest->sort == 'newest') {
             $operator = '>';
             $order = 'asc';
         }
 
-        if ($messageListRequest->paginate_message_id){
-            $message = $message->where('id', $operator , $messageListRequest->paginate_message_id);
+        if ($messageListRequest->paginate_message_id) {
+            $message = $message->where('id', $operator, $messageListRequest->paginate_message_id);
         }
 
         $message = $message->orderBy('id', $order);

@@ -69,44 +69,33 @@ class SwapMessageService
         $receiver_id = (int)$receiver_id;
 
         if ($conversation_type == 'private') {
-            try {
+            $conversation = Conversation::where('composite_id', $sender_id . ':' . $receiver_id)
+                ->orWhere('composite_id', $receiver_id . ':' . $sender_id)
+                ->orWhere('reverse_composite_id', $sender_id . ':' . $receiver_id)
+                ->orWhere('reverse_composite_id', $receiver_id . ':' . $sender_id)
+                ->first();
 
-                DB::beginTransaction();
+            if (!$conversation) {
+                $conversation = Conversation::create([
+                    'name' => 'Private',
+                    'channel_name' => 'channel-' . rand(10000, 99999999) . '-' . time(),
+                    'user_id' => $sender_id,
+                    'conversation_type' => 'private',
+                    'composite_id' => $sender_id . ':' . $receiver_id,
+                    'reverse_composite_id' => $receiver_id . ':' . $sender_id,
+                    // 'last_message_id' => '',
+                    // 'last_message' => '',
+                ]);
 
-                $conversation = Conversation::where('composite_id', $sender_id . ':' . $receiver_id)
-                    ->orWhere('composite_id', $receiver_id . ':' . $sender_id)
-                    ->orWhere('reverse_composite_id', $sender_id . ':' . $receiver_id)
-                    ->orWhere('reverse_composite_id', $receiver_id . ':' . $sender_id)
-                    ->first();
-
-                if (!$conversation) {
-                    $conversation = Conversation::create([
-                        'name' => 'Private',
-                        'channel_name' => 'channel-' . rand(10000, 99999999) . '-' . time(),
-                        'user_id' => $sender_id,
-                        'conversation_type' => 'private',
-                        'composite_id' => $sender_id . ':' . $receiver_id,
-                        'reverse_composite_id' => $receiver_id . ':' . $sender_id,
-                        // 'last_message_id' => '',
-                        // 'last_message' => '',
-                    ]);
-
-                    $this->insertParticipant(
-                        $conversation,
-                        [$sender_id, $receiver_id]
-                    );
-                }
-
-                DB::commit();
-
-                return $conversation;
-
-            } catch (\Exception $e) {
-
-                DB::rollBack();
-                return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+                $this->insertParticipant(
+                    $conversation,
+                    [$sender_id, $receiver_id]
+                );
             }
-        }else if ($conversation_type == 'group') {
+
+            return $conversation;
+
+        } else if ($conversation_type == 'group') {
             //
         }
         return null;
@@ -138,11 +127,20 @@ class SwapMessageService
         return $this;
     }
 
-    public function doBroadcast()
+    public function doMessageBroadcast()
     {
         event(new MessageBroadcast(
             $this->conversation,
             $this->message
+        ));
+        return $this;
+    }
+
+    public function doConversationBroadcast()
+    {
+        info('conversation broadcast');
+        event(new ConversationBroadcast(
+            $this->conversation
         ));
         return $this;
     }

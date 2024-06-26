@@ -132,9 +132,6 @@ class SwapInitiateDetailsController extends Controller
             $exchangedUser = User::findOrFail($swapInitiateRequest->exchanged_user_id);
             $requestUser = User::findOrFail(auth()->id());
 
-
-//            Mail::to($exchangedUser->email)->send(new SwapInitiated($data));
-
             MessageFacade::prepareData(
                 auth()->id(),
                 $swap->exchanged_user_id,
@@ -143,7 +140,7 @@ class SwapInitiateDetailsController extends Controller
                 'You have a new swap request ' . $swap->uid,
                 $swap
             )->messageGenerate()
-                ->doBroadcast()
+                ->doMessageBroadcast()
                 ->withNotify();
 
 
