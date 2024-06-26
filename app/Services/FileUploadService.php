@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Image;
+use App\Models\Message;
 use App\Models\Product;
 use App\Models\ProductVariation;
 use App\Models\User;
@@ -15,7 +16,7 @@ class FileUploadService
     public const FILE_STORAGE = 'public';
 
 
-    public static function uploadFile($requestFile, Product|ProductVariation|User $model, string $upload_path = null,): string
+    public static function uploadFile($requestFile, Product|ProductVariation|User|Message $model, string $upload_path = null,): string
     {
         $upload_path = $upload_path ?? strtolower(class_basename($model));
         $filename = time() . '-' . uniqid() . '.' . $requestFile->getClientOriginalExtension();

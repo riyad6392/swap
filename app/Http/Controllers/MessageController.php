@@ -215,6 +215,7 @@ class MessageController extends Controller
                 'private',
                 'message',
                 $messageRequest->message,
+                $messageRequest->files,
                 null
             )
                 ->messageGenerate()

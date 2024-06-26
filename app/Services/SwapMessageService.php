@@ -20,14 +20,16 @@ class SwapMessageService
     public $message = null;
     public $swap = null;
     public $conversation = null;
+    public $files = null;
 
-    public function prepareData($sender_id, $receiver_id, $conversation_type, $message_type, $message, $swap = null): static
+    public function prepareData($sender_id, $receiver_id, $conversation_type, $message_type, $message, $files, $swap = null): static
     {
         $this->sender_id = $sender_id;
         $this->receiver_id = $receiver_id;
         $this->conversation_type = $conversation_type;
         $this->message_type = $message_type;
         $this->message = $message;
+        $this->files = $files;
         $this->swap = $swap;
 
         return $this;
@@ -41,13 +43,32 @@ class SwapMessageService
         );
 
         $this->message = Message::create([
-            'message' => $this->message,
+            'message' => $this->message ?? '',
             'receiver_id' => $this->receiver_id,
             'swap_id' => $this->swap->id ?? null,
             'sender_id' => auth()->id(),
             'conversation_id' => $this->conversation->id,
             'message_type' => $this->message_type,
         ]);
+
+        $fileMessage = [];
+
+        if ($this->files && count($this->files) > 0) {
+            foreach ($this->files as $file){
+                dd($this->files);
+                dd($file);
+                $fileMessage['conversation_id'] = $this->conversation->id;
+                $fileMessage['receiver_id'] = $this->receiver_id;
+                $fileMessage['sender_id'] = $this->sender_id;
+                $fileMessage['swap_id'] = null;
+                $fileMessage['message_type'] = 'file';
+                $fileMessage['message'] = null;
+                $fileMessage['data'] = null;
+                $fileMessage['file_path'] = FileUploadService::uploadFile($file, $this->message);
+            }
+        }
+
+        Message::insert($fileMessage);
 
         $this->conversation->last_message_id = $this->message->id;
         $this->conversation->last_message = $this->message->message;
