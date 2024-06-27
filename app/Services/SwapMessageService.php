@@ -62,7 +62,9 @@ class SwapMessageService
                         'message_type' => 'file',
                         'message' => null,
                         'data' => null,
-                        'file_path' => FileUploadService::uploadFile($singleFile, $this->message)
+                        'file_path' => FileUploadService::uploadFile($singleFile, $this->message),
+                        'created_at' => now(),
+                        'updated_at' => now(),
                     ];
                 }
 
