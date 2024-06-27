@@ -25,7 +25,7 @@ class StoreMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'message' => 'required|string',
+            'message' => 'nullable|string',
             'files' => 'nullable|array',
             'files.*' => 'nullable|file|mimes:jpeg,jpg,webp,png,gif,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,zip,rar|max:2048', // 2MB max
             'receiver_id' => 'required|integer|exists:users,id',
