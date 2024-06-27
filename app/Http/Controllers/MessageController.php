@@ -341,7 +341,7 @@ class MessageController extends Controller
 
         $message = $message->take(10)->get();
 
-        $message = $message->load('sender');
+        $message = $message->load('sender.image');
 
         return response()->json(['success' => true, 'data' => $message]);
     }
