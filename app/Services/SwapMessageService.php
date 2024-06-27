@@ -43,7 +43,7 @@ class SwapMessageService
         );
 
         $this->message = Message::create([
-            'message' => $this->message ?? '',
+            'message' => $this->message,
             'receiver_id' => $this->receiver_id,
             'swap_id' => $this->swap->id ?? null,
             'sender_id' => auth()->id(),
