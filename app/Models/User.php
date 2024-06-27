@@ -126,8 +126,6 @@ class User extends Authenticatable
         }
 
     }
-
-
     public function getPhotoOfIdInfoAttribute()
     {
         if ($this->photo_of_id && file_exists(public_path('storage/' . $this->photo_of_id))) {
@@ -142,7 +140,6 @@ class User extends Authenticatable
             return $this->nullFileInfo();
         }
     }
-
     protected function nullFileInfo()
     {
         return [
@@ -154,18 +151,15 @@ class User extends Authenticatable
 
         ];
     }
-
     public function notifications(): BelongsToMany
     {
         return $this->belongsToMany(Notification::class);
 
     }
-
     public function unreadNotifications()
     {
         return $this->notifications()->whereNull('read_at');
     }
-
     public function readNotifications()
     {
         return $this->notifications()->whereNotNull('read_at');
@@ -175,7 +169,6 @@ class User extends Authenticatable
     {
         return $this->morphOne(Image::class, 'imageable');
     }
-
     public function activeSubscriptions(): HasOne
     {
         return $this->hasOne(Subscription::class)->where('status', 'active');

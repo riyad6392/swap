@@ -20,6 +20,7 @@ class FileUploadService
     {
         $upload_path = $upload_path ?? strtolower(class_basename($model));
         $filename = time() . '-' . uniqid() . '.' . $requestFile->getClientOriginalExtension();
+//        dd($upload_path, $requestFile, $filename);
         return Storage::disk(self::FILE_STORAGE)->putFileAs($upload_path, $requestFile, $filename);
     }
 

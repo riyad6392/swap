@@ -576,6 +576,7 @@ class ProductController extends Controller
 
     public function update(UpdateProductRequest $updateProductRequest, UpdateProductVariationRequest $updateProductVariationRequest, $id): \Illuminate\Http\JsonResponse
     {
+        dd($updateProductVariationRequest->all());
         $product = Product::find($id);
 
         if (!$product) {
