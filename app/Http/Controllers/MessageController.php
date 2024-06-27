@@ -10,6 +10,7 @@ use App\Http\Requests\Message\ConversationLitRequest;
 use App\Http\Requests\Message\MessageListRequest;
 use App\Http\Requests\Message\StoreMessageRequest;
 use App\Http\Resources\ConversationResources;
+use App\Http\Resources\MessageResource;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Services\SwapMessageService;
@@ -343,7 +344,10 @@ class MessageController extends Controller
 
         $message = $message->load('sender.image');
 
-        return response()->json(['success' => true, 'data' => $message]);
+
+
+
+        return response()->json(['success' => true, 'data' => MessageResource::collection($message)->resource]);
     }
 
     /**

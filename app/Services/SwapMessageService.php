@@ -42,14 +42,17 @@ class SwapMessageService
             $this->sender_id, $this->receiver_id, $this->conversation_type,
         );
 
-        $this->message = Message::create([
-            'message' => $this->message ?? '',
-            'receiver_id' => $this->receiver_id,
-            'swap_id' => $this->swap->id ?? null,
-            'sender_id' => auth()->id(),
-            'conversation_id' => $this->conversation->id,
-            'message_type' => $this->message_type,
-        ]);
+        if($this->message){
+            $this->message = Message::create([
+                'message' => $this->message,
+                'receiver_id' => $this->receiver_id,
+                'swap_id' => $this->swap->id ?? null,
+                'sender_id' => auth()->id(),
+                'conversation_id' => $this->conversation->id,
+                'message_type' => $this->message_type,
+            ]);
+        }
+
         $fileMessages = [];
         if ($this->message_files && count($this->message_files) > 0) {
             foreach ($this->message_files as $key => $file) {

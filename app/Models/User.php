@@ -148,7 +148,6 @@ class User extends Authenticatable
             'basename' => null,
             'path' => null,
             'exist' => false
-
         ];
     }
     public function notifications(): BelongsToMany
@@ -173,12 +172,10 @@ class User extends Authenticatable
     {
         return $this->hasOne(Subscription::class)->where('status', 'active');
     }
-
     public function inventories()
     {
         return $this->hasMany(Product::class);
     }
-
     public function store()
     {
         return $this->hasMany(Product::class)->where('is_publish', 1);
