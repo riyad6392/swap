@@ -18,6 +18,8 @@ class UserResourceForMessage extends JsonResource
             'id' => $this->id,
             'first_name' => $this->first_name,
             'last_name' => $this->last_name,
+            'is_active' => $this->is_active,
+            'active_at' => $this->active_at,
 //            'subscription_is_active' => $this->subscription_is_active,
 //            'stripe_customer_id' => $this->stripe_customer_id,
 //            'is_approved_by_admin' => $this->is_approved_by_admin,
