@@ -288,10 +288,11 @@ class MessageController extends Controller
 
         $conversation = $conversation->whereHas('participants', function ($query) use ($conversationListRequest) {
             $query->where('user_id', auth()->id());
+        })->whereHas('participants.user', function ($query) use ($conversationListRequest) {
             if ($conversationListRequest->search) {
-                $query->whereHas('user', function ($query) use ($conversationListRequest) {
-                    $query->where('first_name', 'like', '%' . $conversationListRequest->search . '%');
-                    $query->orWhere('last_name', 'like', '%' . $conversationListRequest->search . '%');
+                $query->where(function ($query) use ($conversationListRequest) {
+                    $query->where('first_name', 'like', '%' . $conversationListRequest->search . '%')
+                        ->orWhere('last_name', 'like', '%' . $conversationListRequest->search . '%');
                 });
             }
         })->with('participants.user');
@@ -300,18 +301,6 @@ class MessageController extends Controller
         $conversation = $conversation->orderBy('updated_at', 'desc');
 
         $conversation = ConversationResources::collection($conversation->paginate($request->pagination ?? self::PER_PAGE))->resource;
-
-
-//        $conversation = $conversation->take(10)->get();
-
-//        if (request()->get_all) {
-//
-//            $conversation = $conversation->get();
-//
-//            return response()->json(['success' => true, 'data' => ConversationResources::collection($conversation)]);
-//        }
-//
-//        $conversation = ConversationResources::collection($conversation->paginate($request->pagination ?? self::PER_PAGE))->resource;
 
         return response()->json(['success' => true, 'data' => $conversation]);
     }
