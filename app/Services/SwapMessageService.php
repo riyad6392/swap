@@ -64,7 +64,7 @@ class SwapMessageService
                             'sender_id' => $this->sender_id,
                             'swap_id' => null,
                             'message_type' => $this->matchExtension($singleFile->getClientOriginalExtension()),
-                            'message' => null,
+                            'message' => 'This is a file',
                             'data' => null,
                             'file_path' => FileUploadService::uploadFile($singleFile, new Message()),
                         ]
