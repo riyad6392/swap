@@ -20,12 +20,13 @@ class SwapMessageService
     public $message = null;
     public $swap = null;
     public $conversation = null;
-    public $message_files = [];
+    public $message_files = '';
 
     public function prepareData($sender_id, $receiver_id, $conversation_type, $message_type, $message, $message_files, $swap = null): static
     {
+//        dd($sender_id, $receiver_id, $conversation_type, $message_type, $message, $message_files, $swap);
         $this->sender_id = $sender_id;
-        $this->receiver_id = $receiver_id;
+        $this->receiver_id = (int) $receiver_id;
         $this->conversation_type = $conversation_type;
         $this->message_type = $message_type;
         $this->message = $message;
@@ -53,35 +54,29 @@ class SwapMessageService
             ]);
         }
 
-        $fileMessages = [];
         if ($this->message_files && count($this->message_files) > 0) {
             foreach ($this->message_files as $key => $file) {
                 foreach ($file as $singleFile) {
-                    $fileMessages[] = [
-                        'conversation_id' => $this->conversation->id,
-                        'receiver_id' => $this->receiver_id,
-                        'sender_id' => $this->sender_id,
-                        'swap_id' => null,
-                        'message_type' => 'file',
-                        'message' => null,
-                        'data' => null,
-                        'file_path' => FileUploadService::uploadFile($singleFile, $this->message),
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
+                    $this->message = Message::create(
+                        [
+                            'conversation_id' => $this->conversation->id,
+                            'receiver_id' => $this->receiver_id,
+                            'sender_id' => $this->sender_id,
+                            'swap_id' => null,
+                            'message_type' => 'file',
+                            'message' => null,
+                            'data' => null,
+                            'file_path' => FileUploadService::uploadFile($singleFile, new Message()),
+                        ]
+                    );
                 }
-
             }
-            Message::insert($fileMessages);
         }
-
-
-
-        $this->conversation->last_message_id = $this->message->id;
-        $this->conversation->last_message = $this->message->message;
-        $this->conversation->save();
-
-//        $this->message = $message->load('conversation');
+        
+        $this->conversation->update([
+            'last_message_id' => $this->message->id,
+            'last_message' => $this->message->message,
+        ]);
 
         return $this;
     }

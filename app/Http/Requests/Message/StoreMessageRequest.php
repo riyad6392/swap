@@ -26,8 +26,8 @@ class StoreMessageRequest extends FormRequest
     {
         return [
             'message' => 'nullable|string',
-            'message_files' => 'sometimes|array',
-            'message_files.*' => 'file|mimes:jpeg,jpg,webp,png,gif,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,zip,rar|max:2048', // 2MB max
+            'files' => 'sometimes|array',
+            'files.*' => 'file|mimes:jpeg,jpg,webp,png,gif,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,zip,rar|max:2048', // 2MB max
             'receiver_id' => 'required|integer|exists:users,id',
 //            'swap_id' => 'required|integer|exists:swaps,id',
             'sender_id' => 'required|integer|exists:users,id',
