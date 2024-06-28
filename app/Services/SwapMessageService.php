@@ -72,9 +72,10 @@ class SwapMessageService
                 }
 
             }
+            Message::insert($fileMessages);
         }
 
-        Message::insert($fileMessages);
+
 
         $this->conversation->last_message_id = $this->message->id;
         $this->conversation->last_message = $this->message->message;
