@@ -63,7 +63,7 @@ class SwapMessageService
                             'receiver_id' => $this->receiver_id,
                             'sender_id' => $this->sender_id,
                             'swap_id' => null,
-                            'message_type' => 'file',
+                            'message_type' => $this->matchExtension($singleFile->getClientOriginalExtension()),
                             'message' => null,
                             'data' => null,
                             'file_path' => FileUploadService::uploadFile($singleFile, new Message()),
@@ -72,7 +72,7 @@ class SwapMessageService
                 }
             }
         }
-        
+
         $this->conversation->update([
             'last_message_id' => $this->message->id,
             'last_message' => $this->message->message,
@@ -168,4 +168,13 @@ class SwapMessageService
         return $this;
     }
 
+    public function matchExtension($value){
+        return match($value){
+            'jpeg', 'jpg', 'webp', 'png', 'gif' => 'image',
+            'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt' => 'file',
+            'zip', 'rar' => 'archive',
+            'mp4', 'mkv', 'avi', 'mov', '3gp', 'flv', 'wmv', 'webm' => 'video',
+            default => 'unknown'
+        };
+    }
 }
