@@ -27,7 +27,6 @@ class MessageBroadcast implements ShouldBroadcast, ShouldDispatchAfterCommit
      */
     public function __construct(Conversation $conversation, Message $message)
     {
-        dump($message);
         $this->conversation = $conversation;
         $this->message = $message;
     }
