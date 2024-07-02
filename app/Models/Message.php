@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Message extends Model
 {
@@ -38,16 +39,16 @@ class Message extends Model
     {
         return $this->belongsTo(Swap::class);
     }
-
     public function images()
     {
         return $this->morphMany(Image::class, 'imageable');
     }
-
     public function conversation()
     {
         return $this->belongsTo(Conversation::class);
     }
-
-
+    protected function getFilePathAttribute($value)
+    {
+        return asset('storage/'.$value);
+    }
 }

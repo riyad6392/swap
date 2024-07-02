@@ -16,23 +16,36 @@ class Product extends Model
         'category_id',
         'user_id',
         'description',
+        'brand_id',
+        'is_publish',
         'created_by',
         'updated_by'
     ];
 
-    public function images()
+    public function image()
     {
-        return $this->morphMany(Image::class, 'imageable');
+        return $this->morphOne(Image::class, 'imageable');
     }
 
     public function category()
     {
-//        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Category::class);
     }
+
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
+    }
+
 
     public function productVariations()
     {
         return $this->hasMany(ProductVariation::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     protected static function boot()
@@ -41,7 +54,7 @@ class Product extends Model
         self::bootCreatedUpdatedBy();
 
         self::bootUserId();
-        static::addGlobalScope(new UserSpecificDataScope());
+//        static::addGlobalScope(new UserSpecificDataScope());
     }
 
 }

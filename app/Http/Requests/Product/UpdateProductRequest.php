@@ -31,8 +31,12 @@ class UpdateProductRequest extends FormRequest
             'description' => 'sometimes|required',
             'category_id' => 'required|exists:categories,id',
             'brand_id'=>'required|exists:brands,id',
-            'product_images' => 'sometimes|array',
+            'product_image' => 'sometimes',
+            'deleted_product_image_ids' => 'sometimes|array',
+            'deleted_product_variation_image_ids' => 'sometimes|array',
             'deleted_image_ids' => 'sometimes|array',
+            'is_publish' => 'required|boolean',
+            'deleted_variation_ids' => 'sometimes|array',
         ];
     }
 
@@ -49,7 +53,8 @@ class UpdateProductRequest extends FormRequest
             'user_id.exists' => 'User does not exist',
             'user_id.integer' => 'User must be an integer',
             'images.required' => 'Product image is required',
-            'images.array' => 'Product image must be an array'
+            'images.array' => 'Product image must be an array',
+            'deleted_product_image_ids.array' => 'Deleted product image ids must be an array',
         ];
     }
 }

@@ -26,7 +26,7 @@ class UpdateSwapRequest extends FormRequest
         return [
             'requested_user_id' => 'sometimes|required|integer|exists:users,id',
             'exchanged_user_id' => 'sometimes|required|integer|exists:users,id',
-            'status' => 'sometimes|required|string',
+//            'status' => 'sometimes|required|string',
 
 //            'requested_wholesale_amount' => 'sometimes|required|integer',
 //            'exchanged_wholesale_amount' => 'sometimes|required|integer',

@@ -1,15 +1,23 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\Color\UpdateColorRequest;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Size\CreateSizeRequest;
 use App\Http\Requests\Size\UpdateSizeRequest;
+use App\Models\ProductVariation;
 use App\Models\Size;
 use Illuminate\Http\Request;
 
 class SizeController extends Controller
 {
+    public function __construct() {
+        $this->middleware('permission:size.index,size.create,size.edit,size.delete', ['only' => ['index']]);
+        $this->middleware('permission:size.create', ['only' => ['store']]);
+        $this->middleware('permission:size.edit', ['only' => ['update']]);
+        $this->middleware('permission:size.delete', ['only' => ['destroy']]);
+
+    }
     const PER_PAGE = 10;
 
     /**
@@ -152,17 +160,51 @@ class SizeController extends Controller
         $size = Size::create([
             'name' => $sizeRequest->name,
             'description' => $sizeRequest->description,
+            'is_published'=>$sizeRequest->is_published,
         ]);
 
         return response()->json(['success' => true, 'message' => 'Size created successfully', 'data' => $size]);
     }
 
     /**
-     * Display the specified resource.
+     * Size Show.
+     *
+     * @OA\Get(
+     *     path="/api/size/{id}",
+     *     tags={"Size"},
+     *     security={{ "apiAuth": {} }},
+     *
+     *     @OA\MediaType(mediaType="multipart/form-data"),
+     *
+     *     @OA\Response(
+     *           response=200,
+     *           description="success",
+     *
+     *           @OA\JsonContent(
+     *               @OA\Property(property="data", type="json", example={}),
+     *               @OA\Property(property="links", type="json", example={}),
+     *               @OA\Property(property="meta", type="json", example={}),
+     *           )
+     *       ),
+     *
+     *       @OA\Response(
+     *           response=401,
+     *           description="Invalid user",
+     *
+     *           @OA\JsonContent(
+     *               @OA\Property(property="success", type="boolean", example="false"),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Unauthenticated"}}),
+     *           )
+     *       )
+     * )
      */
     public function show(string $id)
     {
-        //
+        $size = Size::find($id);
+        if (!$size) {
+            return response()->json(['success' => false, 'message' => 'Size not found']);
+        }
+        return response()->json(['success' => true, 'data' => $size]);
     }
 
     /**
@@ -232,6 +274,8 @@ class SizeController extends Controller
         $size->update([
             'name' => $sizeRequest->name,
             'description' => $sizeRequest->description,
+            'is_published'=>$sizeRequest->is_published,
+
         ]);
 
         return response()->json(['success' => true, 'message' => 'Size updated successfully', 'data' => $size]);
@@ -273,6 +317,12 @@ class SizeController extends Controller
 
         if (!$size) {
             return response()->json(['success' => false, 'message' => 'Size not found']);
+        }
+
+        $isSizeUsedInProductVariations =ProductVariation::where('size_id', $id)->exists();
+
+        if ($isSizeUsedInProductVariations) {
+            return response()->json(['success' => false, 'message' => 'Size is in use in product variations and cannot be deleted'], 403);
         }
 
         $size->delete();

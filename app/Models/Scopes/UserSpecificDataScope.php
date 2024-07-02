@@ -16,7 +16,7 @@ class UserSpecificDataScope implements Scope
     public function apply(Builder $builder, Model $model): void
     {
         if ($this->defineGuard() == 'api') {
-            $builder->where('user_id', auth()->id());
+//            $builder->where('user_id', auth()->id());
         }
     }
 

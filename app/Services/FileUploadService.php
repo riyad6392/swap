@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Image;
+use App\Models\Message;
 use App\Models\Product;
 use App\Models\ProductVariation;
 use App\Models\User;
@@ -15,10 +16,11 @@ class FileUploadService
     public const FILE_STORAGE = 'public';
 
 
-    public static function uploadFile($requestFile, Product|ProductVariation|User $model, string $upload_path = null,): string
+    public static function uploadFile($requestFile, Product|ProductVariation|User|Message $model, string $upload_path = null,): string
     {
         $upload_path = $upload_path ?? strtolower(class_basename($model));
         $filename = time() . '-' . uniqid() . '.' . $requestFile->getClientOriginalExtension();
+//        dd($upload_path, $requestFile, $filename);
         return Storage::disk(self::FILE_STORAGE)->putFileAs($upload_path, $requestFile, $filename);
     }
 
@@ -29,7 +31,6 @@ class FileUploadService
         $imagePath = [];
 
         if (is_array($requestImages)) {
-
             foreach ($requestImages as $imageData) {
                 $imagePath[] = (new FileUploadService)->manageStore($imageData, $model, $relation, $upload_path,);
             }
@@ -49,13 +50,36 @@ class FileUploadService
         return $path;
     }
 
-    public static function deleteImages(array $deleted_image_ids)
+    public static function deleteImages(array $deleted_image_ids, $model, string $relation = null,): bool
     {
-        $images = Image::whereIn('id', $deleted_image_ids)->get();
+        $relation = $relation ?? 'images';
+        $images = $model->$relation()
+            ->whereIn('id', $deleted_image_ids)
+            ->get();
+
         foreach ($images as $image) {
             Storage::disk(self::FILE_STORAGE)->delete($image->path);
             $image->delete();
         }
-        return $images;
+        return true;
+    }
+
+    public static function formatSizeUnits($bytes)
+    {
+        if ($bytes >= 1073741824) {
+            $bytes = number_format($bytes / 1073741824, 2) . ' GB';
+        } elseif ($bytes >= 1048576) {
+            $bytes = number_format($bytes / 1048576, 2) . ' MB';
+        } elseif ($bytes >= 1024) {
+            $bytes = number_format($bytes / 1024, 2) . ' KB';
+        } elseif ($bytes > 1) {
+            $bytes = $bytes . ' bytes';
+        } elseif ($bytes == 1) {
+            $bytes = $bytes . ' byte';
+        } else {
+            $bytes = '0 bytes';
+        }
+
+        return $bytes;
     }
 }

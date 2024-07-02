@@ -1,15 +1,24 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\Brand\UpdateBrandRequest;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Color\CreateColorRequest;
 use App\Http\Requests\Color\UpdateColorRequest;
 use App\Models\Color;
+use App\Models\ProductVariation;
 use Illuminate\Http\Request;
 
 class ColorController extends Controller
 {
+
+    public function __construct() {
+        $this->middleware('permission:color.index,color.create,color.edit,color.delete', ['only' => ['index']]);
+        $this->middleware('permission:color.create', ['only' => ['store']]);
+        $this->middleware('permission:color.edit', ['only' => ['update']]);
+        $this->middleware('permission:color.delete', ['only' => ['destroy']]);
+
+    }
     const PER_PAGE = 10;
 
     /**
@@ -152,17 +161,51 @@ class ColorController extends Controller
         $color = Color::create([
             'name' => $coloLRequest->name,
             'color_code' => $coloLRequest->color_code,
+            'is_published'=>$coloLRequest->is_published,
         ]);
 
         return response()->json(['success' => true, 'message'=>'Color created successfully', 'data' => $color]);
     }
 
     /**
-     * Display the specified resource.
+     * Color Show.
+     *
+     * @OA\Get(
+     *     path="/api/color/{id}",
+     *     tags={"Color"},
+     *     security={{ "apiAuth": {} }},
+     *
+     *     @OA\MediaType(mediaType="multipart/form-data"),
+     *
+     *     @OA\Response(
+     *           response=200,
+     *           description="success",
+     *
+     *           @OA\JsonContent(
+     *               @OA\Property(property="data", type="json", example={}),
+     *               @OA\Property(property="links", type="json", example={}),
+     *               @OA\Property(property="meta", type="json", example={}),
+     *           )
+     *       ),
+     *
+     *       @OA\Response(
+     *           response=401,
+     *           description="Invalid user",
+     *
+     *           @OA\JsonContent(
+     *               @OA\Property(property="success", type="boolean", example="false"),
+     *               @OA\Property(property="errors", type="json", example={"message": {"Unauthenticated"}}),
+     *           )
+     *       )
+     * )
      */
     public function show(string $id)
     {
-        //
+        $color = Color::find($id);
+        if (!$color) {
+            return response()->json(['success' => false, 'message' => 'Color not found']);
+        }
+        return response()->json(['success' => true, 'data' => $color]);
     }
 
     /**
@@ -221,13 +264,14 @@ class ColorController extends Controller
      *      )
      * )
      */
-    public function update(UpdateColorRequest $coloLRequest, string $id)
+    public function update(UpdateColorRequest $colorLRequest, string $id)
     {
         $color = Color::find($id);
 
         $color->update([
-            'name' => $coloLRequest->name,
-            'color_code' => $coloLRequest->color_code,
+            'name' => $colorLRequest->name,
+            'color_code' => $colorLRequest->color_code,
+            'is_published'=>$colorLRequest->is_published,
         ]);
 
         return response()->json(['success' => true, 'message' => 'Color updated successfully', 'data' => $color]);
@@ -269,6 +313,12 @@ class ColorController extends Controller
 
         if (!$color) {
             return response()->json(['success' => false, 'message' => 'Color not found']);
+        }
+
+        $isColorUsedInProductVariations =ProductVariation::where('color_id', $id)->exists();
+
+        if ($isColorUsedInProductVariations) {
+            return response()->json(['success' => false, 'message' => 'Color is in use in product variations and cannot be deleted'], 403);
         }
 
         $color->delete();

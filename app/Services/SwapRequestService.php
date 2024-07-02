@@ -16,7 +16,10 @@ class SwapRequestService
         $wholeSaleAmount = 0;
         $totalCommission = 0;
         foreach ($request->$prepareFor as $product) {
-            $variation = ProductVariation::where('id', $product['variation_id'])
+            $variation = ProductVariation::whereHas('product', function ($query) use ($product) {
+                $query->where('user_id', '!=', auth()->id());
+            })
+                ->where('id', $product['variation_id'])
                 ->where('product_id', $product['product_id'])
                 ->first();
 
@@ -86,6 +89,13 @@ class SwapRequestService
             'exchange_product' => 'exchangeDetails',
             'request_product' => 'requestDetail',
         };
+    }
+
+    public static function swapColumnMapper($defineType)
+    {
+        return $defineType === 'exchange_product' ?
+            ['exchanged_wholesale_amount', 'exchanged_total_commission'] :
+            ['requested_wholesale_amount', 'requested_total_commission'];
     }
 
 }

@@ -14,17 +14,18 @@ return new class extends Migration
         Schema::create('shipments', function (Blueprint $table) {
             $table->id();
             $table->integer('swap_id');
-            $table->string('requested_address');
-            $table->string('requested_tracking_number');
-            $table->string('requested_carrier_name');
-            $table->string('requested_carrier_contact');
-            $table->date('requested_expected_delivery_date');
+            $table->string('requested_address')->nullable();
+            $table->string('requested_tracking_number')->nullable();
+            $table->string('requested_carrier_name')->nullable();
+            $table->string('requested_carrier_contact')->nullable();
+            $table->date('requested_expected_delivery_date')->nullable();
 
-            $table->string('exchanged_address');
-            $table->string('exchanged_tracking_number');
-            $table->string('exchanged_carrier_name');
-            $table->string('exchanged_carrier_contact');
-            $table->date('exchanged_expected_delivery_date');
+            $table->string('exchanged_address')->nullable();
+            $table->string('exchanged_tracking_number')->nullable();
+            $table->string('exchanged_carrier_name')->nullable();
+            $table->string('exchanged_carrier_contact')->nullable();
+            $table->date('exchanged_expected_delivery_date')->nullable();
+            $table->enum('status', ['pending', 'shipped', 'delivered'])->default('pending');
             $table->integer('created_by');
             $table->integer('updated_by');
             $table->timestamps();

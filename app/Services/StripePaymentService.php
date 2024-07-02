@@ -94,4 +94,34 @@ class StripePaymentService
             ['billing_cycle_anchor' => 'now']
         );
     }
+
+    public function invoiceList($limit = 3): \Stripe\Collection
+    {
+        return $this->stripe->invoices->all(['limit' => $limit]);
+    }
+
+    public function createInvoiceItem($userData , $commission)
+    {
+        $paymentIntentData =  $this->stripe->paymentIntents->create([
+            'customer' => $userData['stripe_customer_id'],
+            'amount' => (double) $commission * 100,
+            'currency' => 'USD',
+            'description' => 'This is just a test invoice item',
+        ]);
+
+        return $this->stripe->paymentIntents->confirm(
+            $paymentIntentData->id,
+            [
+                'payment_method' => $userData->activePaymentMethod->stripe_payment_method_id,
+                'return_url' => 'https://example.com/return',
+            ]
+        );
+    }
+
+    public function transactionList($limit = 3): \Stripe\Collection
+    {
+        return $this->stripe->paymentIntents->all(['limit' => $limit]);
+//        return $this->stripe->issuing->transactions->all(['limit' => 3]);
+
+    }
 }

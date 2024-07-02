@@ -2,6 +2,9 @@
 
 namespace App\Traits;
 
+use App\Services\FileUploadService;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 trait ModelAttributeTrait
@@ -28,7 +31,7 @@ trait ModelAttributeTrait
     {
         static::creating(function ($model) {
             if (!$model->isDirty('uid')) {
-                $model->uid = uniqid();
+                $model->uid = strtolower(class_basename($model)) .'-'. uniqid();
             }
         });
     }
@@ -57,5 +60,14 @@ trait ModelAttributeTrait
         });
     }
 
-
+    public function fileDetails($data)
+    {
+        return [
+            'size' => $data ? FileUploadService::formatSizeUnits(File::size(public_path('storage/' . $data))) : null,
+            'extension' => $data ? File::extension($data) : null,
+            'basename' => $data ? File::basename($data) : null,
+            'path' => $data ? asset('storage/' . $data) : null,
+            'storage_path' => $data ? Storage::url($data) : null
+        ];
+    }
 }

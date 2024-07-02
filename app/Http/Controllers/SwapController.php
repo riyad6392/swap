@@ -3,19 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Events\MessageBroadcast;
+use App\Facades\StripePaymentFacade;
 use App\Http\Requests\Swap\StoreSwapExchangeDetailsRequest;
 use App\Http\Requests\Swap\StoreSwapRequest;
 use App\Http\Requests\Swap\StoreSwapRequestDetails;
 use App\Http\Requests\Swap\StoreSwapRequestDetailsRequest;
 use App\Http\Requests\Swap\UpdateSwapDetailsRequest;
 use App\Http\Requests\Swap\UpdateSwapRequest;
+use App\Http\Resources\SwapResource;
 use App\Jobs\SwapJob;
+use App\Models\Billing;
 use App\Models\Message;
 use App\Models\Swap;
 use App\Models\SwapExchangeDetails;
+use App\Models\SwapRequestDetails;
+use App\Models\User;
 use App\Services\SwapMessageService;
 use App\Services\SwapNotificationService;
 use App\Services\SwapRequestService;
+use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -76,112 +82,158 @@ class SwapController extends Controller
     {
         $swaps = Swap:: query();
 
-        $swaps->where('requested_user_id', auth()->id());
+        $swaps->where(function($query) {
+            $userId = auth()->id();
+            $query->where('requested_user_id', $userId)
+                ->orWhere('exchanged_user_id', $userId);
+        });
+
+        if ($request->has('search')) {
+            $searchTerm = '%' . $request->search . '%';
+            $swaps->where(function ($query) use ($searchTerm) {
+                $query->whereHas('user', function ($query) use ($searchTerm) {
+                    $query->where('first_name', 'like', $searchTerm)
+                        ->orWhere('last_name', 'like', $searchTerm);
+                })
+                    ->orWhereHas('exchangeDetails', function ($query) use ($searchTerm) {
+                        $query->whereHas('product', function ($query) use ($searchTerm) {
+                            $query->where('name', 'like', $searchTerm)
+                                ->orWhere('description', 'like', $searchTerm);
+                        });
+                    })
+                    ->orWhereHas('requestDetail', function ($query) use ($searchTerm) {
+                        $query->whereHas('product', function ($query) use ($searchTerm) {
+                            $query->where('name', 'like', $searchTerm)
+                                ->orWhere('description', 'like', $searchTerm);
+                        });
+                    })
+                    ->orWhereHas('initiateDetails', function ($query) use ($searchTerm) {
+                        $query->whereHas('product', function ($query) use ($searchTerm) {
+                            $query->where('name', 'like', $searchTerm)
+                                ->orWhere('description', 'like', $searchTerm);
+                        });
+                    });
+            });
+        }
+
+        if ($request->sort) {
+            $swaps->orderBy('created_at', $request->sort ?? 'desc');
+        }
+
+        $swaps = $swaps->with(
+            'initiateDetails',
+            'exchangeDetails',
+            'exchangeDetails.product.productVariations.size',
+            'exchangeDetails.product.productVariations.color',
+            'user'
+        );
+
 
         if ($request->get('get_all')) {
-            return response()->json(['success' => true, 'data' => $swaps->get()]);
+            return response()->json(['success' => true, 'data' => SwapResource::collection($swaps->get())->resource]);
         }
+
 
         $swap = $swaps->paginate($request->pagination ?? self::PER_PAGE);
 
-        return response()->json(['success' => true, 'data' => $swap]);
+        return response()->json(['success' => true, 'data' => SwapResource::collection($swap)->resource]);
     }
 
-    /**
-     * Create Swap.
-     *
-     * @OA\Post (
-     *     path="/api/swap",
-     *     tags={"Swaps"},
-     *     security={{ "apiAuth": {} }},
-     *     summary="Create a new swap",
-     *
-     *     @OA\Parameter(
-     *         in="query",
-     *         name="requested_user_id",
-     *         required=true,
-     *         description="Requested User ID",
-     *         @OA\Schema(type="integer", example=2),
-     *     ),
-     *     @OA\Parameter(
-     *         in="query",
-     *         name="exchanged_user_id",
-     *         required=true,
-     *         description="Exchanged User ID",
-     *         @OA\Schema(type="integer", example=3),
-     *     ),
-     *     @OA\Parameter(
-     *         in="query",
-     *         name="status",
-     *         required=true,
-     *         description="Status",
-     *         @OA\Schema(type="string", example="pending"),
-     *     ),
-     *     @OA\Parameter(
-     *         in="query",
-     *         name="define_type",
-     *         required=true,
-     *         description="Exchanged Wholesale Amount",
-     *         @OA\Schema(type="enum", example="exchange_product | request_product"),
-     *     ),
-     *     @OA\Parameter(
-     *         in="query",
-     *         name="exchange_product[0][product_id]",
-     *         required=true,
-     *         description="Product ID",
-     *         @OA\Schema(type="number", format="integer", example=1),
-     *     ),
-     *     @OA\Parameter(
-     *         in="query",
-     *         name="exchange_product[0][variation_id]",
-     *         required=true,
-     *         description="Product ID",
-     *         @OA\Schema(type="number", format="integer", example=1),
-     *     ),
-     *     @OA\Parameter(
-     *          in="query",
-     *          name="exchange_product[0][variation_size]",
-     *          required=true,
-     *          description="Product ID",
-     *          @OA\Schema(type="number", format="integer", example=1),
-     *      ),
-     *     @OA\Parameter(
-     *          in="query",
-     *          name="exchange_product[0][variation_color]",
-     *          required=true,
-     *          description="Product ID",
-     *          @OA\Schema(type="number", format="integer", example=1),
-     *      ),
-     *     @OA\Parameter(
-     *          in="query",
-     *          name="exchange_product[0][variation_quantity]",
-     *          required=true,
-     *          description="Product ID",
-     *          @OA\Schema(type="number", format="integer", example=1),
-     *      ),
-     *     @OA\Response(
-     *          response=200,
-     *          description="success",
-     *
-     *          @OA\JsonContent(
-     *
-     *              @OA\Property(property="success", type="boolean", example="true"),
-     *               @OA\Property(property="errors", type="json", example={"message": {"Swap created successfully."}}),
-     *          ),
-     *      ),
-     *
-     *      @OA\Response(
-     *          response=422,
-     *          description="Invalid data",
-     *
-     *          @OA\JsonContent(
-     *
-     *              @OA\Property(property="success", type="boolean", example="false"),
-     *              @OA\Property(property="errors", type="json", example={"message": {"The given data was invalid."}}),
-     *          )
-     *      )
-     * )
-     */
+//    /**
+//     * Create Swap.
+//     *
+//     * @OA\Post (
+//     *     path="/api/swap",
+//     *     tags={"Swaps"},
+//     *     security={{ "apiAuth": {} }},
+//     *     summary="Create a new swap",
+//     *
+//     *     @OA\Parameter(
+//     *         in="query",
+//     *         name="requested_user_id",
+//     *         required=true,
+//     *         description="Requested User ID",
+//     *         @OA\Schema(type="integer", example=2),
+//     *     ),
+//     *     @OA\Parameter(
+//     *         in="query",
+//     *         name="exchanged_user_id",
+//     *         required=true,
+//     *         description="Exchanged User ID",
+//     *         @OA\Schema(type="integer", example=3),
+//     *     ),
+//     *     @OA\Parameter(
+//     *         in="query",
+//     *         name="status",
+//     *         required=true,
+//     *         description="Status",
+//     *         @OA\Schema(type="string", example="pending"),
+//     *     ),
+//     *     @OA\Parameter(
+//     *         in="query",
+//     *         name="define_type",
+//     *         required=true,
+//     *         description="Exchanged Wholesale Amount",
+//     *         @OA\Schema(type="enum", example="exchange_product | request_product"),
+//     *     ),
+//     *     @OA\Parameter(
+//     *         in="query",
+//     *         name="exchange_product[0][product_id]",
+//     *         required=true,
+//     *         description="Product ID",
+//     *         @OA\Schema(type="number", format="integer", example=1),
+//     *     ),
+//     *     @OA\Parameter(
+//     *         in="query",
+//     *         name="exchange_product[0][variation_id]",
+//     *         required=true,
+//     *         description="Product ID",
+//     *         @OA\Schema(type="number", format="integer", example=1),
+//     *     ),
+//     *     @OA\Parameter(
+//     *          in="query",
+//     *          name="exchange_product[0][variation_size_id]",
+//     *          required=true,
+//     *          description="Product ID",
+//     *          @OA\Schema(type="number", format="integer", example=1),
+//     *      ),
+//     *     @OA\Parameter(
+//     *          in="query",
+//     *          name="exchange_product[0][variation_color_id]",
+//     *          required=true,
+//     *          description="Product ID",
+//     *          @OA\Schema(type="number", format="integer", example=1),
+//     *      ),
+//     *     @OA\Parameter(
+//     *          in="query",
+//     *          name="exchange_product[0][variation_quantity]",
+//     *          required=true,
+//     *          description="Product ID",
+//     *          @OA\Schema(type="number", format="integer", example=1),
+//     *      ),
+//     *     @OA\Response(
+//     *          response=200,
+//     *          description="success",
+//     *
+//     *          @OA\JsonContent(
+//     *
+//     *              @OA\Property(property="success", type="boolean", example="true"),
+//     *               @OA\Property(property="errors", type="json", example={"message": {"Swap created successfully."}}),
+//     *          ),
+//     *      ),
+//     *
+//     *      @OA\Response(
+//     *          response=422,
+//     *          description="Invalid data",
+//     *
+//     *          @OA\JsonContent(
+//     *
+//     *              @OA\Property(property="success", type="boolean", example="false"),
+//     *              @OA\Property(property="errors", type="json", example={"message": {"The given data was invalid."}}),
+//     *          )
+//     *      )
+//     * )
+//     */
     public function store(StoreSwapRequest                $swapRequest,
                           StoreSwapExchangeDetailsRequest $SwapExchangeDetailsRequest): \Illuminate\Http\JsonResponse
     {
@@ -259,7 +311,7 @@ class SwapController extends Controller
      *         description="success",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example="true"),
-     *             @OA\Property(property="errors", type="json", example={"message": {"Get swap details."}}),
+     *             @OA\Property(property="data", type="json", example={"uid": "swp-547689"}),
      *         ),
      *     ),
      *     @OA\Response(
@@ -274,7 +326,7 @@ class SwapController extends Controller
      */
     public function show(Swap $swap)
     {
-        if ($swap->requested_user_id == auth()->id()) {
+        if ($swap->requested_user_id == auth()->id() || $swap->exchanged_user_id == auth()->id()) {
 
             return response()->json(['success' => true, 'data' => $swap]);
         }
@@ -314,14 +366,14 @@ class SwapController extends Controller
      *     ),
      *     @OA\Parameter(
      *          in="query",
-     *          name="exchange_product[0][variation_size]",
+     *          name="exchange_product[0][variation_size_id]",
      *          required=true,
      *          description="Product ID",
      *          @OA\Schema(type="number", format="integer", example=1),
      *      ),
      *     @OA\Parameter(
      *          in="query",
-     *          name="exchange_product[0][variation_color]",
+     *          name="exchange_product[0][variation_color_id]",
      *          required=true,
      *          description="Product ID",
      *          @OA\Schema(type="number", format="integer", example=1),
@@ -399,41 +451,56 @@ class SwapController extends Controller
      * )
      */
     public function update(UpdateSwapRequest        $updateSwapRequest,
-                           UpdateSwapDetailsRequest $SwapExchangeDetailsRequest,
-                           Swap                     $swap): \Illuminate\Http\JsonResponse
+                           UpdateSwapDetailsRequest $swapExchangeDetailsRequest,
+                                                    $id): \Illuminate\Http\JsonResponse
     {
+
+        $swap = Swap::find($id);
+
+        if (!$swap) {
+            return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
+        }
+
         try {
             DB::beginTransaction();
 
-            if (($swap->requested_user_id == auth()->id() || $swap->exchanged_user_id == auth()->id()) && $swap->status == 'accepted') {
+            if (($swap->requested_user_id == auth()->id() || $swap->exchanged_user_id == auth()->id()) && $swap->exchanged_user_status == 'approved') {
+
+                $defineType = $swapExchangeDetailsRequest->define_type;
+
+                if (is_null($swapExchangeDetailsRequest->$defineType)) {
+                    return response()->json(['success' => false, 'message' => str_replace('_', ' ', $defineType) . ' is empty']);
+                }
 
                 $prepareData = SwapRequestService::prepareDetailsData(
-                    $SwapExchangeDetailsRequest,
+                    $swapExchangeDetailsRequest,
                     $swap,
-                    $SwapExchangeDetailsRequest->define_type
+                    $swapExchangeDetailsRequest->define_type
                 );
 
-                SwapExchangeDetails::insert($prepareData['insertData']);
+                $this->swapDetailsClassMapper($swapExchangeDetailsRequest->define_type)::insert($prepareData['insertData']);
 
                 if ($updateSwapRequest->deleted_details_id) {
                     SwapRequestService::deleteDetailsData(
                         $updateSwapRequest->deleted_details_id,
                         $swap,
-                        SwapRequestService::matchClass($SwapExchangeDetailsRequest->define_type)
+                        SwapRequestService::matchClass($swapExchangeDetailsRequest->define_type)
                     );
                 }
 
-                $totalAmountAndCommission = SwapRequestService::calculateTotalAmountAndCommission(
-                    $swap,
-                    SwapRequestService::matchRelation($SwapExchangeDetailsRequest->define_type)
-                );
+                $defineWholeSaleColumn = SwapRequestService::swapColumnMapper($swapExchangeDetailsRequest->define_type)[0];
+                $defineTotalCommissionColumn = SwapRequestService::swapColumnMapper($swapExchangeDetailsRequest->define_type)[1];
+
 
                 $swap->update(
                     [
-                        'exchanged_wholesale_amount' => (int)$prepareData['wholeSaleAmount'] +
-                            (int)$totalAmountAndCommission['wholeSaleAmount'],
-                        'exchanged_total_commission' => $prepareData['totalCommission'] +
-                            (int)$totalAmountAndCommission['totalCommission'],
+                        $defineWholeSaleColumn =>
+                            (int)$prepareData['wholeSaleAmount'] +
+                            (int)$swap->$defineWholeSaleColumn,
+
+                        $defineTotalCommissionColumn =>
+                            $prepareData['totalCommission'] +
+                            $swap->$defineTotalCommissionColumn,
                     ]
                 );
 
@@ -446,7 +513,7 @@ class SwapController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'Failed to update swap'], 500);
+            return response()->json(['success' => false, 'message' => 'Failed to update swap', 'errors' => $e->getMessage()], 500);
         }
     }
 
@@ -524,24 +591,39 @@ class SwapController extends Controller
      *     )
      * )
      */
-    public function approve($id): \Illuminate\Http\JsonResponse
+    public function swapApprove($uid): \Illuminate\Http\JsonResponse
     {
-        $swap = Swap::find($id);
+        $swap = Swap::where(function ($query) use ($uid) {
+            $query->where('exchanged_user_id', auth()->id())
+                ->orWhere('requested_user_id', auth()->id());
+        })->where('uid', $uid)->first();
 
-        if ($swap->exchanged_user_id == auth()->id()) {
+        if (!$swap) {
+            return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
+        }
 
-            $swap->update(['status' => 'accepted']);
+        if ($swap->exchanged_user_id != auth()->id()) {
+            return response()->json(['success' => false, 'message' => 'You are not authorized to approve this swap'], 401);
+        }
+
+
+        if ($swap->exchanged_user_status == 'accepted') {
+
+            $swap->update([
+                'exchanged_user_status' => 'approved',
+                'requested_user_status' => 'approved'
+            ]);
 
             SwapNotificationService::sendNotification(
                 $swap,
                 [$swap->requested_user_id],
-                'Swap request has been accepted'
+                'Swap request has been approved'
             );
 
-            return response()->json(['success' => true, 'message' => 'You accept the swap request'], 200);
+            return response()->json(['success' => true, 'message' => 'You approved the swap request'], 200);
         }
 
-        return response()->json(['success' => true, 'message' => 'You are not allow to change the swap status'], 200);
+        return response()->json(['success' => false, 'message' => 'You are not allow to change the swap status'], 403);
     }
 
     /**
@@ -575,13 +657,27 @@ class SwapController extends Controller
      *     )
      * )
      */
-    public function decline($id): \Illuminate\Http\JsonResponse
+    public function swapDecline($uid): \Illuminate\Http\JsonResponse
     {
-        $swap = Swap::find($id);
+        $swap = Swap::where(function ($query) use ($uid) {
+            $query->where('exchanged_user_id', auth()->id())
+                ->orWhere('requested_user_id', auth()->id());
+        })->where('uid', $uid)->first();
 
-        if ($swap->exchanged_user_id == auth()->id()) {
+        if (!$swap) {
+            return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
+        }
 
-            $swap->update(['status' => 'decline']);
+        if ($swap->exchanged_user_id != auth()->id()) {
+            return response()->json(['success' => false, 'message' => 'You are not authorized to decline this swap'], 401);
+        }
+
+        if ($swap->exchanged_user_status == 'pending') {
+
+            $swap->update([
+                'exchanged_user_status' => 'decline',
+                'requested_user_status' => 'rejected'
+            ]);
 
             SwapNotificationService::sendNotification(
                 $swap,
@@ -592,6 +688,95 @@ class SwapController extends Controller
             return response()->json(['success' => true, 'message' => 'You decline the swap request'], 200);
         }
 
-        return response()->json(['success' => true, 'message' => 'You are not allow to change the swap status'], 200);
+        return response()->json(['success' => false, 'message' => 'You are not allow to change the swap status'], 403);
     }
+
+    public function swapComplete($uid): \Illuminate\Http\JsonResponse
+    {
+        $swap = Swap::where(function ($query) use ($uid) {
+            $query->where('exchanged_user_id', auth()->id())
+                ->orWhere('requested_user_id', auth()->id());
+        })->where('uid', $uid)->first();
+
+        if (!$swap) {
+            return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
+        }
+
+        $user = auth()->user()->load('activePaymentMethod');
+        if (!$user->activePaymentMethod) {
+            return response()->json(['success' => true, 'message' => 'You are not allow to change the swap status'], 200);
+        }
+
+        if ($swap->requested_total_commission < 0.50 || $swap->exchanged_total_commission < 0.50) {
+            return response()->json(['success' => false, 'message' => 'Minimum commission is 0.50'], 401);
+        }
+
+        if ($swap->requested_user_id !== auth()->id() && $swap->exchanged_user_id !== auth()->id()) {
+            return response()->json(['success' => true, 'message' => 'You are not allow to change the swap status'], 200);
+        }
+
+        return $this->processSwapCompletion($swap, $user);
+    }
+
+    protected function processSwapCompletion($swap, $user)
+    {
+        $approvalField =
+            $swap->requested_user_id === auth()->id() ?
+                'requested_user_status' :
+                'exchanged_user_status';
+
+        $swap->update([$approvalField => 'completed']);
+
+        $this->sendSwapNotification($swap);
+
+        if ($user->is_super_swaper == 0){
+            $this->handlePayment($swap, $user);
+        }
+
+        return response()->json(['success' => true, 'message' => 'You completed the swap request'], 200);
+    }
+
+    protected function sendSwapNotification($swap)
+    {
+        $notificationRecipients =
+            $swap->requested_user_id === auth()->id() ?
+                [$swap->exchanged_user_id] :
+                [$swap->requested_user_id];
+
+        SwapNotificationService::sendNotification(
+            $swap,
+            $notificationRecipients,
+            'Swap request has been completed'
+        );
+    }
+
+    protected function handlePayment($swap, $user)
+    {
+        $commission =
+            $swap->requested_user_id === auth()->id() ?
+                $swap->requested_total_commission :
+                $swap->exchanged_total_commission;
+
+        $invoiceItem = StripePaymentFacade::createInvoiceItem(
+            $user,
+            $commission
+        );
+
+        Billing::create([
+            'user_id' => auth()->id(),
+            'swap_id' => $swap->id,
+            'payment_type' => 'one_time',
+            'payment_method_id' => $user->activePaymentMethod->stripe_payment_method_id,
+            'stripe_payment_intent_id' => $invoiceItem->payment_intent,
+            'amount' => $commission,
+        ]);
+    }
+
+    protected function swapDetailsClassMapper($defineType)
+    {
+        return $defineType === 'exchange_product' ?
+            SwapExchangeDetails::class :
+            SwapRequestDetails::class;
+    }
+
 }

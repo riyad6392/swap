@@ -18,6 +18,7 @@ class Brand extends Model
         'logo',
         'created_by',
         'updated_by',
+        'is_published'
     ];
 
     public function products(): HasMany

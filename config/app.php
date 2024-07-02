@@ -55,7 +55,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', 'http://localhost:8000'),
 
     'asset_url' => env('ASSET_URL'),
 
@@ -168,6 +168,7 @@ return [
         App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        App\Providers\TelescopeServiceProvider::class,
     ])->toArray(),
 
     /*
@@ -184,6 +185,7 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
         'StripePaymentFacade' => App\Facades\StripePaymentFacade::class,
+        'MessageFacade' => App\Facades\MessageFacade::class,
     ])->toArray(),
 
 ];

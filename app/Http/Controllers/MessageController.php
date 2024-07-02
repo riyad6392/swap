@@ -3,12 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Events\MessageBroadcast;
+use App\Facades\MessageFacade;
 use App\Http\Requests\Conversation\StoreConversationRequest;
+use App\Http\Requests\Message\ConversationListRequest;
+use App\Http\Requests\Message\ConversationLitRequest;
+use App\Http\Requests\Message\MessageListRequest;
 use App\Http\Requests\Message\StoreMessageRequest;
+use App\Http\Resources\ConversationResources;
+use App\Http\Resources\MessageResource;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Services\SwapMessageService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 
 class MessageController extends Controller
@@ -96,14 +104,25 @@ class MessageController extends Controller
      *      )
      * )
      */
-    public function prepareConversation(StoreConversationRequest $conversationRequest)
+    public function prepareConversation(StoreConversationRequest $conversationRequest): JsonResponse
     {
-        SwapMessageService::createPrivateConversation(
+
+        MessageFacade::prepareData(
+            auth()->id(),
+            $conversationRequest->receiver_id,
+            'private',
+            'message',
+            'You have a new swap request ' . $swap->uid,
+            $swap
+        )->messageGenerate()->withNotify();
+
+
+        $conversation = SwapMessageService::createPrivateConversation(
             $conversationRequest->sender_id,
             $conversationRequest->receiver_id,
             $conversationRequest->conversation_type
         );
-        return response()->json(['success' => true, 'message' => 'Conversation started successfully']);
+        return response()->json(['success' => true, 'data' => $conversation, 'message' => 'Conversation started successfully']);
     }
 
     /**
@@ -187,29 +206,31 @@ class MessageController extends Controller
      *      )
      * )
      */
-    public function sendMessages(StoreMessageRequest $messageRequest)
+    public function sendMessages(StoreMessageRequest $messageRequest): JsonResponse
     {
-        $conversation = Conversation::whereHas('participants', function ($query) use ($messageRequest) {
-            $query->where('user_id', $messageRequest->sender_id);
-        })->where('id', $messageRequest->conversation_id)->first();
+        try {
+            DB::beginTransaction();
+            MessageFacade::prepareData(
+                auth()->id(),
+                $messageRequest->receiver_id,
+                'private',
+                'message',
+                $messageRequest->message,
+                $messageRequest->files,
+                null
+            )
+                ->messageGenerate()
+                ->doMessageBroadcast()
+                ->doConversationBroadcast();
 
-        if (!$conversation) {
-            return response()->json(['success' => false, 'message' => 'Conversation not found'], 404);
+            DB::commit();
+
+            return response()->json(['success' => true, 'message' => 'Message sent successfully']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
 
-        $message = $conversation->messages()->create($messageRequest->only(
-            'receiver_id',
-            'conversation_id',
-            'swap_id',
-            'message',
-            'sender_id')
-        );
-
-        $message = $message->load('sender', 'receiver','swap');
-
-        event(new MessageBroadcast($conversation, $message));
-
-        return response()->json(['success' => true, 'message' => 'Message sent successfully', 'data' => $message]);
     }
 
     /**
@@ -261,24 +282,61 @@ class MessageController extends Controller
      * )
      */
 
-    public function index(Request $request): \Illuminate\Http\JsonResponse
+    public function index(ConversationListRequest $conversationListRequest): \Illuminate\Http\JsonResponse
     {
         $conversation = Conversation::query();
 
-        $conversation = $conversation->whereHas('participants', function ($query) {
+        $conversation = $conversation->whereHas('participants', function ($query) use ($conversationListRequest) {
             $query->where('user_id', auth()->id());
-        })->with('participants');
+        })->whereHas('participants.user', function ($query) use ($conversationListRequest) {
+            if ($conversationListRequest->search) {
+                $query->where(function ($query) use ($conversationListRequest) {
+                    $query->where('first_name', 'like', '%' . $conversationListRequest->search . '%')
+                        ->orWhere('last_name', 'like', '%' . $conversationListRequest->search . '%');
+                });
+            }
+        })->with('participants.user');
 
-        if (request()->get_all) {
 
-            $conversation = $conversation->get();
+        $conversation = $conversation->orderBy('updated_at', 'desc');
 
-            return response()->json(['success' => true, 'data' => $conversation]);
-        }
-
-        $conversation = $conversation->paginate($request->pagination ?? self::PER_PAGE);
+        $conversation = ConversationResources::collection($conversation->paginate($request->pagination ?? self::PER_PAGE))->resource;
 
         return response()->json(['success' => true, 'data' => $conversation]);
+    }
+
+    public function messageList(MessageListRequest $messageListRequest, $id)
+    {
+
+        $message = Message::whereHas('conversation', function ($query) use ($id) {
+            $query->whereHas('participants', function ($query) {
+                $query->where('user_id', auth()->id());
+            })->where('id', $id);
+        });
+
+
+        $operator = '<';
+        $order = 'desc';
+
+        if ($messageListRequest->sort == 'newest') {
+            $operator = '>';
+            $order = 'asc';
+        }
+
+        if ($messageListRequest->paginate_message_id) {
+            $message = $message->where('id', $operator, $messageListRequest->paginate_message_id);
+        }
+
+        $message = $message->orderBy('id', $order);
+
+        $message = $message->take(10)->get();
+
+        $message = $message->load('sender.image');
+
+
+
+
+        return response()->json(['success' => true, 'data' => MessageResource::collection($message)->resource]);
     }
 
     /**
@@ -288,7 +346,6 @@ class MessageController extends Controller
      * @OA\Put  (path="/api/update-message/{id}",
      *     tags={"Message"},
      *     security={{ "apiAuth": {} }},
-
      *          @OA\Parameter(
      *          in="query",
      *          name="sender_id",
@@ -357,7 +414,6 @@ class MessageController extends Controller
      * @OA\Delete (path="/api/delete-message/{id}",
      *     tags={"Message"},
      *     security={{ "apiAuth": {} }},
-
      *          @OA\Parameter(
      *          in="query",
      *          name="sender_id",

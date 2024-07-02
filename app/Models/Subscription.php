@@ -29,4 +29,9 @@ class Subscription extends Model
         self::bootUID();
 
     }
+
+    public function paymentMethods()
+    {
+        return $this->hasOne(PaymentMethods::class, 'id', 'payment_method_id');
+    }
 }

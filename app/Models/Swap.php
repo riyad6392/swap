@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\ModelAttributeTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
@@ -17,7 +18,8 @@ class Swap extends Model
         'user_id',
         'requested_user_id',
         'exchanged_user_id',
-        'status',
+        'exchanged_user_status',
+        'requested_user_status',
         'requested_wholesale_amount',
         'exchanged_wholesale_amount',
         'requested_total_commission',
@@ -41,12 +43,20 @@ class Swap extends Model
         return $this->hasMany(SwapRequestDetails::class);
     }
 
+    public function initiateDetails(): HasMany
+    {
+        return $this->hasMany(SwapInitiateDetails::class);
+    }
+
     public function shipments(): HasMany
     {
         return $this->hasMany(Shipment::class);
     }
 
-
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
     protected static function boot(): void
     {
         parent::boot();

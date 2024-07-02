@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\RegistrationSuccess;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -39,6 +41,9 @@ class RegistrationController extends Controller
      *          in="query",
      *          name="passord",
      *          required=true,
+     *
+     *
+     *
      *
      *          @OA\Schema(type="string"),
      *          example="Ex123456@",
@@ -86,12 +91,22 @@ class RegistrationController extends Controller
                     'first_name' => $request->first_name,
                     'last_name' => $request->last_name,
                     'email' => $request->email,
-                    'is_approved_by_admin' => 1, // This is for admin approval, if you want to approve user by admin then set 0 otherwise set 1
+                    'is_approved_by_admin' => 0, // This is for admin approval, if you want to approve user by admin then set 0 otherwise set 1
                     'password' => bcrypt($request->password),
                     'subscription_is_active' => 0
                 ]);
 
                 DB::commit();
+
+                $data = $request->validate([
+                    'email' => 'required|email',
+                    'first_name' => 'required|string|max:255',
+                    'last_name' => 'required|string|max:255',
+                ]);
+
+                Mail::to($data['email'])->send((new RegistrationSuccess($data))->afterCommit());
+
+
                 return response()->json(['success' => true, 'message' => 'Your registration successfully done'], 200);
 
             } catch (\Exception $e) {

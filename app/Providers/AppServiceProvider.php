@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Services\StripePaymentService;
+use App\Services\SwapMessageService;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passport\Passport;
 
@@ -17,6 +19,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('StripePaymentService', function(){
             return new StripePaymentService();
         });
+
+        $this->app->bind('SwapMessageService', function(){
+            return new SwapMessageService();
+        });
     }
 
     /**
@@ -24,7 +30,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-
+//        JsonResource::withoutWrapping();
 
     }
 }

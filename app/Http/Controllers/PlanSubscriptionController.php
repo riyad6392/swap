@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Facades\StripePaymentFacade;
 use App\Http\Requests\PlanSubscription\DeletePlanSubscriptionRequest;
 use App\Http\Requests\PlanSubscription\StorePlanSubscriptionRequest;
+use App\Models\Billing;
 use App\Models\PaymentMethods;
 use App\Models\Plan;
 use App\Models\Subscription;
@@ -28,7 +29,6 @@ class PlanSubscriptionController extends Controller
      * @OA\Post (path="/api/plan-subscription",
      *     tags={"Subscription"},
      *     security={{ "apiAuth": {} }},
-
      *     @OA\Parameter(
      *     in="query",
      *     name="plan_id",
@@ -98,7 +98,7 @@ class PlanSubscriptionController extends Controller
             DB::beginTransaction();
 
             $paymentMethods = PaymentMethods::where('user_id', auth()->user()->id)
-                ->where('status','=', 'active')
+                ->where('is_active', 1)
                 ->first();
 
             if (!$paymentMethods) {
@@ -111,8 +111,6 @@ class PlanSubscriptionController extends Controller
                 return response()->json(['success' => false, 'message' => 'Plan does not exist!'], 422);
             }
 
-            $stripeSubscription = StripePaymentFacade::subscription($plan, auth()->user());
-
             $previousSubscription = Subscription::where('user_id', auth()->user()->id)
                 ->where('status', 'active')
                 ->first();
@@ -122,7 +120,9 @@ class PlanSubscriptionController extends Controller
                 $previousSubscription->update(['status' => 'cancelled']);
             }
 
-            Subscription::create([
+            $stripeSubscription = StripePaymentFacade::subscription($plan, auth()->user());
+
+            $subscription = Subscription::create([
                 'plan_id' => $planSubscriptionRequest->plan_id,
                 'user_id' => auth()->user()->id,
                 'start_date' => date('Y-m-d'),
@@ -139,11 +139,20 @@ class PlanSubscriptionController extends Controller
                 'business_name' => $planSubscriptionRequest->business_name,
                 'business_address' => $planSubscriptionRequest->business_address,
                 'subscription_is_active' => 1,
-                'is_super_swapper' => $plan->interval == 'month' ? 1 : 0
+                'is_super_swapper' => $plan->is_super_swapper ?? 0,
+            ]);
+
+            Billing::create([
+                'user_id' => auth()->user()->id,
+                'payment_type' => 'subscription',
+                'plan_id' => $planSubscriptionRequest->plan_id,
+                'subscription_id' => $subscription->id,
+                'payment_method_id' => $paymentMethods->id,
+                'stripe_payment_subscription_id' => $stripeSubscription->id,
             ]);
 
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Subscription created successfully!'], 200);
+            return response()->json(['success' => true,'message' => 'Subscription created successfully!', 'data' => auth()->user()], 200);
 
         } catch (\Exception $exception) {
             DB::rollBack();
@@ -185,6 +194,7 @@ class PlanSubscriptionController extends Controller
 
             $subscription = Subscription::where('id', $id)
                 ->where('user_id', auth()->user()->id)
+                ->where('status', 'active')
                 ->first();
 
             if (!$subscription) {
@@ -195,18 +205,29 @@ class PlanSubscriptionController extends Controller
             if ($subscription->status == 'cancelled') {
                 return response()->json(['success' => false, 'message' => 'Subscription already cancelled!'], 422);
             }
-
-            StripePaymentFacade::cancelSubscription($subscription->stripe_subscription_id);
+            $subscription->paymentMethods->update(['is_active' => 0]);
 
             $subscription->update(['status' => 'cancelled']);
 
-            auth()->user()->update(['subscription_is_active' => false]);
+            auth()->user()->update(['subscription_is_active' => 0]);
+
+            StripePaymentFacade::cancelSubscription($subscription->stripe_subscription_id);
 
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Subscription cancelled successfully!'], 200);
 
         } catch (\Exception $exception) {
             DB::rollBack();
+            return response()->json(['success' => false, 'message' => $exception->getMessage()], 422);
+        }
+    }
+
+    public function invoiceList()
+    {
+        try {
+            $invoices = StripePaymentFacade::invoiceList();
+            return response()->json(['success' => true, 'data' => $invoices], 200);
+        } catch (\Exception $exception) {
             return response()->json(['success' => false, 'message' => $exception->getMessage()], 422);
         }
     }

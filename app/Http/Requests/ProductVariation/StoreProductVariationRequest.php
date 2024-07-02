@@ -24,14 +24,14 @@ class StoreProductVariationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'variations' => 'required|array',
-            'variations.*.size_id' => 'nullable|integer|exists:sizes,id',
-            'variations.*.color_id' => 'nullable|integer|exists:colors,id',
+            'variations' => 'sometimes|array',
+            'variations.*.size_id' => 'required|integer|exists:sizes,id',
+            'variations.*.color_id' => 'required|integer|exists:colors,id',
             'variations.*.unit_price' => 'required|numeric',
             'variations.*.stock' => 'required|integer',
             'variations.*.discount' => 'nullable|numeric',
             'variations.*.quantity' => 'required|integer',
-            'variations.*.discount_type' => 'nullable|string',
+            'variations.*.discount_type' => 'nullable|in:percentage,flat',
             'variations.*.discount_start_date' => 'nullable|date',
             'variations.*.discount_end_date' => 'nullable|date',
             'variations.*.variant_images' => 'nullable|array',

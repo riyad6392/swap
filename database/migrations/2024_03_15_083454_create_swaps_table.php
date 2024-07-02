@@ -17,16 +17,20 @@ return new class extends Migration
             $table->integer('user_id');
             $table->integer('requested_user_id')->comment('User who requested the swap');
             $table->integer('exchanged_user_id')->comment('User who accepted the swap');
-            $table->enum('status', ['requested', 'accepted', 'completed', 'decline'])->default('requested');
+
+            $table->enum('exchanged_user_status', ['pending', 'accepted','approved', 'completed', 'decline'])->default('pending');
+            $table->enum('requested_user_status', ['requested', 'accepted','approved', 'completed', 'rejected'])->default('requested');
+
+//            $table->enum('status', ['requested', 'accepted', 'completed', 'decline'])->default('requested');
 
             $table->integer('requested_wholesale_amount')->nullable();
-            $table->double('requested_total_commission',8, 2)->nullable();
+            $table->double('requested_total_commission',8, 2)->default(0);
 
             $table->integer('exchanged_wholesale_amount')->nullable();
-            $table->double('exchanged_total_commission',8, 2)->nullable();
+            $table->double('exchanged_total_commission',8, 2)->default(0);
 
-            $table->boolean('is_approved_by_requester')->default(false);
-            $table->boolean('is_approved_by_exchanger')->default(false);
+//            $table->boolean('is_approved_by_requester')->default(false);
+//            $table->boolean('is_approved_by_exchanger')->default(false);
 
             $table->integer('created_by');
             $table->integer('updated_by');

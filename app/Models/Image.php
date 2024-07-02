@@ -18,22 +18,19 @@ class Image extends Model
         'path'
     ];
     protected $appends = [
-        'imagePath'
+        'image_path'
     ];
 
-//    protected $hidden = [
-//        'created_at',
-//        'updated_at',
-//        'imageable_type',
-//        'imageable_id',
-//        'created_by',
-//        'updated_by'
-//    ];
     public function getImagePathAttribute()
     {
-        return asset($this->path);
+//        dd(asset('storage/'.$this->path));
+        return env('APP_URL').'/storage/'.$this->path;
     }
 
+    public function imageable()
+    {
+        return $this->morphTo();
+    }
     protected static function boot()
     {
         parent::boot();
