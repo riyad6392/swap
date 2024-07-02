@@ -22,6 +22,8 @@ class SwapMessageService
     public $conversation = null;
     public $message_files = '';
 
+    public $file_new_message = null;
+
     public function prepareData($sender_id, $receiver_id, $conversation_type, $message_type, $message, $message_files, $swap = null): static
     {
 //        dd($sender_id, $receiver_id, $conversation_type, $message_type, $message, $message_files, $swap);
@@ -69,6 +71,7 @@ class SwapMessageService
                             'file_path' => FileUploadService::uploadFile($singleFile, new Message()),
                         ]
                     );
+                    $this->file_new_message[] = $this->message;
                 }
             }
         }
@@ -156,6 +159,21 @@ class SwapMessageService
             $this->conversation,
             $this->message
         ));
+
+        if ( $this->message_files) {
+            foreach ($this->file_new_message as $message) {
+                event(new MessageBroadcast(
+                    $this->conversation,
+                    $message
+                ));
+            }
+//            $this->file_new_message->each(function ($message) {
+//                event(new MessageBroadcast(
+//                    $this->conversation,
+//                    $message
+//                ));
+//            });
+        }
         return $this;
     }
 

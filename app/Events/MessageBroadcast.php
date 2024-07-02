@@ -12,6 +12,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Queue\SerializesModels;
 
 class MessageBroadcast implements ShouldBroadcast, ShouldDispatchAfterCommit
@@ -58,7 +59,7 @@ class MessageBroadcast implements ShouldBroadcast, ShouldDispatchAfterCommit
     public function broadcastWith()
     {
         return [
-            'message' => $this->message,
+            'message' => new BroadcastMessage((array)$this->message),
             'conversation' => $this->conversation
         ];
     }
