@@ -160,19 +160,13 @@ class SwapMessageService
             $this->message
         ));
 
-        if ( $this->message_files) {
+        if ( count($this->message_files) > 0) {
             foreach ($this->file_new_message as $message) {
                 event(new MessageBroadcast(
                     $this->conversation,
                     $message
                 ));
             }
-//            $this->file_new_message->each(function ($message) {
-//                event(new MessageBroadcast(
-//                    $this->conversation,
-//                    $message
-//                ));
-//            });
         }
         return $this;
     }
