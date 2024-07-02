@@ -24,7 +24,7 @@ class MessageBroadcast implements ShouldBroadcast, ShouldDispatchAfterCommit
     /**
      * Create a new event instance.
      */
-    public function __construct(Conversation $conversation,Message $message)
+    public function __construct(Conversation $conversation, Message $message)
     {
         $this->conversation = $conversation;
         $this->message = $message;
@@ -41,9 +41,7 @@ class MessageBroadcast implements ShouldBroadcast, ShouldDispatchAfterCommit
             $channels = $this->conversation->participants->filter(function ($participant) {
                 return $participant->user_id != auth()->id();
             })->map(function ($participant) {
-                new PrivateChannel('conversation.'.$this->conversation->channel_name.'.'.$participant->user_id);
-
-//                return new PrivateChannel('conversation.user.' . $participant->user_id);
+                return new PrivateChannel('conversation.' . $this->conversation->channel_name . '.' . $participant->user_id);
             });
             return $channels->toArray();
         }
@@ -52,7 +50,7 @@ class MessageBroadcast implements ShouldBroadcast, ShouldDispatchAfterCommit
 //        ];
     }
 
-    public function broadcastAs() :string
+    public function broadcastAs(): string
     {
         return 'MessageBroadcast';
     }
