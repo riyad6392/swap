@@ -2,6 +2,9 @@
 
 namespace App\Events;
 
+use App\Http\Resources\MessageResource;
+use App\Http\Resources\SwapResource;
+use App\Http\Resources\UserResourceForMessage;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
@@ -19,7 +22,7 @@ class MessageBroadcast implements ShouldBroadcast, ShouldDispatchAfterCommit
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     protected Conversation $conversation;
-    protected Message $message;
+    protected $message;
 
     /**
      * Create a new event instance.
@@ -27,7 +30,24 @@ class MessageBroadcast implements ShouldBroadcast, ShouldDispatchAfterCommit
     public function __construct(Conversation $conversation, Message $message)
     {
         $this->conversation = $conversation;
-        $this->message = $message;
+        $this->message = [
+            'id' => $message->id,
+            'conversation_id' => $message->conversation_id,
+            'sender_id' => $message->sender_id,
+            'receiver_id' => $message->receiver_id,
+            'message_type' => $message->message_type,
+            'swap_id' => $message->swap_id,
+            'is_read' => $message->is_read,
+            'is_deleted' => $message->is_deleted,
+            'file_path' => $message->file_path,
+            'type' => $message->type,
+            'message' => $message->message,
+            'data' => $message->data,
+            'sender' => new UserResourceForMessage($message->sender),
+            'receiver' => new UserResourceForMessage($message->receiver),
+            'swap' => $message->swap ? new SwapResource($message->swap) : null,
+
+        ];
     }
 
     /**
@@ -60,7 +80,7 @@ class MessageBroadcast implements ShouldBroadcast, ShouldDispatchAfterCommit
     {
         return [
             'message' => $this->message,
-            'conversation' => $this->conversation
+            'conversation' => $this->conversation,
         ];
     }
 }
