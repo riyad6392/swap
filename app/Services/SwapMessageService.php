@@ -158,15 +158,16 @@ class SwapMessageService
 
     public function doMessageBroadcast()
     {
+//        dd($this->insert_message);
        info('message broadcast');
-        if ( count($this->message_files) > 0) {
+//        if ( count($this->message_files) > 0) {
            foreach($this->insert_message as $message){
                 event(new MessageBroadcast(
                     $this->conversation,
                     $message
                 ));
            }
-        }
+//        }
         return $this;
     }
 
