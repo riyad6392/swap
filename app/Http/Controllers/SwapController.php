@@ -248,7 +248,7 @@ class SwapController extends Controller
                     'status' => $swapRequest->status,
                 ]
             );
-
+            dd("ok");
             $prepareData = SwapRequestService::prepareDetailsData(
                 $SwapExchangeDetailsRequest,
                 $swap,
