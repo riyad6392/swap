@@ -210,7 +210,7 @@ class MessageController extends Controller
     {
         try {
             DB::beginTransaction();
-            MessageFacade::prepareData(
+            $response = MessageFacade::prepareData(
                 auth()->id(),
                 $messageRequest->receiver_id,
                 'private',
@@ -223,9 +223,16 @@ class MessageController extends Controller
                 ->doMessageBroadcast()
                 ->doConversationBroadcast();
 
+//            dd($response);
+            $data = [
+                'messages' => $response->insert_message,
+                'conversation' => $response->conversation,
+            ];
+
+
             DB::commit();
 
-            return response()->json(['success' => true, 'message' => 'Message sent successfully']);
+            return response()->json(['success' => true, 'message' => 'Message sent successfully', 'data' => $data]);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
@@ -332,8 +339,6 @@ class MessageController extends Controller
         $message = $message->take(10)->get();
 
         $message = $message->load('sender.image');
-
-
 
 
         return response()->json(['success' => true, 'data' => MessageResource::collection($message)->resource]);
