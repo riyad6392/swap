@@ -21,13 +21,13 @@ class MessageBroadcast implements ShouldBroadcast, ShouldDispatchAfterCommit
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    protected Conversation $conversation;
+    protected  $conversation;
     protected $message;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(Conversation $conversation, Message $message)
+    public function __construct($conversation, $message)
     {
         $this->conversation = $conversation;
         $this->message = [
