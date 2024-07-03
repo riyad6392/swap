@@ -57,17 +57,17 @@ class MessageBroadcast implements ShouldBroadcast, ShouldDispatchAfterCommit
      */
     public function broadcastOn(): array
     {
-        if ($this->conversation->participants->count() > 0) {
-            $channels = $this->conversation->participants->filter(function ($participant) {
-                return $participant->user_id != auth()->id();
-            })->map(function ($participant) {
-                return new PrivateChannel('conversation.' . $this->conversation->channel_name . '.' . $participant->user_id);
-            });
-            return $channels->toArray();
-        }
-//        return [
-//            new PrivateChannel('conversation.'.$this->conversation->channel_name),
-//        ];
+//        if ($this->conversation->participants->count() > 0) {
+//            $channels = $this->conversation->participants->filter(function ($participant) {
+//                return $participant->user_id != auth()->id();
+//            })->map(function ($participant) {
+//                return new PrivateChannel('conversation.' . $this->conversation->channel_name . '.' . $participant->user_id);
+//            });
+//            return $channels->toArray();
+//        }
+        return [
+            new PrivateChannel('conversation.'.$this->conversation->channel_name),
+        ];
     }
 
     public function broadcastAs(): string

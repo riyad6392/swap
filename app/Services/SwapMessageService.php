@@ -29,7 +29,7 @@ class SwapMessageService
     {
 //        dd($sender_id, $receiver_id, $conversation_type, $message_type, $message, $message_files, $swap);
         $this->sender_id = $sender_id;
-        $this->receiver_id = (int) $receiver_id;
+        $this->receiver_id = (int)$receiver_id;
         $this->conversation_type = $conversation_type;
         $this->message_type = $message_type;
         $this->message = $message;
@@ -46,8 +46,8 @@ class SwapMessageService
             $this->sender_id, $this->receiver_id, $this->conversation_type,
         );
 
-        if($this->message){
-            $this->last_message  = Message::create([
+        if ($this->message) {
+            $this->last_message = Message::create([
                 'message' => $this->message,
                 'receiver_id' => $this->receiver_id,
                 'swap_id' => $this->swap->id ?? null,
@@ -158,16 +158,13 @@ class SwapMessageService
 
     public function doMessageBroadcast()
     {
-//        dd($this->insert_message);
-       info('message broadcast');
-//        if ( count($this->message_files) > 0) {
-           foreach($this->insert_message as $message){
-                event(new MessageBroadcast(
-                    $this->conversation,
-                    $message
-                ));
-           }
-//        }
+        info('message broadcast');
+        foreach ($this->insert_message as $message) {
+            event(new MessageBroadcast(
+                $this->conversation,
+                $message
+            ));
+        }
         return $this;
     }
 
@@ -180,8 +177,9 @@ class SwapMessageService
         return $this;
     }
 
-    public function matchExtension($value){
-        return match($value){
+    public function matchExtension($value)
+    {
+        return match ($value) {
             'jpeg', 'jpg', 'webp', 'png', 'gif' => 'image',
             'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt' => 'file',
             'zip', 'rar' => 'archive',
