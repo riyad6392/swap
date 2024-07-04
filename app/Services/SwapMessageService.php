@@ -22,11 +22,14 @@ class SwapMessageService
     public $conversation = null;
     public $message_files = '';
 
+    public $insert_message = [];
+    public $last_message = '';
+
     public function prepareData($sender_id, $receiver_id, $conversation_type, $message_type, $message, $message_files, $swap = null): static
     {
 //        dd($sender_id, $receiver_id, $conversation_type, $message_type, $message, $message_files, $swap);
         $this->sender_id = $sender_id;
-        $this->receiver_id = (int) $receiver_id;
+        $this->receiver_id = (int)$receiver_id;
         $this->conversation_type = $conversation_type;
         $this->message_type = $message_type;
         $this->message = $message;
@@ -43,8 +46,8 @@ class SwapMessageService
             $this->sender_id, $this->receiver_id, $this->conversation_type,
         );
 
-        if($this->message){
-            $this->message = Message::create([
+        if ($this->message) {
+            $this->last_message = Message::create([
                 'message' => $this->message,
                 'receiver_id' => $this->receiver_id,
                 'swap_id' => $this->swap->id ?? null,
@@ -52,12 +55,14 @@ class SwapMessageService
                 'conversation_id' => $this->conversation->id,
                 'message_type' => $this->message_type,
             ]);
+            $this->insert_message[] = $this->last_message;
         }
 
         if ($this->message_files && count($this->message_files) > 0) {
             foreach ($this->message_files as $key => $file) {
+//                dd($file);
                 foreach ($file as $singleFile) {
-                    $this->message = Message::create(
+                    $this->last_message = Message::create(
                         [
                             'conversation_id' => $this->conversation->id,
                             'receiver_id' => $this->receiver_id,
@@ -69,13 +74,14 @@ class SwapMessageService
                             'file_path' => FileUploadService::uploadFile($singleFile, new Message()),
                         ]
                     );
+                    $this->insert_message[] = $this->last_message;
                 }
             }
         }
 
         $this->conversation->update([
-            'last_message_id' => $this->message->id,
-            'last_message' => $this->message->message,
+            'last_message_id' => $this->last_message->id,
+            'last_message' => $this->last_message->message,
         ]);
 
         return $this;
@@ -145,17 +151,20 @@ class SwapMessageService
         SwapNotificationService::sendNotification(
             $this->swap,
             [$this->swap->exchanged_user_id],
-            $this->message
+            $this->last_message
         );
         return $this;
     }
 
     public function doMessageBroadcast()
     {
-        event(new MessageBroadcast(
-            $this->conversation,
-            $this->message
-        ));
+        info('message broadcast');
+        foreach ($this->insert_message as $message) {
+            event(new MessageBroadcast(
+                $this->conversation,
+                $message
+            ));
+        }
         return $this;
     }
 
@@ -168,8 +177,9 @@ class SwapMessageService
         return $this;
     }
 
-    public function matchExtension($value){
-        return match($value){
+    public function matchExtension($value)
+    {
+        return match ($value) {
             'jpeg', 'jpg', 'webp', 'png', 'gif' => 'image',
             'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt' => 'file',
             'zip', 'rar' => 'archive',

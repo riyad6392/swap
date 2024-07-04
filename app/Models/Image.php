@@ -23,7 +23,8 @@ class Image extends Model
 
     public function getImagePathAttribute()
     {
-        return asset('storage/'.$this->path);
+//        dd(asset('storage/'.$this->path));
+        return env('APP_URL').'/storage/'.$this->path;
     }
 
     public function imageable()
