@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -20,7 +21,7 @@ class UserOnlineStatus
             $expireAt = now()->addMinutes(1);
             Cache::store('redis')->put('active_users_' . auth()->id(), true, $expireAt);
             auth()->user()->update([
-                'active_at' => now()->addMinutes(1)
+                'active_at' => Carbon::now()->toISOString(),
             ]);
         }
         return $next($request);
