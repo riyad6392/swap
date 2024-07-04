@@ -25,6 +25,8 @@ class UserResourceForMessage extends JsonResource
 //            'is_approved_by_admin' => $this->is_approved_by_admin,
 //            'is_super_swapper' => $this->is_super_swapper,
             'image' => new ImageResource($this->image),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }
