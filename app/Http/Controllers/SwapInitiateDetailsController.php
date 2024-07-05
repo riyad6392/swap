@@ -141,8 +141,9 @@ class SwapInitiateDetailsController extends Controller
                 [],
                 $swap
             )->messageGenerate()
-                ->doMessageBroadcast()
-                ->withNotify();
+            ->withNotify()
+                ->doMessageBroadcast();
+
 
 
             $data = [
