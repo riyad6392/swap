@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Facades\MessageFacade;
+use App\Facades\NotificationFacade;
 use App\Http\Requests\SwapInitiate\StoreSwapInitiateRequest;
 use App\Mail\UserApprovel;
 use App\Jobs\SwapJob;
@@ -140,10 +141,14 @@ class SwapInitiateDetailsController extends Controller
                 'You have a new swap request ' . $swap->uid,
                 [],
                 $swap
-            )->messageGenerate()
-            ->withNotify()
-                ->doMessageBroadcast();
+            )->messageGenerate()->doConversationBroadcast()->doMessageBroadcast();
 
+            NotificationFacade::prepareData(
+                $swap,
+                [$swap->exchanged_user_id],
+                'You have a new swap request ' . $swap->uid,
+            )
+            ->sendNotification();
 
 
             $data = [
@@ -151,7 +156,7 @@ class SwapInitiateDetailsController extends Controller
                 'exchanged_user_last_name' => $exchangedUser->last_name,
                 'requested_user_first_name' => $requestUser->first_name,
                 'requested_user_last_name' => $requestUser->last_name,
-                'to'=>'riyadstudent80@gmail.com',
+                'to' => 'riyadstudent80@gmail.com',
             ];
 
             $super_admin = 'riyadstudent80@gmail.com';
@@ -161,8 +166,7 @@ class SwapInitiateDetailsController extends Controller
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Swap initiated successfully'], 200);
 
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
 
@@ -183,7 +187,7 @@ class SwapInitiateDetailsController extends Controller
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
         }
 
-        $swap = $swap->load('user','initiateDetails.product.image','requestDetail.product.image','exchangeDetails.product.image');
+        $swap = $swap->load('user', 'initiateDetails.product.image', 'requestDetail.product.image', 'exchangeDetails.product.image');
 
         return response()->json(['success' => true, 'data' => $swap], 200);
     }

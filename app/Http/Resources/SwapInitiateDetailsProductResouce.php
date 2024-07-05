@@ -17,6 +17,7 @@ class SwapInitiateDetailsProductResouce extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'image' => new ImageResource($this->image),
         ];
     }
 }

@@ -20,13 +20,13 @@ class UserResourceForMessage extends JsonResource
             'last_name' => $this->last_name,
             'is_active' => $this->is_active,
             'active_at' => $this->active_at,
-//            'subscription_is_active' => $this->subscription_is_active,
-//            'stripe_customer_id' => $this->stripe_customer_id,
-//            'is_approved_by_admin' => $this->is_approved_by_admin,
-//            'is_super_swapper' => $this->is_super_swapper,
+            'subscription_is_active' => $this->subscription_is_active,
+////            'stripe_customer_id' => $this->stripe_customer_id,
+////            'is_approved_by_admin' => $this->is_approved_by_admin,
+////            'is_super_swapper' => $this->is_super_swapper,
             'image' => new ImageResource($this->image),
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+//            'created_at' => $this->created_at,
+//            'updated_at' => $this->updated_at,
         ];
     }
 }

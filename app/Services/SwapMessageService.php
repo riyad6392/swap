@@ -146,21 +146,12 @@ class SwapMessageService
         Participant::insert($insertDataForParticipant);
     }
 
-    public function withNotify()
-    {
-        SwapNotificationService::sendNotification(
-            $this->swap,
-            [$this->swap->exchanged_user_id],
-            $this->last_message
-        );
-        return $this;
-    }
-
     public function doMessageBroadcast()
     {
         // dd($this->last_message);
         // dd($this->insert_message);
         info('message broadcast');
+
         foreach ($this->insert_message as $message) {
             event(new MessageBroadcast(
                 $this->conversation,

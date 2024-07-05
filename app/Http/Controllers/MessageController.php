@@ -14,6 +14,7 @@ use App\Http\Resources\MessageResource;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Services\SwapMessageService;
+use App\Services\SwapNotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -223,7 +224,8 @@ class MessageController extends Controller
                 ->doMessageBroadcast()
                 ->doConversationBroadcast();
 
-//            dd($response);
+
+//            dd($response->conversation);
             $data = [
                 'messages' => $response->insert_message,
                 'conversation' => $response->conversation,
@@ -339,7 +341,6 @@ class MessageController extends Controller
         $message = $message->take(10)->get();
 
         $message = $message->load('sender.image');
-
 
         return response()->json(['success' => true, 'data' => MessageResource::collection($message)->resource]);
     }

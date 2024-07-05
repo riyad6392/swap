@@ -186,6 +186,7 @@ return [
         // 'Example' => App\Facades\Example::class,
         'StripePaymentFacade' => App\Facades\StripePaymentFacade::class,
         'MessageFacade' => App\Facades\MessageFacade::class,
+        'NotificationFacade' => App\Facades\NotificationFacade::class,
     ])->toArray(),
 
 ];
