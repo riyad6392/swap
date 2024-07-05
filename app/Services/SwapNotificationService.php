@@ -11,11 +11,12 @@ use App\Models\Notification as NotificationModel;
 
 enum SwapNotificationService: string
 {
-    public static function sendNotification($swap, array $id, $message): void
+    public static function sendNotification($model, array $id, $message): void
     {
-        $insertNotification = $swap->notifications()->create([
+        //dd($message);
+        $insertNotification = $model->notifications()->create([
             'data' => [
-                'swap_id' => $swap->id,
+                'swap_id' => $model->id,
                 'data'    => $message,
             ],
         ]);
@@ -24,7 +25,7 @@ enum SwapNotificationService: string
 
         $users = User::whereIn('id', $id)->get();
 
-        $users->each(function ($user) use ($insertNotification, $swap, $message) {
+        $users->each(function ($user) use ($insertNotification, $model, $message) {
 
             $user->notifications()->attach($insertNotification->id);
             Notification::send($user, new SwapRequestNotification($insertNotification));

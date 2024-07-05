@@ -158,6 +158,8 @@ class SwapMessageService
 
     public function doMessageBroadcast()
     {
+        // dd($this->last_message);
+        // dd($this->insert_message);
         info('message broadcast');
         foreach ($this->insert_message as $message) {
             event(new MessageBroadcast(

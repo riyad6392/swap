@@ -138,10 +138,12 @@ class SwapInitiateDetailsController extends Controller
                 'private',
                 'notification',
                 'You have a new swap request ' . $swap->uid,
+                [],
                 $swap
             )->messageGenerate()
-                ->doMessageBroadcast()
-                ->withNotify();
+            ->withNotify()
+                ->doMessageBroadcast();
+
 
 
             $data = [

@@ -20,7 +20,7 @@ class UserOnlineStatus
         if(auth()->check()) {
             $expireAt = now()->addMinutes(1);
             Cache::store('redis')->put('active_users_' . auth()->id(), true, $expireAt);
-//            dump(Carbon::now()->toISOString());
+        //    dump(Carbon::now()->toISOString());
 //            dd(auth()->user()->active_at);
             auth()->user()->update([
                 'active_at' => now()->addMinutes(1),
