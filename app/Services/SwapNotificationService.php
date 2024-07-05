@@ -9,9 +9,21 @@ use Illuminate\Support\Facades\Notification;
 use App\Models\Notification as NotificationModel;
 
 
-enum SwapNotificationService: string
+class SwapNotificationService: string
 {
-    public static function sendNotification($swap, array $id, $message): void
+
+    public $swap = null;
+    public $user = null;
+    public $message = null;
+    public function prepareData($swap, $user, $message): static
+    {
+        $this->swap = $swap;
+        $this->user = $user;
+        $this->message = $message;
+
+        return $this;
+    }
+    public function sendNotification($swap, array $id, $message): void
     {
         $insertNotification = $swap->notifications()->create([
             'data' => [
@@ -30,6 +42,20 @@ enum SwapNotificationService: string
             Notification::send($user, new SwapRequestNotification($insertNotification));
         });
 
+    }
+
+    public function matchNotifiableType(){
+        return $matchNotifiableType = [
+            'App\Models\User' => [
+                'message' => $this->message,
+                'user'=> $this->user,
+            ],
+            'App\Models\Admin' => 'admin',
+            'App\Models\Swap' => [
+                'message' => $this->message,
+                'swap' => $this->swap,
+            ],
+        ];
     }
 
 }
