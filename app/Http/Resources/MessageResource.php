@@ -30,6 +30,8 @@ class MessageResource extends JsonResource
             'sender' => new UserResourceForMessage($this->sender),
             'receiver' => new UserResourceForMessage($this->receiver),
             'swap' => new SwapResource($this->swap),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
 //            'conversation' => new ConversationResource($this->conversation),
         ];
     }
