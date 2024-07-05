@@ -146,8 +146,6 @@ class SwapMessageService
         Participant::insert($insertDataForParticipant);
     }
 
-
-
     public function doMessageBroadcast()
     {
         info('message broadcast');

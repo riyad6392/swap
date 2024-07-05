@@ -141,12 +141,8 @@ class SwapInitiateDetailsController extends Controller
                 'You have a new swap request ' . $swap->uid,
                 [],
                 $swap
-            )->messageGenerate()
-                ->doConversationBroadcast()
-                ->doMessageBroadcast();
-//                ->withNotify();
+            )->messageGenerate()->doConversationBroadcast()->doMessageBroadcast();
 
-            dd(1);
             NotificationFacade::prepareData(
                 $swap,
                 [$swap->exchanged_user_id],
