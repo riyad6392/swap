@@ -261,16 +261,8 @@ class NotificationController extends Controller
         return response()->json(['success' => true, 'message' => 'Notifications update successfully'], 200);
     }
 
-    public function deleteNotification(Request $request)
+    public function deleteNotification(Request $request, String $id)
     {
-        $validator = validator($request->all(), [
-            'id' => 'required|numeric|exists:notifications,id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['success' => false, 'message' => $validator->errors()], 400);
-        }
-
         DB::beginTransaction();
         try {
             $user = auth()->user();
