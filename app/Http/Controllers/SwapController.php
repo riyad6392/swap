@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\MessageBroadcast;
 use App\Facades\StripePaymentFacade;
+use App\Facades\NotificationFacade;
 use App\Http\Requests\Swap\StoreSwapExchangeDetailsRequest;
 use App\Http\Requests\Swap\StoreSwapRequest;
 use App\Http\Requests\Swap\StoreSwapRequestDetails;
@@ -614,11 +615,11 @@ class SwapController extends Controller
                 'requested_user_status' => 'approved'
             ]);
 
-            SwapNotificationService::sendNotification(
+            NotificationFacade::prepareData(
                 $swap,
                 [$swap->requested_user_id],
-                'Swap request has been approved'
-            );
+                'Your swap request has been approved'
+            )->sendNotification();
 
             return response()->json(['success' => true, 'message' => 'You approved the swap request'], 200);
         }
@@ -679,11 +680,11 @@ class SwapController extends Controller
                 'requested_user_status' => 'rejected'
             ]);
 
-            SwapNotificationService::sendNotification(
+            NotificationFacade::prepareData(
                 $swap,
                 [$swap->requested_user_id],
-                'your swap request has been declined'
-            );
+                'Your swap request has been declined'
+            )->sendNotification();
 
             return response()->json(['success' => true, 'message' => 'You decline the swap request'], 200);
         }
@@ -743,11 +744,11 @@ class SwapController extends Controller
                 [$swap->exchanged_user_id] :
                 [$swap->requested_user_id];
 
-        SwapNotificationService::sendNotification(
-            $swap,
-            $notificationRecipients,
-            'Swap request has been completed'
-        );
+        NotificationFacade::prepareData(
+                $swap,
+                $notificationRecipients,
+                'Swap request has been completed'
+            )->sendNotification();
     }
 
     protected function handlePayment($swap, $user)

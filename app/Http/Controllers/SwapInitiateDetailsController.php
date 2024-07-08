@@ -321,6 +321,12 @@ class SwapInitiateDetailsController extends Controller
                 'requested_user_status' => 'accepted',
             ]);
 
+            NotificationFacade::prepareData(
+                $swap,
+                [$swap->requested_user_id],
+                'Your swap request has been accepted'
+            )->sendNotification();
+
             return response()->json(['success' => true, 'message' => 'Request accepted successfully'], 200);
         }
 
