@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Notification\UpdateReadAndUnreadNotificationRequest;
 use App\Models\Notification;
 use App\Models\Swap;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class NotificationController extends Controller
 {
@@ -257,5 +259,39 @@ class NotificationController extends Controller
         $notification->update(['read_at' => null]);
 
         return response()->json(['success' => true, 'message' => 'Notifications update successfully'], 200);
+    }
+
+    public function deleteNotification(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'id' => 'required|numeric|exists:notifications,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => $validator->errors()], 400);
+        }
+
+        DB::beginTransaction();
+        try {
+            $user = auth()->user();
+            $notification = $user->notifications()->where('notifications.id', $request->id)->first();
+
+            if ($notification) {
+                $user->notifications()->detach($notification->id);
+                $notification->delete();
+            } else{
+                return response()->json(['success' => false, 'message' => 'Unauthorized to delete this notification'], 403);
+            }
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Notifications deleted successfully'], 200);
+        } catch (\Error $th) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $th]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e]);
+        }
+
     }
 }
