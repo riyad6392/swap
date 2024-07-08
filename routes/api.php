@@ -127,7 +127,7 @@ Route::group(['middleware' => ['auth:api','user.online.status']], function () {
             Route::get('notification-show/{id}', [NotificationController::class , 'show']);
             Route::post('mark-as-read', [NotificationController::class , 'markAllAsRead']);
             Route::post('mark-as-unread', [NotificationController::class , 'markAllAsUnRead']);
-            Route::delete('delete-notification', [NotificationController::class , 'deleteNotification']);
+            Route::delete('delete-notification/{id}', [NotificationController::class , 'deleteNotification']);
 
             //swap
             Route::resource('swap', SwapController::class);
