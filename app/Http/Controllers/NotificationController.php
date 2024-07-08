@@ -261,12 +261,12 @@ class NotificationController extends Controller
         return response()->json(['success' => true, 'message' => 'Notifications update successfully'], 200);
     }
 
-    public function deleteNotification(Request $request, String $id)
+    public function deleteNotification(Request $request, String $id): \Illuminate\Http\JsonResponse
     {
         DB::beginTransaction();
         try {
             $user = auth()->user();
-            $notification = $user->notifications()->where('notifications.id', $request->id)->first();
+            $notification = $user->notifications()->where('notifications.id', $id)->first();
 
             if ($notification) {
                 $user->notifications()->detach($notification->id);
