@@ -22,7 +22,7 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'phone' => $this->phone,
             'subscription_is_active' => $this->subscription_is_active,
-            'is_subscription_expired' => $this->subscription_is_active ? ($this->activeSubscriptions->end_date <= now() ? 1 : 0) : null,
+            'is_subscription_expired' => $this->subscription_is_active && $this->activeSubscriptions && $this->activeSubscriptions->end_date <= now() ? 1 : 0,
             'stripe_customer_id' => $this->stripe_customer_id,
             'is_approved_by_admin' => $this->is_approved_by_admin,
             'is_super_swapper' => $this->is_super_swapper,
