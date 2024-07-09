@@ -17,8 +17,8 @@ return new class extends Migration
             $table->integer('user_id');
             $table->integer('plan_id');
             $table->enum('status', ['active', 'cancelled','paused']);
-            $table->date('start_date');
-            $table->date('end_date');
+            $table->timestamp('start_date');
+            $table->timestamp('end_date');
             $table->double('amount', 8, 2);
             $table->integer('payment_method_id');
             $table->string('stripe_subscription_id');

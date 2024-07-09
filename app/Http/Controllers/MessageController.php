@@ -225,7 +225,7 @@ class MessageController extends Controller
                 ->doConversationBroadcast();
 
 
-//            dd($response->conversation);
+            //            dd($response->conversation);
             $data = [
                 'messages' => $response->insert_message,
                 'conversation' => $response->conversation,
@@ -461,17 +461,39 @@ class MessageController extends Controller
      * )
      */
 
-    public function deleteMessage(Request $request)
+    public function deleteMessage(Request $request, int $id): JsonResponse
     {
-        $message = Message::where('sender_id', auth()->id())->where('id', $request->id)->first();
+        DB::beginTransaction();
+        try {
+            $message = Message::where('sender_id', auth()->id())
+                ->where('id', $request->id)
+                ->with('conversation')
+                ->firstOrFail();
 
-        if (!$message) {
-            return response()->json(['success' => false, 'message' => 'Message not found'], 404);
+            $conversation = $message->conversation;
+
+            if ($conversation->last_message_id == $message->id) {
+                $previousMessage = $conversation->messages()
+                    ->where('id', '<', $message->id)
+                    ->latest()
+                    ->first();
+
+                $conversation->last_message_id = $previousMessage ? $previousMessage->id : null;
+                $conversation->last_message = $previousMessage ? $previousMessage->message : null;
+                $conversation->save();
+            }
+
+            $message->delete();
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Message deleted successfully'], 200);
+        } catch (\Error $th) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $th]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e]);
         }
 
-        $message->delete();
-
-        return response()->json(['success' => true, 'message' => 'Message deleted successfully']);
     }
 
 }
