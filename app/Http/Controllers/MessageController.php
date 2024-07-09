@@ -323,7 +323,6 @@ class MessageController extends Controller
             })->where('id', $id);
         });
 
-
         $operator = '<';
         $order = 'desc';
 
@@ -341,6 +340,14 @@ class MessageController extends Controller
         $message = $message->take(10)->get();
 
         $message = $message->load('sender.image');
+
+        $message->each(function ($message_ins) {
+            $message_ins->last_seen_users = $message_ins->conversation->participants
+                ->where('message_id', $message_ins->id)
+                ->map(function ($participant) {
+                    return $participant->user;
+                })->values();
+        });
 
         return response()->json(['success' => true, 'data' => MessageResource::collection($message)->resource]);
     }
