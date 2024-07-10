@@ -27,8 +27,7 @@ class MessageResource extends JsonResource
             'type' => $this->type,
             'message' => $this->message,
             'data' => $this->data,
-            'last_seen_users' => $this->last_seen_users ?? [],
-
+            'last_seen_users' => UserResourceForMessage::collection($this->last_seen_users ?? []),
             /*conversation->participants->filter(function ($participant) {
                 return $participant->message_id == $this->id;
             })->map(function ($participant) {
@@ -41,7 +40,7 @@ class MessageResource extends JsonResource
             'swap' => new SwapResource($this->swap),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            //            'conversation' => new ConversationResource($this->conversation),
+            //'conversation' => new ConversationResource($this->conversation),
         ];
     }
 }

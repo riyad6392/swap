@@ -22,8 +22,9 @@ class Message extends Model
         'type',
         'message',
         'data',
-
     ];
+
+    protected $appends = ['last_seen_users'];
 
     public function sender()
     {
@@ -50,5 +51,18 @@ class Message extends Model
     protected function getFilePathAttribute($value)
     {
         return asset('storage/'.$value);
+    }
+
+    public function getLastSeenUsersAttribute()
+    {
+        $seenUsers = collect();
+        $participants = $this->conversation->participants;
+        $participants->each(function ($participant) use ($seenUsers) {
+            if ($this->id == $participant->message_id){
+                $seenUsers->push($participant->user);
+            }
+        });
+
+        return $seenUsers;
     }
 }
