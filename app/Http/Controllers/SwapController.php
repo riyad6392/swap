@@ -327,7 +327,7 @@ class SwapController extends Controller
      */
     public function show($id)
     {
-        $swap = Swap::where('uid', $id)
+        $swap = Swap::with('exchangeDetails','requestDetail','initiateDetails')->where('uid', $id)
             ->orWhere('id', $id)
             ->first();
 
