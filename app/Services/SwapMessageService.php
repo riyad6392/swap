@@ -21,13 +21,11 @@ class SwapMessageService
     public $swap              = null;
     public $conversation      = null;
     public $message_files     = '';
-
-    public $insert_message = [];
-    public $last_message   = '';
+    public $insert_message    = [];
+    public $last_message      = '';
 
     public function prepareData($sender_id, $receiver_id, $conversation_type, $message_type, $message, $message_files, $swap = null): static
     {
-//        dd($sender_id, $receiver_id, $conversation_type, $message_type, $message, $message_files, $swap);
         $this->sender_id = $sender_id;
         $this->receiver_id = (int)$receiver_id;
         $this->conversation_type = $conversation_type;

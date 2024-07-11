@@ -104,23 +104,24 @@ class SwapInitiateDetailsController extends Controller
         try {
             DB::beginTransaction();
             $swap = Swap::create([
-                'user_id' => auth()->id(),
-                'exchanged_user_id' => $swapInitiateRequest->exchanged_user_id,
-                'requested_user_id' => auth()->id(),
+                'user_id'               => auth()->id(),
+                'exchanged_user_id'     => $swapInitiateRequest->exchanged_user_id,
+                'requested_user_id'     => auth()->id(),
                 'requested_user_status' => 'requested',
                 'exchanged_user_status' => 'pending',
-            ]);
+            ]
+            );
 
             $insertData = [];
 
             foreach ($swapInitiateRequest->products as $products) {
                 $insertData[] = [
-                    'swap_id' => $swap->id,
-                    'uid' => 'sid-' . uniqid(),
-                    'user_id' => auth()->id(),
+                    'swap_id'    => $swap->id,
+                    'uid'        => 'sid-' . uniqid(),
+                    'user_id'    => auth()->id(),
                     'product_id' => $products['product_id'],
-//                    'product_variation_id' => $products['product_variation_id'],
-//                    'quantity' => $products['quantity'],
+                    //                    'product_variation_id' => $products['product_variation_id'],
+                    //                    'quantity' => $products['quantity'],
                     'created_by' => auth()->id(),
                     'updated_by' => auth()->id(),
                     'created_at' => now(),
@@ -147,16 +148,15 @@ class SwapInitiateDetailsController extends Controller
                 $swap,
                 [$swap->exchanged_user_id],
                 'You have a new swap request ' . $swap->uid,
-            )
-            ->sendNotification();
+            )->sendNotification();
 
 
             $data = [
                 'exchanged_user_first_name' => $exchangedUser->first_name,
-                'exchanged_user_last_name' => $exchangedUser->last_name,
+                'exchanged_user_last_name'  => $exchangedUser->last_name,
                 'requested_user_first_name' => $requestUser->first_name,
-                'requested_user_last_name' => $requestUser->last_name,
-                'to' => 'riyadstudent80@gmail.com',
+                'requested_user_last_name'  => $requestUser->last_name,
+                'to'                        => 'riyadstudent80@gmail.com',
             ];
 
             $super_admin = 'riyadstudent80@gmail.com';
@@ -179,8 +179,9 @@ class SwapInitiateDetailsController extends Controller
     {
         $swap = Swap::where(function ($query) use ($uid) {
             $query->where('exchanged_user_id', auth()->id())
-                ->orWhere('requested_user_id', auth()->id());
-        })->where('uid', $uid)->first();
+                  ->orWhere('requested_user_id', auth()->id());
+        }
+        )->where('uid', $uid)->first();
 
 
         if (!$swap) {
@@ -243,8 +244,9 @@ class SwapInitiateDetailsController extends Controller
     {
         $swap = Swap::where(function ($query) use ($uid) {
             $query->where('exchanged_user_id', auth()->id())
-                ->orWhere('requested_user_id', auth()->id());
-        })->where('uid', $uid)->first();
+                  ->orWhere('requested_user_id', auth()->id());
+        }
+        )->where('uid', $uid)->first();
 
         if (!$swap) {
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
@@ -303,8 +305,9 @@ class SwapInitiateDetailsController extends Controller
     {
         $swap = Swap::where(function ($query) use ($uid) {
             $query->where('exchanged_user_id', auth()->id())
-                ->orWhere('requested_user_id', auth()->id());
-        })->where('uid', $uid)->first();
+                  ->orWhere('requested_user_id', auth()->id());
+        }
+        )->where('uid', $uid)->first();
 
         if (!$swap) {
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
@@ -319,7 +322,8 @@ class SwapInitiateDetailsController extends Controller
             $swap->update([
                 'exchanged_user_status' => 'accepted',
                 'requested_user_status' => 'accepted',
-            ]);
+            ]
+            );
 
             NotificationFacade::prepareData(
                 $swap,

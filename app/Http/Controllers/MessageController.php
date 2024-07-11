@@ -6,7 +6,6 @@ use App\Events\MessageBroadcast;
 use App\Facades\MessageFacade;
 use App\Http\Requests\Conversation\StoreConversationRequest;
 use App\Http\Requests\Message\ConversationListRequest;
-use App\Http\Requests\Message\ConversationLitRequest;
 use App\Http\Requests\Message\MessageListRequest;
 use App\Http\Requests\Message\StoreMessageRequest;
 use App\Http\Resources\ConversationResources;
@@ -520,5 +519,5 @@ class MessageController extends Controller
         }
 
     }
-    
+
 }
