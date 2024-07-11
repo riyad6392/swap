@@ -325,8 +325,12 @@ class SwapController extends Controller
      *     )
      * )
      */
-    public function show(Swap $swap)
+    public function show($id)
     {
+        $swap = Swap::where('uid', $id)
+            ->orWhere('id', $id)
+            ->first();
+
         if ($swap->requested_user_id == auth()->id() || $swap->exchanged_user_id == auth()->id()) {
 
             return response()->json(['success' => true, 'data' => $swap]);
