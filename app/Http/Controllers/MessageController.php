@@ -119,7 +119,6 @@ class MessageController extends Controller
             $swap
         )->messageGenerate()->withNotify();
 
-
         $conversation = SwapMessageService::createPrivateConversation(
             $conversationRequest->sender_id,
             $conversationRequest->receiver_id,
@@ -221,19 +220,15 @@ class MessageController extends Controller
                 $messageRequest->message,
                 $messageRequest->files,
                 null
-            )->messageGenerate()
-            ->doMessageBroadcast()
-            ->doConversationBroadcast();
+            )
+                ->messageGenerate()
+                ->doMessageBroadcast()
+                ->doConversationBroadcast();
 
-            dd($response);
-            $lastMessage = end($response->insert_message);
-            $response->conversation->participants()->where('user_id', auth()->id())->update(['message_id' => $lastMessage->id]);
 
-            $response->doMessageBroadcast()
-            ->doConversationBroadcast();
             //dd($response->conversation);
             $data = [
-                'messages' => $response->insert_message,
+                'messages'     => $response->insert_message,
                 'conversation' => $response->conversation,
             ];
 
@@ -301,21 +296,29 @@ class MessageController extends Controller
     {
         $conversation = Conversation::query();
 
-        $conversation = $conversation->whereHas('participants', function ($query) use ($conversationListRequest) {
+        $conversation = $conversation->whereHas(
+            'participants', function ($query) use ($conversationListRequest) {
             $query->where('user_id', auth()->id());
-        })->whereHas('participants.user', function ($query) use ($conversationListRequest) {
+        }
+        )->whereHas(
+            'participants.user', function ($query) use ($conversationListRequest) {
             if ($conversationListRequest->search) {
-                $query->where(function ($query) use ($conversationListRequest) {
-                    $query->where('first_name', 'like', '%' . $conversationListRequest->search . '%')
-                        ->orWhere('last_name', 'like', '%' . $conversationListRequest->search . '%');
-                });
+                $query->where(
+                    function ($query) use ($conversationListRequest) {
+                        $query->where('first_name', 'like', '%' . $conversationListRequest->search . '%')
+                            ->orWhere('last_name', 'like', '%' . $conversationListRequest->search . '%');
+                    }
+                );
             }
-        })->with('participants.user');
+        }
+        )->with('participants.user');
 
 
         $conversation = $conversation->orderBy('updated_at', 'desc');
 
-        $conversation = ConversationResources::collection($conversation->paginate($request->pagination ?? self::PER_PAGE))->resource;
+        $conversation = ConversationResources::collection(
+            $conversation->paginate($request->pagination ?? self::PER_PAGE)
+        )->resource;
 
         return response()->json(['success' => true, 'data' => $conversation]);
     }
@@ -323,14 +326,20 @@ class MessageController extends Controller
     public function messageList(MessageListRequest $messageListRequest, $id)
     {
 
-        $message = Message::whereHas('conversation', function ($query) use ($id) {
-            $query->whereHas('participants', function ($query) {
+        $message = Message::whereHas(
+            'conversation', function ($query) use ($id) {
+            $query->whereHas(
+                'participants', function ($query) {
                 $query->where('user_id', auth()->id());
-            })->where('id', $id);
-        });
+            }
+            )->where('id', $id);
+        }
+        );
+
+        MessageFacade::updateUserLastSeen($id, auth()->id());
 
         $latestMessage = $message->latest('id')->first();
-        if($latestMessage){
+        if ($latestMessage) {
             auth()->user()->participants()->where('conversation_id', $id)->update(['message_id' => $latestMessage->id]);
         }
 

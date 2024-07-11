@@ -56,7 +56,7 @@ class Message extends Model
     public function getLastSeenUsersAttribute()
     {
         $seenUsers = collect();
-        $participants = $this->conversation->participants->whereIn('message_id',$this->id);
+        $participants = $this->conversation->participants->whereIn('last_seen_message_id',$this->id);
         $participants->each(function ($participant) use ($seenUsers) {
             $seenUsers->push($participant->user);
         });
