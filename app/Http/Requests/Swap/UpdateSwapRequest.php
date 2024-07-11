@@ -24,8 +24,8 @@ class UpdateSwapRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'requested_user_id' => 'sometimes|required|integer|exists:users,id',
-            'exchanged_user_id' => 'sometimes|required|integer|exists:users,id',
+            'requested_user_id' => 'required|required|integer|exists:users,id',
+            'exchanged_user_id' => 'required|required|integer|exists:users,id',
 //            'status' => 'sometimes|required|string',
 
 //            'requested_wholesale_amount' => 'sometimes|required|integer',

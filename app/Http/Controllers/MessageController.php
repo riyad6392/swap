@@ -13,6 +13,8 @@ use App\Http\Resources\ConversationResources;
 use App\Http\Resources\MessageResource;
 use App\Models\Conversation;
 use App\Models\Message;
+use App\Models\Participant;
+use App\Models\User;
 use App\Services\SwapMessageService;
 use App\Services\SwapNotificationService;
 use Illuminate\Http\JsonResponse;
@@ -116,7 +118,6 @@ class MessageController extends Controller
             'You have a new swap request ' . $swap->uid,
             $swap
         )->messageGenerate()->withNotify();
-
 
         $conversation = SwapMessageService::createPrivateConversation(
             $conversationRequest->sender_id,
@@ -225,15 +226,12 @@ class MessageController extends Controller
                 ->doConversationBroadcast();
 
 
-            //            dd($response->conversation);
             $data = [
-                'messages' => $response->insert_message,
+                'messages'     => $response->insert_message,
                 'conversation' => $response->conversation,
             ];
 
-
             DB::commit();
-
             return response()->json(['success' => true, 'message' => 'Message sent successfully', 'data' => $data]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -291,25 +289,35 @@ class MessageController extends Controller
      * )
      */
 
+
+    // Deprecated method
     public function index(ConversationListRequest $conversationListRequest): \Illuminate\Http\JsonResponse
     {
         $conversation = Conversation::query();
 
-        $conversation = $conversation->whereHas('participants', function ($query) use ($conversationListRequest) {
+        $conversation = $conversation->whereHas(
+            'participants', function ($query) use ($conversationListRequest) {
             $query->where('user_id', auth()->id());
-        })->whereHas('participants.user', function ($query) use ($conversationListRequest) {
+        }
+        )->whereHas(
+            'participants.user', function ($query) use ($conversationListRequest) {
             if ($conversationListRequest->search) {
-                $query->where(function ($query) use ($conversationListRequest) {
-                    $query->where('first_name', 'like', '%' . $conversationListRequest->search . '%')
-                        ->orWhere('last_name', 'like', '%' . $conversationListRequest->search . '%');
-                });
+                $query->where(
+                    function ($query) use ($conversationListRequest) {
+                        $query->where('first_name', 'like', '%' . $conversationListRequest->search . '%')
+                            ->orWhere('last_name', 'like', '%' . $conversationListRequest->search . '%');
+                    }
+                );
             }
-        })->with('participants.user');
+        }
+        )->with('participants.user');
 
 
         $conversation = $conversation->orderBy('updated_at', 'desc');
 
-        $conversation = ConversationResources::collection($conversation->paginate($request->pagination ?? self::PER_PAGE))->resource;
+        $conversation = ConversationResources::collection(
+            $conversation->paginate($request->pagination ?? self::PER_PAGE)
+        )->resource;
 
         return response()->json(['success' => true, 'data' => $conversation]);
     }
@@ -317,12 +325,17 @@ class MessageController extends Controller
     public function messageList(MessageListRequest $messageListRequest, $id)
     {
 
-        $message = Message::whereHas('conversation', function ($query) use ($id) {
-            $query->whereHas('participants', function ($query) {
+        $message = Message::whereHas(
+            'conversation', function ($query) use ($id) {
+            $query->whereHas(
+                'participants', function ($query) {
                 $query->where('user_id', auth()->id());
-            })->where('id', $id);
-        });
+            }
+            )->where('id', $id);
+        }
+        );
 
+        MessageFacade::updateUserLastSeen($id, auth()->id());
 
         $operator = '<';
         $order = 'desc';
@@ -341,6 +354,18 @@ class MessageController extends Controller
         $message = $message->take(10)->get();
 
         $message = $message->load('sender.image');
+
+
+        // $participants = Participant::where('conversation_id', $id)->get();
+        // $participants->each(function ($participant) use($message) {
+        //     $message_ins = $message->where('id',$participant->message_id)->first();
+        //     if (!isset($message_ins->last_seen_users)) {
+        //         $message_ins->last_seen_users = collect(); // Initialize the array if it doesn't exist
+        //     }
+
+        //     // Check if $participant->user is not already in $message_ins->last_seen_users
+        //     $message_ins->last_seen_users->push($participant->user);  // Add $participant->user to the array
+        // });
 
         return response()->json(['success' => true, 'data' => MessageResource::collection($message)->resource]);
     }
@@ -495,5 +520,5 @@ class MessageController extends Controller
         }
 
     }
-
+    
 }

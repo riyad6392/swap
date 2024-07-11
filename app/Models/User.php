@@ -187,6 +187,11 @@ class User extends Authenticatable
         return $this->hasMany(Billing::class);
     }
 
+    public function participants()
+    {
+        return $this->hasMany(Participant::class);
+    }
+
 //     $role = Role::create(['name' => 'admin']);
 //     $permission = Permission::create(['name' => 'user.index']);
 //     $role->givePermissionTo($permission);

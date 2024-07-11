@@ -48,6 +48,11 @@ class UpdateSwapDetailsRequest extends FormRequest
                 'request_product.*.variation_quantity' => 'nullable|numeric',
                 'request_product.*.discount_end_date' => 'nullable|date',
             ];
+        }else{
+            return [
+                'define_type' => 'required|string|in:request_product,exchange_product',
+            ];
+
         }
     }
     public function messages(): array
