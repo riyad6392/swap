@@ -59,8 +59,8 @@ Route::post('forget-password', [ForgetPasswordController::class, 'forgetPassword
 Route::post('reset-password', [ForgetPasswordController::class, 'resetPassword']);
 Route::post('refresh-token', [LoginController::class, 'getRefreshToken']);
 
-Route::get('admin-approval/{id}', function () {
-    \App\Models\User::find(1)->update(['is_approved_by_admin' => 1]);
+Route::get('admin-approval/{id}', function ($id) {
+    \App\Models\User::find($id)->update(['is_approved_by_admin' => 1]);
 });
 
 
