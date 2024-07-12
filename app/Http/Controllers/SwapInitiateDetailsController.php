@@ -104,12 +104,12 @@ class SwapInitiateDetailsController extends Controller
         try {
             DB::beginTransaction();
             $swap = Swap::create([
-                'user_id'               => auth()->id(),
-                'exchanged_user_id'     => $swapInitiateRequest->exchanged_user_id,
-                'requested_user_id'     => auth()->id(),
-                'requested_user_status' => 'requested',
-                'exchanged_user_status' => 'pending',
-            ]
+                    'user_id'               => auth()->id(),
+                    'exchanged_user_id'     => $swapInitiateRequest->exchanged_user_id,
+                    'requested_user_id'     => auth()->id(),
+                    'requested_user_status' => 'requested',
+                    'exchanged_user_status' => 'pending',
+                ]
             );
 
             $insertData = [];
@@ -319,10 +319,11 @@ class SwapInitiateDetailsController extends Controller
 
         if ($swap->exchanged_user_status == 'pending') {
 
-            $swap->update([
-                'exchanged_user_status' => 'accepted',
-                'requested_user_status' => 'accepted',
-            ]
+            $swap->update(
+                [
+                    'exchanged_user_status' => 'accepted',
+                    'requested_user_status' => 'accepted',
+                ]
             );
 
             NotificationFacade::prepareData(
