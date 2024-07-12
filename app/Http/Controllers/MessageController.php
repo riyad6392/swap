@@ -6,7 +6,6 @@ use App\Events\MessageBroadcast;
 use App\Facades\MessageFacade;
 use App\Http\Requests\Conversation\StoreConversationRequest;
 use App\Http\Requests\Message\ConversationListRequest;
-use App\Http\Requests\Message\ConversationLitRequest;
 use App\Http\Requests\Message\MessageListRequest;
 use App\Http\Requests\Message\StoreMessageRequest;
 use App\Http\Resources\ConversationResources;
@@ -226,7 +225,6 @@ class MessageController extends Controller
                 ->doConversationBroadcast();
 
 
-//            dd($response->conversation);
             $data = [
                 'messages'     => $response->insert_message,
                 'conversation' => $response->conversation,
@@ -337,11 +335,6 @@ class MessageController extends Controller
         );
 
         MessageFacade::updateUserLastSeen($id, auth()->id());
-
-        $latestMessage = $message->latest('id')->first();
-        if ($latestMessage) {
-            auth()->user()->participants()->where('conversation_id', $id)->update(['message_id' => $latestMessage->id]);
-        }
 
         $operator = '<';
         $order = 'desc';

@@ -28,7 +28,7 @@ use Illuminate\Support\Facades\DB;
 
 class SwapController extends Controller
 {
-    const PER_PAGE = 10;
+    const PER_PAGE   = 10;
     const COMMISSION = 0.25;
 
     /**
@@ -87,7 +87,8 @@ class SwapController extends Controller
             $userId = auth()->id();
             $query->where('requested_user_id', $userId)
                 ->orWhere('exchanged_user_id', $userId);
-        });
+        }
+        );
 
         if ($request->has('search')) {
             $searchTerm = '%' . $request->search . '%';
@@ -95,26 +96,34 @@ class SwapController extends Controller
                 $query->whereHas('user', function ($query) use ($searchTerm) {
                     $query->where('first_name', 'like', $searchTerm)
                         ->orWhere('last_name', 'like', $searchTerm);
-                })
+                }
+                )
                     ->orWhereHas('exchangeDetails', function ($query) use ($searchTerm) {
                         $query->whereHas('product', function ($query) use ($searchTerm) {
                             $query->where('name', 'like', $searchTerm)
                                 ->orWhere('description', 'like', $searchTerm);
-                        });
-                    })
+                        }
+                        );
+                    }
+                    )
                     ->orWhereHas('requestDetail', function ($query) use ($searchTerm) {
                         $query->whereHas('product', function ($query) use ($searchTerm) {
                             $query->where('name', 'like', $searchTerm)
                                 ->orWhere('description', 'like', $searchTerm);
-                        });
-                    })
+                        }
+                        );
+                    }
+                    )
                     ->orWhereHas('initiateDetails', function ($query) use ($searchTerm) {
                         $query->whereHas('product', function ($query) use ($searchTerm) {
                             $query->where('name', 'like', $searchTerm)
                                 ->orWhere('description', 'like', $searchTerm);
-                        });
-                    });
-            });
+                        }
+                        );
+                    }
+                    );
+            }
+            );
         }
 
         if ($request->sort) {
@@ -243,10 +252,10 @@ class SwapController extends Controller
 
             $swap = Swap::create(
                 [
-                    'user_id' => auth()->id(),
+                    'user_id'           => auth()->id(),
                     'requested_user_id' => auth()->id(), // User who requested the swap
                     'exchanged_user_id' => $swapRequest->exchanged_user_id, // User who accepted the swap
-                    'status' => $swapRequest->status,
+                    'status'            => $swapRequest->status,
                 ]
             );
             dd("ok");
@@ -274,13 +283,14 @@ class SwapController extends Controller
             );
 
             $message = Message::create([
-                'message' => 'You have a new swap request ' . $swap->id,
-                'receiver_id' => $swapRequest->exchanged_user_id,
-                'swap_id' => $swap->id,
-                'sender_id' => auth()->id(),
-                'conversation_id' => $conversation->id,
-                'message_type' => 'notification',
-            ]);
+                    'message'         => 'You have a new swap request ' . $swap->id,
+                    'receiver_id'     => $swapRequest->exchanged_user_id,
+                    'swap_id'         => $swap->id,
+                    'sender_id'       => auth()->id(),
+                    'conversation_id' => $conversation->id,
+                    'message_type'    => 'notification',
+                ]
+            );
 
             $message = $message->load('sender', 'receiver', 'swap');
 
@@ -327,7 +337,7 @@ class SwapController extends Controller
      */
     public function show($id)
     {
-        $swap = Swap::with('exchangeDetails','requestDetail','initiateDetails')->where('uid', $id)
+        $swap = Swap::with('exchangeDetails', 'requestDetail', 'initiateDetails')->where('uid', $id)
             ->orWhere('id', $id)
             ->first();
 
@@ -603,7 +613,8 @@ class SwapController extends Controller
         $swap = Swap::where(function ($query) use ($uid) {
             $query->where('exchanged_user_id', auth()->id())
                 ->orWhere('requested_user_id', auth()->id());
-        })->where('uid', $uid)->first();
+        }
+        )->where('uid', $uid)->first();
 
         if (!$swap) {
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
@@ -617,9 +628,10 @@ class SwapController extends Controller
         if ($swap->exchanged_user_status == 'accepted') {
 
             $swap->update([
-                'exchanged_user_status' => 'approved',
-                'requested_user_status' => 'approved'
-            ]);
+                    'exchanged_user_status' => 'approved',
+                    'requested_user_status' => 'approved'
+                ]
+            );
 
             NotificationFacade::prepareData(
                 $swap,
@@ -669,7 +681,8 @@ class SwapController extends Controller
         $swap = Swap::where(function ($query) use ($uid) {
             $query->where('exchanged_user_id', auth()->id())
                 ->orWhere('requested_user_id', auth()->id());
-        })->where('uid', $uid)->first();
+        }
+        )->where('uid', $uid)->first();
 
         if (!$swap) {
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
@@ -682,9 +695,10 @@ class SwapController extends Controller
         if ($swap->exchanged_user_status == 'pending') {
 
             $swap->update([
-                'exchanged_user_status' => 'decline',
-                'requested_user_status' => 'rejected'
-            ]);
+                    'exchanged_user_status' => 'decline',
+                    'requested_user_status' => 'rejected'
+                ]
+            );
 
             NotificationFacade::prepareData(
                 $swap,
@@ -703,7 +717,8 @@ class SwapController extends Controller
         $swap = Swap::where(function ($query) use ($uid) {
             $query->where('exchanged_user_id', auth()->id())
                 ->orWhere('requested_user_id', auth()->id());
-        })->where('uid', $uid)->first();
+        }
+        )->where('uid', $uid)->first();
 
         if (!$swap) {
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
@@ -770,13 +785,14 @@ class SwapController extends Controller
         );
 
         Billing::create([
-            'user_id' => auth()->id(),
-            'swap_id' => $swap->id,
-            'payment_type' => 'one_time',
-            'payment_method_id' => $user->activePaymentMethod->stripe_payment_method_id,
-            'stripe_payment_intent_id' => $invoiceItem->payment_intent,
-            'amount' => $commission,
-        ]);
+                'user_id'                  => auth()->id(),
+                'swap_id'                  => $swap->id,
+                'payment_type'             => 'one_time',
+                'payment_method_id'        => $user->activePaymentMethod->stripe_payment_method_id,
+                'stripe_payment_intent_id' => $invoiceItem->payment_intent,
+                'amount'                   => $commission,
+            ]
+        );
     }
 
     protected function swapDetailsClassMapper($defineType)
