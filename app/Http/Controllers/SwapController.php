@@ -83,7 +83,7 @@ class SwapController extends Controller
     {
         $swaps = Swap:: query();
 
-        $swaps->where(function($query) {
+        $swaps->where(function ($query) {
             $userId = auth()->id();
             $query->where('requested_user_id', $userId)
                 ->orWhere('exchanged_user_id', $userId);
@@ -325,8 +325,12 @@ class SwapController extends Controller
      *     )
      * )
      */
-    public function show(Swap $swap)
+    public function show($id)
     {
+        $swap = Swap::with('exchangeDetails','requestDetail','initiateDetails')->where('uid', $id)
+            ->orWhere('id', $id)
+            ->first();
+
         if ($swap->requested_user_id == auth()->id() || $swap->exchanged_user_id == auth()->id()) {
 
             return response()->json(['success' => true, 'data' => $swap]);
@@ -456,7 +460,9 @@ class SwapController extends Controller
                                                     $id): \Illuminate\Http\JsonResponse
     {
 
-        $swap = Swap::find($id);
+        $swap = Swap::where('uid', $id)
+            ->orWhere('id', $id)
+            ->first();
 
         if (!$swap) {
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
@@ -730,7 +736,7 @@ class SwapController extends Controller
 
         $this->sendSwapNotification($swap);
 
-        if ($user->is_super_swaper == 0){
+        if ($user->is_super_swaper == 0) {
             $this->handlePayment($swap, $user);
         }
 
@@ -745,10 +751,10 @@ class SwapController extends Controller
                 [$swap->requested_user_id];
 
         NotificationFacade::prepareData(
-                $swap,
-                $notificationRecipients,
-                'Swap request has been completed'
-            )->sendNotification();
+            $swap,
+            $notificationRecipients,
+            'Swap request has been completed'
+        )->sendNotification();
     }
 
     protected function handlePayment($swap, $user)

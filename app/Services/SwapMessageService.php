@@ -13,17 +13,17 @@ use Illuminate\Support\Facades\DB;
 
 class SwapMessageService
 {
-    public $sender_id = null;
-    public $receiver_id = null;
+    public $sender_id         = null;
+    public $receiver_id       = null;
     public $conversation_type = null;
-    public $message_type = null;
-    public $message = null;
-    public $swap = null;
-    public $conversation = null;
-    public $message_files = '';
+    public $message_type      = null;
+    public $message           = null;
+    public $swap              = null;
+    public $conversation      = null;
+    public $message_files     = '';
 
     public $insert_message = [];
-    public $last_message = '';
+    public $last_message   = '';
 
     public function prepareData($sender_id, $receiver_id, $conversation_type, $message_type, $message, $message_files, $swap = null): static
     {
@@ -47,14 +47,16 @@ class SwapMessageService
         );
 
         if ($this->message) {
-            $this->last_message = Message::create([
-                'message' => $this->message,
-                'receiver_id' => $this->receiver_id,
-                'swap_id' => $this->swap->id ?? null,
-                'sender_id' => auth()->id(),
-                'conversation_id' => $this->conversation->id,
-                'message_type' => $this->message_type,
-            ]);
+            $this->last_message = Message::create(
+                [
+                    'message'         => $this->message,
+                    'receiver_id'     => $this->receiver_id,
+                    'swap_id'         => $this->swap->id ?? null,
+                    'sender_id'       => auth()->id(),
+                    'conversation_id' => $this->conversation->id,
+                    'message_type'    => $this->message_type,
+                ]
+            );
             $this->insert_message[] = $this->last_message;
         }
 
@@ -65,13 +67,19 @@ class SwapMessageService
                     $this->last_message = Message::create(
                         [
                             'conversation_id' => $this->conversation->id,
-                            'receiver_id' => $this->receiver_id,
-                            'sender_id' => $this->sender_id,
-                            'swap_id' => null,
-                            'message_type' => $this->matchExtension($singleFile->getClientOriginalExtension()),
-                            'message' => 'This is a file',
-                            'data' => null,
-                            'file_path' => FileUploadService::uploadFile($singleFile, new Message()),
+                            'receiver_id'     => $this->receiver_id,
+                            'sender_id'       => $this->sender_id,
+                            'swap_id'         => null,
+                            'message_type'    => $this->matchExtension(
+                                $singleFile->getClientOriginalExtension()
+                            ),
+                            'message'         => 'This is a file',
+                            'data'            => null,
+                            'file_path'       => FileUploadService::uploadFile
+                            (
+                                $singleFile,
+                                new Message()
+                            ),
                         ]
                     );
                     $this->insert_message[] = $this->last_message;
@@ -79,10 +87,16 @@ class SwapMessageService
             }
         }
 
-        $this->conversation->update([
-            'last_message_id' => $this->last_message->id,
-            'last_message' => $this->last_message->message,
-        ]);
+        $this->conversation->update(
+            [
+                'last_message_id' => $this->last_message->id,
+                'last_message'    => $this->last_message->message,
+            ]
+        );
+
+        if ($this->message_type != 'notification') {
+            $this->updateUserLastSeen($this->conversation->id, $this->sender_id);
+        }
 
         return $this;
     }
@@ -104,17 +118,20 @@ class SwapMessageService
                 ->orWhere('reverse_composite_id', $receiver_id . ':' . $sender_id)
                 ->first();
 
+//            dd($conversation);
             if (!$conversation) {
-                $conversation = Conversation::create([
-                    'name' => 'Private',
-                    'channel_name' => 'channel-' . rand(10000, 99999999) . '-' . time(),
-                    'user_id' => $sender_id,
-                    'conversation_type' => 'private',
-                    'composite_id' => $sender_id . ':' . $receiver_id,
-                    'reverse_composite_id' => $receiver_id . ':' . $sender_id,
-                    // 'last_message_id' => '',
-                    // 'last_message' => '',
-                ]);
+                $conversation = Conversation::create(
+                    [
+                        'name'                 => 'Private',
+                        'channel_name'         => 'channel-' . rand(10000, 99999999) . '-' . time(),
+                        'user_id'              => $sender_id,
+                        'conversation_type'    => 'private',
+                        'composite_id'         => $sender_id . ':' . $receiver_id,
+                        'reverse_composite_id' => $receiver_id . ':' . $sender_id,
+                        // 'last_message_id' => '',
+                        // 'last_message' => '',
+                    ]
+                );
 
                 $this->insertParticipant(
                     $conversation,
@@ -137,9 +154,9 @@ class SwapMessageService
         foreach ($participants as $participant) {
             $insertDataForParticipant[] = [
                 'conversation_id' => $messageRequest->id,
-                'user_id' => $participant,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'user_id'         => $participant,
+                'created_at'      => now(),
+                'updated_at'      => now(),
             ];
         }
 
@@ -153,10 +170,12 @@ class SwapMessageService
         info('message broadcast');
 
         foreach ($this->insert_message as $message) {
-            event(new MessageBroadcast(
-                $this->conversation,
-                $message
-            ));
+            event(
+                new MessageBroadcast(
+                    $this->conversation,
+                    $message
+                )
+            );
         }
         return $this;
     }
@@ -164,20 +183,40 @@ class SwapMessageService
     public function doConversationBroadcast()
     {
         info('conversation broadcast');
-        event(new ConversationBroadcast(
-            $this->conversation
-        ));
+        event(
+            new ConversationBroadcast(
+                $this->conversation
+            )
+        );
+        return $this;
+    }
+
+    public function updateUserLastSeen($conversation_id, $user_id)
+    {
+        $conversation = Conversation::find($conversation_id);
+        $conversation->participants()
+            ->where('user_id', $user_id)
+            ->update([
+                    'last_seen_message_id' => $conversation->last_message_id
+                ]
+            );
+
         return $this;
     }
 
     public function matchExtension($value)
     {
         return match ($value) {
-            'jpeg', 'jpg', 'webp', 'png', 'gif' => 'image',
+            'jpeg', 'jpg', 'webp', 'png', 'gif'                       => 'image',
             'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt' => 'file',
-            'zip', 'rar' => 'archive',
-            'mp4', 'mkv', 'avi', 'mov', '3gp', 'flv', 'wmv', 'webm' => 'video',
-            default => 'unknown'
+            'zip', 'rar'                                              => 'archive',
+            'mp4', 'mkv', 'avi', 'mov', '3gp', 'flv', 'wmv', 'webm'   => 'video',
+            default                                                   => 'unknown'
         };
+    }
+
+    public function get()
+    {
+        return $this;
     }
 }
