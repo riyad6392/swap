@@ -6,6 +6,7 @@ use App\Events\MessageBroadcast;
 use App\Facades\MessageFacade;
 use App\Http\Requests\Conversation\StoreConversationRequest;
 use App\Http\Requests\Message\ConversationListRequest;
+use App\Http\Requests\Message\ConversationLitRequest;
 use App\Http\Requests\Message\MessageListRequest;
 use App\Http\Requests\Message\StoreMessageRequest;
 use App\Http\Resources\ConversationResources;
@@ -106,6 +107,7 @@ class MessageController extends Controller
      *      )
      * )
      */
+    /*Deprecated
     public function prepareConversation(StoreConversationRequest $conversationRequest): JsonResponse
     {
 
@@ -124,7 +126,7 @@ class MessageController extends Controller
             $conversationRequest->conversation_type
         );
         return response()->json(['success' => true, 'data' => $conversation, 'message' => 'Conversation started successfully']);
-    }
+    }*/
 
     /**
      * Send Message.
@@ -224,17 +226,17 @@ class MessageController extends Controller
                 ->doMessageBroadcast()
                 ->doConversationBroadcast();
 
-
+            $response->jubayer;
             $data = [
                 'messages'     => $response->insert_message,
                 'conversation' => $response->conversation,
             ];
 
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Message sent successfully', 'data' => $data]);
+            return response()->json(['success' => true, 'message' => str_replace(':model', 'Message', config('constants.data_send')), 'data' => $data]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            return response()->json(['success' => false, 'message' => config('constants.exception_occured'), 'errors'=>$e->getMessage()], 500);
         }
 
     }
@@ -289,7 +291,7 @@ class MessageController extends Controller
      */
 
 
-    // Deprecated method
+    /*Deprecated method
     public function index(ConversationListRequest $conversationListRequest): \Illuminate\Http\JsonResponse
     {
         $conversation = Conversation::query();
@@ -319,7 +321,7 @@ class MessageController extends Controller
         )->resource;
 
         return response()->json(['success' => true, 'data' => $conversation]);
-    }
+    }*/
 
     public function messageList(MessageListRequest $messageListRequest, $id)
     {
@@ -366,7 +368,7 @@ class MessageController extends Controller
         //     $message_ins->last_seen_users->push($participant->user);  // Add $participant->user to the array
         // });
 
-        return response()->json(['success' => true, 'data' => MessageResource::collection($message)->resource]);
+        return response()->json(['success' => true, 'message' => str_replace(':model', 'Messages', config('constants.data_retrieve')), 'data' => MessageResource::collection($message)->resource]);
     }
 
     /**
@@ -429,12 +431,12 @@ class MessageController extends Controller
     {
         $message = Message::where('sender_id', auth()->id())->where('id', $request->id)->first();
         if (!$message) {
-            return response()->json(['success' => false, 'message' => 'Message not found'], 404);
+            return response()->json(['success' => false, 'message' => str_replace(':model', 'Message', config('constants.not_found'))], 404);
         }
 
         $message->update($request->only('message'));
 
-        return response()->json(['success' => true, 'message' => 'Message updated successfully', 'data' => $message]);
+        return response()->json(['success' => true, 'message' => str_replace(':model', 'Message', config('constants.data_update')), 'data' => $message]);
     }
 
     /**
@@ -509,13 +511,13 @@ class MessageController extends Controller
 
             $message->delete();
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Message deleted successfully'], 200);
+            return response()->json(['success' => true, 'message' => str_replace(':model', 'Message', config('constants.data_delete'))], 200);
         } catch (\Error $th) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $th]);
+            return response()->json(['success' => false, 'message' => config('constants.throwable error')]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e]);
+            return response()->json(['success' => false, 'message' => config('constants.exception_occured')]);
         }
 
     }
