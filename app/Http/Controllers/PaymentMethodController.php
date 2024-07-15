@@ -21,7 +21,7 @@ class PaymentMethodController extends Controller
     public function index()
     {
         $paymentMethods = PaymentMethods::where('user_id', auth()->id())->get();
-        return response()->json(['success' => true, 'message' => $paymentMethods], 200);
+        return response()->json(['success' => true, 'message' => str_replace(':model', 'Payment Methods', config('constants.data_retrieve')), 'data' => $paymentMethods], 200);
     }
 
     /**
@@ -149,10 +149,10 @@ class PaymentMethodController extends Controller
 
             DB::commit();
 
-            return response()->json(['success' => true, 'message' => $paymentMethod], 201);
+            return response()->json(['success' => true, 'message' => str_replace(':model', 'Payment Method', config('constants.data_retrieve')), 'data' => $paymentMethod], 201);
         } catch (\Exception $exception) {
             DB::rollBack();
-            return response()->json(['success' => false, 'errors' => ['message' => [$exception->getMessage()]]], 500);
+            return response()->json(['success' => false, 'errors' => ['message' => config('constants.exception_occured')]], 500);
         }
 
     }
@@ -238,10 +238,10 @@ class PaymentMethodController extends Controller
                         "' ELSE '" .
                         self::STATUS_INACTIVE . "' END")]);
 
-            return response()->json(['success' => true, 'message' => $paymentMethod], 201);
+            return response()->json(['success' => true, 'message' => str_replace(':model', 'Payment Method', config('constants.data_update')), 'data' => $paymentMethod], 201);
         } catch (\Exception $exception) {
             DB::rollBack();
-            return response()->json(['success' => false, 'errors' => ['message' => [$exception->getMessage()]]], 500);
+            return response()->json(['success' => false, 'message' => config('constants.exception_occured')], 500);
         }
     }
 
@@ -291,7 +291,7 @@ class PaymentMethodController extends Controller
         $payment_method = PaymentMethods::where('id', $id)->where('user_id', auth()->id())->first();
 
         if (!$payment_method) {
-            return response()->json(['success' => false, 'errors' => ['message' => ['Payment method not found']]], 404);
+            return response()->json(['success' => false, 'message' => str_replace(':model', 'Payment Method', config('constants.not_found'))], 404);
         }
 
         try {
@@ -299,10 +299,10 @@ class PaymentMethodController extends Controller
                 $payment_method->stripe_payment_method_id,
             );
             $payment_method->delete();
-            return response()->json(['success' => true, 'message' => $paymentMethod], 201);
+            return response()->json(['success' => true, 'message' => str_replace(':model', 'Payment Method', config('constants.data_delete')), 'data' => $paymentMethod], 201);
         } catch (\Exception $exception) {
             DB::rollBack();
-            return response()->json(['success' => false, 'errors' => ['message' => [$exception->getMessage()]]], 500);
+            return response()->json(['success' => false, 'message' => config('constants.exception_occured')], 500);
         }
     }
 
@@ -351,7 +351,7 @@ class PaymentMethodController extends Controller
         $payment_method = PaymentMethods::where('id', $id)->where('user_id', auth()->id())->first();
 
         if (!$payment_method) {
-            return response()->json(['success' => false, 'errors' => ['message' => ['Payment method not found']]], 404);
+            return response()->json(['success' => false, 'message' => str_replace(':model', 'Payment Method', config('constants.not_found'))], 404);
         }
 
         try {
@@ -371,10 +371,10 @@ class PaymentMethodController extends Controller
 
             $payment_method->update(['is_active' => self::STATUS_ACTIVE]);
 
-            return response()->json(['success' => true, 'message' => 'Payment method update successfully'], 200);
+            return response()->json(['success' => true, 'message' => str_replace(':model', 'Payment Method', config('constants.data_update'))], 200);
         }catch (\Exception $exception) {
             DB::rollBack();
-            return response()->json(['success' => false, 'errors' => ['message' => [$exception->getMessage()]]], 500);
+            return response()->json(['success' => false, 'message' => config('constants.exception_occured')], 500);
         }
 
     }

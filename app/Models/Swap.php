@@ -57,6 +57,12 @@ class Swap extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function exchanged_user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'exchanged_user_id');
+    }
+
     protected static function boot(): void
     {
         parent::boot();

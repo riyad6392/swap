@@ -188,7 +188,7 @@ class SwapInitiateDetailsController extends Controller
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
         }
 
-        $swap = $swap->load('user', 'initiateDetails.product.image', 'requestDetail.product.image', 'exchangeDetails.product.image');
+        $swap = $swap->load('user', 'exchanged_user', 'initiateDetails.product.image', 'requestDetail.product.image', 'exchangeDetails.product.image');
 
         return response()->json(['success' => true, 'data' => $swap], 200);
     }
