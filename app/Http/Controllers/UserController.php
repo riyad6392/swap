@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Facades\StripePaymentFacade;
 use App\Http\Requests\User\ListUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
@@ -33,7 +34,8 @@ class UserController extends Controller
 //    }
 
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->middleware('permission:user.index,user.create,user.edit,user.delete', ['only' => ['index']]);
         $this->middleware('permission:user.create', ['only' => ['store']]);
         $this->middleware('permission:user.edit', ['only' => ['update']]);
@@ -42,6 +44,7 @@ class UserController extends Controller
     }
 
     const PER_PAGE = 10;
+
     /**
      * User List.
      *
@@ -123,7 +126,7 @@ class UserController extends Controller
         if ($listUserRequest->has('search')) {
 
             $users->where('first_name', 'like', '%' . request('search') . '%')
-                ->orWhere('last_name', 'like', '%' . request('search') . '%');
+                  ->orWhere('last_name', 'like', '%' . request('search') . '%');
         }
 
         if ($listUserRequest->has('sort')) {
@@ -216,14 +219,15 @@ class UserController extends Controller
         $admin_id = auth()->user()->id;
 
         $user = User::create([
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'email' => $request->email,
-            'password' => bcrypt('password'),
-            'is_approved_by_admin' => $request->is_approved_by_admin ?? false,
-            'phone' => $request->phone,
-            'approved_by' => $admin_id,
-        ]);
+                'first_name'           => $request->first_name,
+                'last_name'            => $request->last_name,
+                'email'                => $request->email,
+                'password'             => bcrypt('password'),
+                'is_approved_by_admin' => $request->is_approved_by_admin ?? false,
+                'phone'                => $request->phone,
+                'approved_by'          => $admin_id,
+            ]
+        );
 
         return response()->json(['success' => true, 'user' => $user], 201);
 
@@ -262,26 +266,25 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         $user->update([
-            'first_name' => $request->first_name ?? $user->first_name,
-            'last_name' => $request->last_name ?? $user->last_name,
-            'email' => $request->email ?? $user->email,
-            'password' => bcrypt('password'),
-            'is_approved_by_admin' => $request->is_approved_by_admin ?? $user->is_approved_by_admin,
-            'phone' => $request->phone ?? $user->phone,
+                'first_name'           => $request->first_name ?? $user->first_name,
+                'last_name'            => $request->last_name ?? $user->last_name,
+                'email'                => $request->email ?? $user->email,
+                'password'             => bcrypt('password'),
+                'is_approved_by_admin' => $request->is_approved_by_admin ?? $user->is_approved_by_admin,
+                'phone'                => $request->phone ?? $user->phone,
 
-        ]);
+            ]
+        );
 
         $data = [
-            'email' => $user->email,
+            'email'      => $user->email,
             'first_name' => $user->first_name,
-            'last_name' => $user->last_name,
+            'last_name'  => $user->last_name,
         ];
 
-        if($request->is_approved_by_admin==true)
-        {
+        if ($request->is_approved_by_admin == true) {
             Mail::to($data['email'])->send((new UserApprovel($data))->afterCommit());
         }
-
 
 
         return response()->json(['success' => true, 'message' => 'User updated successfully']);
@@ -402,18 +405,15 @@ class UserController extends Controller
         $users = User::query()->with('image')->withCount('receivedRatings');
 
         if ($listUserRequest->has('search')) {
-
             $users->where('first_name', 'like', '%' . request('search') . '%')
-                ->orWhere('last_name', 'like', '%' . request('search') . '%');
+                  ->orWhere('last_name', 'like', '%' . request('search') . '%');
         }
 
         if ($listUserRequest->has('sort')) {
-
             $users->orderBy('created_at', $listUserRequest->sort);
         }
 
         if ($listUserRequest->get('get_all')) {
-
             return response()->json(['success' => true, 'data' => $users->get()]);
         }
 
@@ -518,22 +518,24 @@ class UserController extends Controller
         if ($listUserRequest->get('get_all')) {
 
             return response()->json(['success' => true,
-                'data' => [
-                    'user' => $user,
-                    'inventory' => ProductResource::collection($inventory->get())->resource
+                                     'data'    => [
+                                         'user'      => $user,
+                                         'inventory' => ProductResource::collection($inventory->get())->resource
+                                     ]
                 ]
-            ]);
+            );
         }
 
         $inventory = $inventory->paginate($listUserRequest->pagination ?? self::PER_PAGE);
 
         return response()->json([
-            'success' => true,
-            'data' => [
-                'user' => $user,
-                'inventory' => ProductResource::collection($inventory)->resource
+                'success' => true,
+                'data'    => [
+                    'user'      => $user,
+                    'inventory' => ProductResource::collection($inventory)->resource
+                ]
             ]
-        ]);
+        );
     }
 
     /**
@@ -611,17 +613,18 @@ class UserController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'User not found'
-            ], 404);
+            ], 404
+            );
         }
 
         $inventory = $user->store()
-            ->with(
-                'image',
-                'category',
-                'brand',
-                'productVariations.size',
-                'productVariations.color'
-            );
+                          ->with(
+                              'image',
+                              'category',
+                              'brand',
+                              'productVariations.size',
+                              'productVariations.color'
+                          );
 
         if ($request->search) {
             $inventory->where('name', 'like', '%' . $request->search . '%');
@@ -636,22 +639,24 @@ class UserController extends Controller
 
         if ($request->get('get_all')) {
             return response()->json([
-                'success' => true,
-                'data' => [
-                    'user' => $user,
-                    'store' => ProductResource::collection($user->store()->get())->resource]
-            ]);
+                    'success' => true,
+                    'data'    => [
+                        'user'  => $user,
+                        'store' => ProductResource::collection($user->store()->get())->resource]
+                ]
+            );
         }
 
         $inventory = $inventory->paginate($request->pagination ?? self::PER_PAGE);
 
         return response()->json([
-            'success' => true,
-            'data' => [
-                'user' => $user,
-                'store' => ProductResource::collection($inventory)->resource
+                'success' => true,
+                'data'    => [
+                    'user'  => $user,
+                    'store' => ProductResource::collection($inventory)->resource
+                ]
             ]
-        ]);
+        );
     }
 
     /**
@@ -870,17 +875,18 @@ class UserController extends Controller
             }
 
             $user->update([
-                'first_name' => $userRequest->first_name,
-                'last_name' => $userRequest->last_name,
-                'phone' => $userRequest->phone,
-                'business_name' => $userRequest->business_name,
-                'business_address' => $userRequest->business_address,
-                'resale_license' => $resaleLicense,
-                'photo_of_id' => $photoOfId,
-                'online_store_url' => $userRequest->online_store_url,
-                'ein' => $userRequest->ein,
-                'about_me' => $userRequest->about_me,
-            ]);
+                    'first_name'       => $userRequest->first_name,
+                    'last_name'        => $userRequest->last_name,
+                    'phone'            => $userRequest->phone,
+                    'business_name'    => $userRequest->business_name,
+                    'business_address' => $userRequest->business_address,
+                    'resale_license'   => $resaleLicense ?? $user->resale_license,
+                    'photo_of_id'      => $photoOfId ?? $user->photo_of_id,
+                    'online_store_url' => $userRequest->online_store_url,
+                    'ein'              => $userRequest->ein,
+                    'about_me'         => $userRequest->about_me,
+                ]
+            );
 
             $user = $user->load('image');
 
@@ -891,7 +897,6 @@ class UserController extends Controller
             return response()->json(['success' => false, 'message' => $exception->getMessage()], 500);
         }
     }
-
 
 
     /**
@@ -934,7 +939,6 @@ class UserController extends Controller
         }
         return response()->json(['success' => false, 'message' => 'User not found'], 404);
     }
-
 
 
     /**
@@ -981,25 +985,26 @@ class UserController extends Controller
             $conversation_list = Conversation::where('user_id', $user->id)->get();
 
             return response()->json([
-                'success' => true,
-                'message' => 'User data retrieved successfully',
-                'data' => [
-                    'user' => $user,
-                    'swap_count' => $swap_count,
-                    'product_count' => $product_count,
-                    'swap_exchange_amount' => $swap_exchange_amount,
-                    'swap_exchange_details' => $swapExchangeDetails,
-                    'conversation_list' => $conversation_list
+                    'success' => true,
+                    'message' => 'User data retrieved successfully',
+                    'data'    => [
+                        'user'                  => $user,
+                        'swap_count'            => $swap_count,
+                        'product_count'         => $product_count,
+                        'swap_exchange_amount'  => $swap_exchange_amount,
+                        'swap_exchange_details' => $swapExchangeDetails,
+                        'conversation_list'     => $conversation_list
+                    ]
                 ]
-            ]);
+            );
         }
 
         return response()->json([
-            'success' => false,
-            'message' => 'User not found'
-        ]);
+                'success' => false,
+                'message' => 'User not found'
+            ]
+        );
     }
-
 
 
 }

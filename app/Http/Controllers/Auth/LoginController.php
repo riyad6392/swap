@@ -124,7 +124,7 @@ class LoginController extends Controller
 
 
         if ($validateData->fails()) {
-            return response()->json(['success' => false, 'message' => 'Validation errors', 'errors' => $validateData->errors()], 422);
+            return response()->json(['success' => false, 'message' => config('constants.validation_error'), 'errors' => $validateData->errors()], 422);
         }
 
 
@@ -143,7 +143,7 @@ class LoginController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'User successfully login!',
+                'message' => config('constants.login_success'),
                 'user' => new UserResource($user),
                 'token' => $token,
             ], 200);
