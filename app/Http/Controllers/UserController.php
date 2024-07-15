@@ -27,13 +27,6 @@ use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
-
-//    public function __construct()
-//    {
-//        $this->middleware(['auth:sanctum', 'permission:admin'])->only(['index', 'store', 'show', 'update', 'destroy']);
-//    }
-
-
     public function __construct()
     {
         $this->middleware('permission:user.index,user.create,user.edit,user.delete', ['only' => ['index']]);
@@ -262,7 +255,6 @@ class UserController extends Controller
      */
     public function update(UpdateUserForAdminRequest $request, string $id): JsonResponse
     {
-
         $user = User::findOrFail($id);
 
         $user->update([
@@ -286,9 +278,7 @@ class UserController extends Controller
             Mail::to($data['email'])->send((new UserApprovel($data))->afterCommit());
         }
 
-
         return response()->json(['success' => true, 'message' => 'User updated successfully']);
-
 
     }
 
@@ -858,7 +848,6 @@ class UserController extends Controller
                 FileUploadService::uploadImage($userRequest->image, $user, 'image');
             }
 
-
             if ($userRequest->has('resale_license')) {
                 if ($user->resale_license && Storage::fileExists($user->resale_license)) Storage::delete($user->resale_license);
                 $resaleLicense = FileUploadService::uploadFile(
@@ -867,7 +856,6 @@ class UserController extends Controller
                     'resale_license'
                 );
             }
-
 
             if ($userRequest->has('photo_of_id')) {
                 if ($user->photo_of_id) Storage::delete($user->photo_of_id);
