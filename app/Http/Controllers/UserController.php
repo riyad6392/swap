@@ -865,6 +865,7 @@ class UserController extends Controller
             $user->update([
                     'first_name'       => $userRequest->first_name,
                     'last_name'        => $userRequest->last_name,
+                    'email'            => $userRequest->email,
                     'phone'            => $userRequest->phone,
                     'business_name'    => $userRequest->business_name,
                     'business_address' => $userRequest->business_address,
@@ -877,6 +878,8 @@ class UserController extends Controller
             );
 
             $user = $user->load('image');
+
+            StripePaymentFacade::updateCustomer($user);
 
             DB::commit();
             return response()->json(['success' => true, 'data' => $user]);
