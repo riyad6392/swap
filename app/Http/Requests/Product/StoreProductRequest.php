@@ -32,7 +32,7 @@ class StoreProductRequest extends FormRequest
             'category_id' => 'required|exists:categories,id',
             'brand_id'=>'required|exists:brands,id',
 //            'product_image' => 'required',
-            'is_publish' => 'required|boolean',
+//            'is_publish' => 'required|boolean',
         ];
     }
 
