@@ -13,7 +13,7 @@ return [
     'not_found' => ':model Not Found',
     'data_send' => ':model Sent Successfully',
     'data_retrieve' => ':model Retrieved Successfully',
-    'data_updatee' => ':model Updated Successfully',
+    'data_update' => ':model Updated Successfully',
     'data_delete' => ':model Deleted Successfully',
     'unauthorize' => 'Unauthorized to modify this :model',
 
