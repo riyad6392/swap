@@ -27,6 +27,7 @@ class UpdateUserRequest extends FormRequest
             'first_name' => 'required|string',
             'last_name' => 'required|string',
             'phone' => 'required|string',
+            'email' => 'required|email',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:5000',
             'resale_license' => 'nullable|file|mimes:pdf|max:5000',
             'photo_of_id' => 'nullable|file|mimes:jpeg,png,jpg|max:5000',

@@ -22,6 +22,16 @@ class StripePaymentService
         ]);
     }
 
+    public function updateCustomer($data): \Stripe\Customer
+    {
+        return $this->stripe->customers->update(
+            $data['stripe_customer_id'],
+            ['name' => $data['name'],
+             "email" => "myemail@mydomain11111.com",
+            ]
+        );
+    }
+
     public function getCustomer($limit = 3): \Stripe\Collection
     {
         return $this->stripe->customers->all(['limit' => $limit]);
