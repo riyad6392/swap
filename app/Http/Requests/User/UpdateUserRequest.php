@@ -4,6 +4,7 @@ namespace App\Http\Requests\User;
 
 use App\Traits\ValidationErrorMessageTrait;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateUserRequest extends FormRequest
 {
@@ -23,6 +24,7 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules(): array
     {
+//        $this->dd($this->user);
         return [
             'first_name' => 'required|string',
             'last_name' => 'required|string',

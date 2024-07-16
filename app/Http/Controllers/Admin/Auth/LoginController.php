@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Support\Auth\Facade\PassportService;
+use App\Traits\TokenTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -12,6 +13,7 @@ use Laravel\Passport\Client as OClient;
 
 class LoginController extends Controller
 {
+    use TokenTrait;
     public int $expiresInDays = 7;
 
     /**
@@ -92,7 +94,7 @@ class LoginController extends Controller
 
             $user = auth()->guard('admin')->user();
             config(['auth.guards.api.provider' => 'admin']);
-            $token = $this->getTokenAndRefreshToken($request->email, $request->password, 'admin');
+            $token = $this->getTokenAndRefreshToken($request->email, $request->password, 'admin', 'admins');
 
             if (!$token) {
                 return response()->json(['success' => false, 'errors' => ['message' => 'Authentication failed']], 422);
@@ -106,30 +108,6 @@ class LoginController extends Controller
             ], 200);
         }
         return response()->json(['success' => false, 'errors' => ['message' => 'Authentication failed']], 422);
-
-    }
-
-    public function getTokenAndRefreshToken($email, $password, $scope)
-    {
-        $oClient = OClient::where('password_client', 1)->where('provider', 'admins')->first();
-
-        if (!$oClient) {
-            return false;
-        }
-
-        $response = request()->create('/oauth/token', 'post', [
-            'grant_type' => 'password',
-            'client_id' => $oClient->id,
-            'client_secret' => $oClient->secret,
-            'response_type' => 'token',
-            'username' => $email,
-            'password' => $password,
-            'scope' => $scope,
-        ]);
-
-        $result = app()->handle($response);
-
-        return json_decode((string)$result->getContent(), true);
 
     }
 

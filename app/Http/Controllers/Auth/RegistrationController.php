@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Mail\RegistrationSuccess;
 use App\Models\User;
+use App\Traits\TokenTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -15,6 +16,7 @@ use Laravel\Passport\Client as OClient;
 
 class RegistrationController extends Controller
 {
+    use TokenTrait;
     /**
      * Register a new User.
      *
@@ -110,7 +112,7 @@ class RegistrationController extends Controller
 
                 if (auth()->attempt($request->only('email', 'password'), $request->remember)) {
                     $user = auth()->user();
-                    $token = $this->getTokenAndRefreshToken($request->email, $request->password, 'user');
+                    $token = $this->getTokenAndRefreshToken($request->email, $request->password, 'user', 'users');
 
                     if (!$token) {
                         return response()->json(['success' => false, 'message' => 'Invalid token.'], 422);
@@ -127,40 +129,11 @@ class RegistrationController extends Controller
                         'user' => new UserResource($user),
                         'token' => $token,
                     ], 200);
-
                 }
-
             } catch (\Exception $e) {
                 DB::rollBack();
                 return response()->json(['success' => false, 'message' => 'Something went wrong', 'errors' => $e->getMessage()], 500);
             }
-
-
         }
-    }
-
-    public function getTokenAndRefreshToken($email, $password, $scope = 'user')
-    {
-        $oClient = OClient::where('password_client', 1)->where('provider', 'users')->first();
-
-        if (!$oClient) {
-            return false;
-        }
-
-        $response = request()->create('/oauth/token', 'post', [
-            'grant_type' => 'password',
-            'client_id' => $oClient->id,
-            'client_secret' => $oClient->secret,
-            'response_type' => 'token',
-            'username' => $email,
-            'password' => $password,
-            'scope' => $scope,
-        ]);
-
-        $result = app()->handle($response);
-
-        return json_decode((string)$result->getContent(), true);
-
-
     }
 }
