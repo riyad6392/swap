@@ -27,13 +27,6 @@ use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
-
-//    public function __construct()
-//    {
-//        $this->middleware(['auth:sanctum', 'permission:admin'])->only(['index', 'store', 'show', 'update', 'destroy']);
-//    }
-
-
     public function __construct()
     {
         $this->middleware('permission:user.index,user.create,user.edit,user.delete', ['only' => ['index']]);
@@ -262,7 +255,6 @@ class UserController extends Controller
      */
     public function update(UpdateUserForAdminRequest $request, string $id): JsonResponse
     {
-
         $user = User::findOrFail($id);
 
         $user->update([
@@ -286,9 +278,7 @@ class UserController extends Controller
             Mail::to($data['email'])->send((new UserApprovel($data))->afterCommit());
         }
 
-
         return response()->json(['success' => true, 'message' => 'User updated successfully']);
-
 
     }
 
@@ -858,7 +848,6 @@ class UserController extends Controller
                 FileUploadService::uploadImage($userRequest->image, $user, 'image');
             }
 
-
             if ($userRequest->has('resale_license')) {
                 if ($user->resale_license && Storage::fileExists($user->resale_license)) Storage::delete($user->resale_license);
                 $resaleLicense = FileUploadService::uploadFile(
@@ -868,7 +857,6 @@ class UserController extends Controller
                 );
             }
 
-
             if ($userRequest->has('photo_of_id')) {
                 if ($user->photo_of_id) Storage::delete($user->photo_of_id);
                 $photoOfId = FileUploadService::uploadFile($userRequest->photo_of_id, $user, 'photo_of_id');
@@ -877,11 +865,12 @@ class UserController extends Controller
             $user->update([
                     'first_name'       => $userRequest->first_name,
                     'last_name'        => $userRequest->last_name,
+                    'email'            => $userRequest->email,
                     'phone'            => $userRequest->phone,
                     'business_name'    => $userRequest->business_name,
                     'business_address' => $userRequest->business_address,
-                    'resale_license'   => $resaleLicense,
-                    'photo_of_id'      => $photoOfId,
+                    'resale_license'   => $resaleLicense ?? $user->resale_license,
+                    'photo_of_id'      => $photoOfId ?? $user->photo_of_id,
                     'online_store_url' => $userRequest->online_store_url,
                     'ein'              => $userRequest->ein,
                     'about_me'         => $userRequest->about_me,
@@ -889,6 +878,8 @@ class UserController extends Controller
             );
 
             $user = $user->load('image');
+
+            StripePaymentFacade::updateCustomer($user);
 
             DB::commit();
             return response()->json(['success' => true, 'data' => $user]);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Traits\TokenTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\Http;
 
 class LoginController extends Controller
 {
+    use TokenTrait;
     public int $expiresInDays = 7;
 
     /**
@@ -130,7 +132,7 @@ class LoginController extends Controller
 
         if (auth()->attempt($request->only('email', 'password'), $request->remember)) {
             $user = auth()->user();
-            $token = $this->getTokenAndRefreshToken($request->email, $request->password, 'user');
+            $token = $this->getTokenAndRefreshToken($request->email, $request->password, 'user', 'users');
 
             if (!$token) {
                 return response()->json(['success' => false, 'message' => 'Invalid token.'], 422);
@@ -150,31 +152,6 @@ class LoginController extends Controller
 
         }
         return response()->json(['success' => false, 'message' => 'Authentication failed'], 422);
-    }
-
-    public function getTokenAndRefreshToken($email, $password, $scope = 'user')
-    {
-        $oClient = OClient::where('password_client', 1)->where('provider', 'users')->first();
-
-        if (!$oClient) {
-            return false;
-        }
-
-        $response = request()->create('/oauth/token', 'post', [
-            'grant_type' => 'password',
-            'client_id' => $oClient->id,
-            'client_secret' => $oClient->secret,
-            'response_type' => 'token',
-            'username' => $email,
-            'password' => $password,
-            'scope' => $scope,
-        ]);
-
-        $result = app()->handle($response);
-
-        return json_decode((string)$result->getContent(), true);
-
-
     }
 
     /**

@@ -331,7 +331,7 @@ class ProductController extends Controller
                 'user_id',
                 'description',
                 'brand_id',
-                'is_publish'
+//                'is_publish'
             ]));
 
             if ($productRequest->has('product_image')) {
@@ -576,7 +576,6 @@ class ProductController extends Controller
 
     public function update(UpdateProductRequest $updateProductRequest, UpdateProductVariationRequest $updateProductVariationRequest, $id): \Illuminate\Http\JsonResponse
     {
-        dd($updateProductVariationRequest->all());
         $product = Product::find($id);
 
         if (!$product) {
@@ -592,7 +591,7 @@ class ProductController extends Controller
                 // 'user_id' => $updateProductRequest->user_id,
                 'description' => $updateProductRequest->description,
                 'brand_id' => $updateProductRequest->brand_id,
-                'is_publish' => $updateProductRequest->is_publish
+//                'is_publish' => $updateProductRequest->is_publish
             ]);
 
             if ($updateProductRequest->has('deleted_product_image_ids')) {

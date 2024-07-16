@@ -222,7 +222,7 @@ class MessageController extends Controller
             ];
 
             DB::commit();
-            return apiResponseWithSuccess(sentMessage('Messages'), $data);
+            return apiResponseWithSuccess(config('constants.message_sent'), $data);
         } catch (\Throwable $th) {
             DB::rollBack();
             throw $th;
@@ -345,7 +345,7 @@ class MessageController extends Controller
 
         $message = $message->load('sender.image');
 
-        return apiResponseWithSuccess(retrieveMessage('Messages') , MessageResource::collection($message)->resource);
+        return apiResponseWithSuccess(config('constants.message_retrieve'), MessageResource::collection($message)->resource);
     }
 
     /**
@@ -413,7 +413,7 @@ class MessageController extends Controller
 
         $message->update($request->only('message'));
 
-        return response()->json(['success' => true, 'message' => str_replace(':model', 'Message', config('constants.data_update')), 'data' => $message]);
+        return apiResponseWithSuccess(config('constants.message_update'), $message);
     }
 
     /**
@@ -488,7 +488,7 @@ class MessageController extends Controller
 
             $message->delete();
             DB::commit();
-            return response()->json(['success' => true, 'message' => str_replace(':model', 'Message', config('constants.data_delete'))], 200);
+            return apiResponseWithSuccess(config('constants.message_delete'));
         } catch (\Error $th) {
             DB::rollBack();
             throw $th;
