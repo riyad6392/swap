@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Facades\MessageFacade;
+use App\Http\Requests\Message\ConversationListRequest;
 use App\Http\Requests\Message\MessageListRequest;
 use App\Http\Requests\Message\StoreMessageRequest;
+use App\Http\Resources\ConversationResources;
 use App\Http\Resources\MessageResource;
+use App\Models\Conversation;
 use App\Models\Message;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -280,7 +283,7 @@ class MessageController extends Controller
      */
 
 
-    /*Deprecated method
+
     public function index(ConversationListRequest $conversationListRequest): \Illuminate\Http\JsonResponse
     {
         $conversation = Conversation::query();
@@ -306,11 +309,11 @@ class MessageController extends Controller
         $conversation = $conversation->orderBy('updated_at', 'desc');
 
         $conversation = ConversationResources::collection(
-            $conversation->paginate($request->pagination ?? self::PER_PAGE)
+            $conversation->paginate($conversationListRequest->pagination ?? self::PER_PAGE)
         )->resource;
 
         return response()->json(['success' => true, 'data' => $conversation]);
-    }*/
+    }
 
     public function messageList(MessageListRequest $messageListRequest, $id)
     {
