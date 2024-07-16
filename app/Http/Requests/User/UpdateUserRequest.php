@@ -4,6 +4,7 @@ namespace App\Http\Requests\User;
 
 use App\Traits\ValidationErrorMessageTrait;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateUserRequest extends FormRequest
 {
@@ -23,11 +24,12 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules(): array
     {
+//        $this->dd($this->user);
         return [
             'first_name' => 'required|string',
             'last_name' => 'required|string',
             'phone' => 'required|string',
-            'email' => 'required|email|unique:users,email,' . $this->id,
+            'email' => 'required|email|unique:users,email,'.auth()->id(),
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:5000',
             'resale_license' => 'nullable|file|mimes:pdf|max:5000',
             'photo_of_id' => 'nullable|file|mimes:jpeg,png,jpg|max:5000',
