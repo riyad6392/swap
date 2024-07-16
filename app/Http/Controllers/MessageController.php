@@ -2,20 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\MessageBroadcast;
 use App\Facades\MessageFacade;
-use App\Http\Requests\Conversation\StoreConversationRequest;
-use App\Http\Requests\Message\ConversationListRequest;
 use App\Http\Requests\Message\MessageListRequest;
 use App\Http\Requests\Message\StoreMessageRequest;
-use App\Http\Resources\ConversationResources;
 use App\Http\Resources\MessageResource;
-use App\Models\Conversation;
 use App\Models\Message;
-use App\Models\Participant;
-use App\Models\User;
-use App\Services\SwapMessageService;
-use App\Services\SwapNotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -106,6 +97,7 @@ class MessageController extends Controller
      *      )
      * )
      */
+    /*Deprecated
     public function prepareConversation(StoreConversationRequest $conversationRequest): JsonResponse
     {
 
@@ -124,7 +116,7 @@ class MessageController extends Controller
             $conversationRequest->conversation_type
         );
         return response()->json(['success' => true, 'data' => $conversation, 'message' => 'Conversation started successfully']);
-    }
+    }*/
 
     /**
      * Send Message.
@@ -224,17 +216,16 @@ class MessageController extends Controller
                 ->doMessageBroadcast()
                 ->doConversationBroadcast();
 
-
             $data = [
                 'messages'     => $response->insert_message,
                 'conversation' => $response->conversation,
             ];
 
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Message sent successfully', 'data' => $data]);
-        } catch (\Exception $e) {
+            return apiResponseWithSuccess(config('constants.message_sent'), $data);
+        } catch (\Throwable $th) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            throw $th;
         }
 
     }
@@ -289,7 +280,7 @@ class MessageController extends Controller
      */
 
 
-    // Deprecated method
+    /*Deprecated method
     public function index(ConversationListRequest $conversationListRequest): \Illuminate\Http\JsonResponse
     {
         $conversation = Conversation::query();
@@ -319,7 +310,7 @@ class MessageController extends Controller
         )->resource;
 
         return response()->json(['success' => true, 'data' => $conversation]);
-    }
+    }*/
 
     public function messageList(MessageListRequest $messageListRequest, $id)
     {
@@ -354,19 +345,7 @@ class MessageController extends Controller
 
         $message = $message->load('sender.image');
 
-
-        // $participants = Participant::where('conversation_id', $id)->get();
-        // $participants->each(function ($participant) use($message) {
-        //     $message_ins = $message->where('id',$participant->message_id)->first();
-        //     if (!isset($message_ins->last_seen_users)) {
-        //         $message_ins->last_seen_users = collect(); // Initialize the array if it doesn't exist
-        //     }
-
-        //     // Check if $participant->user is not already in $message_ins->last_seen_users
-        //     $message_ins->last_seen_users->push($participant->user);  // Add $participant->user to the array
-        // });
-
-        return response()->json(['success' => true, 'data' => MessageResource::collection($message)->resource]);
+        return apiResponseWithSuccess(config('constants.message_retrieve'), MessageResource::collection($message)->resource);
     }
 
     /**
@@ -425,16 +404,16 @@ class MessageController extends Controller
      * )
      */
 
-    public function updateMessage(Request $request)
+    public function updateMessage(Request $request, Message $message)
     {
-        $message = Message::where('sender_id', auth()->id())->where('id', $request->id)->first();
-        if (!$message) {
-            return response()->json(['success' => false, 'message' => 'Message not found'], 404);
-        }
+        // $message = Message::where('sender_id', auth()->id())->where('id', $request->id)->first();
+        // if (!$message) {
+        //     return response()->json(['success' => false, 'message' => str_replace(':model', 'Message', config('constants.not_found'))], 404);
+        // }
 
         $message->update($request->only('message'));
 
-        return response()->json(['success' => true, 'message' => 'Message updated successfully', 'data' => $message]);
+        return apiResponseWithSuccess(config('constants.message_update'), $message);
     }
 
     /**
@@ -490,7 +469,7 @@ class MessageController extends Controller
         DB::beginTransaction();
         try {
             $message = Message::where('sender_id', auth()->id())
-                ->where('id', $request->id)
+                ->where('id', $id)
                 ->with('conversation')
                 ->firstOrFail();
 
@@ -509,15 +488,11 @@ class MessageController extends Controller
 
             $message->delete();
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Message deleted successfully'], 200);
+            return apiResponseWithSuccess(config('constants.message_delete'));
         } catch (\Error $th) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $th]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e]);
+            throw $th;
         }
-
     }
 
 }

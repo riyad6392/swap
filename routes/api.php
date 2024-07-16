@@ -63,7 +63,8 @@ Route::get('admin-approval/{id}', function ($id) {
     \App\Models\User::find($id)->update(['is_approved_by_admin' => 1]);
 });
 
-
+//plan
+Route::resource('plan', PlanController::class)->only(['index', 'show']);
 
 
 Route::group(['middleware' => ['auth:api','user.online.status']], function () {
@@ -93,8 +94,6 @@ Route::group(['middleware' => ['auth:api','user.online.status']], function () {
         Route::resource('brand', BrandController::class)->only(['index', 'show']);
         Route::resource('size', SizeController::class)->only(['index', 'show']);
         Route::resource('color', ColorController::class)->only(['index', 'show']);
-
-//        Route::resource('plan', PlanController::class);
 
         Route::group(['middleware' => 'unverified.super.swapper'], function () {
             Route::get('admin-approval', function () {
@@ -162,23 +161,14 @@ Route::group(['middleware' => ['auth:api','user.online.status']], function () {
 
     });
 
-    //plan
-    Route::resource('plan', PlanController::class)->only(['index', 'show']);
-
-
     //Subscription
-
     Route::post('plan-subscription', [PlanSubscriptionController::class , 'subscribe']);
 
     //Payment Method
     Route::post('payment-method', [PaymentMethodController::class, 'store']);
+
     //user profile
     Route::get('user-profile', [UserController::class, 'userProfile']);
-
-
-
-
-
 });
 
 

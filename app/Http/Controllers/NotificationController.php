@@ -85,6 +85,7 @@ class NotificationController extends Controller
 
         return response()->json([
             'success' => true,
+            'message' => str_replace(':model', 'Notifications', config('constants.data_delete')),
             'data' => [
                 'notifications' => $notificationList,
                 'unreadNotifications' => $unreadNotificationsCount,
@@ -139,12 +140,12 @@ class NotificationController extends Controller
         $notification = Notification::find($id);
 
         if (!$notification) {
-            return response()->json(['success' => false, 'message' => 'Notification not found'], 404);
+            return response()->json(['success' => false, 'message' => str_replace(':model', 'Notification', config('constants.not_found'))], 404);
         }
 
         $notification->update(['read_at' => now()]);
 
-        return response()->json(['success' => true, 'message' => 'Notifications update successfully', 'data' => $notification], 200);
+        return response()->json(['success' => true, 'message' => str_replace(':model', 'Notification', config('constants.data_retrieve')), 'data' => $notification], 200);
     }
 
     /**
@@ -201,7 +202,7 @@ class NotificationController extends Controller
 
         $notification->update(['read_at' => now()]);
 
-        return response()->json(['success' => true, 'message' => 'Notifications update successfully'], 200);
+        return response()->json(['success' => true, 'message' => str_replace(':model', 'Notifications', config('constants.data_update'))], 200);
     }
 
     /**
@@ -258,7 +259,7 @@ class NotificationController extends Controller
 
         $notification->update(['read_at' => null]);
 
-        return response()->json(['success' => true, 'message' => 'Notifications update successfully'], 200);
+        return response()->json(['success' => true, 'message' => str_replace(':model', 'Notifications', config('constants.data_update'))], 200);
     }
 
     public function deleteNotification(Request $request, String $id): \Illuminate\Http\JsonResponse
@@ -272,17 +273,17 @@ class NotificationController extends Controller
                 $user->notifications()->detach($notification->id);
                 $notification->delete();
             } else{
-                return response()->json(['success' => false, 'message' => 'Unauthorized to delete this notification'], 403);
+                return response()->json(['success' => false, 'message' => str_replace(':model', 'Notification', config('constants.unauthorize'))], 403);
             }
 
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Notifications deleted successfully'], 200);
+            return response()->json(['success' => true, 'message' => str_replace(':model', 'Notification', config('constants.data_delete'))], 200);
         } catch (\Error $th) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $th]);
+            return response()->json(['success' => false, 'message' => config('constants.throwable error')]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e]);
+            return response()->json(['success' => false, 'message' => config('constants.exception_occured')]);
         }
 
     }

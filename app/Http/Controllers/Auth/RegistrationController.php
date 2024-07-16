@@ -112,7 +112,7 @@ class RegistrationController extends Controller
 
                 if (auth()->attempt($request->only('email', 'password'), $request->remember)) {
                     $user = auth()->user();
-                    $token = $this->getTokenAndRefreshToken($request->email, $request->password, 'user');
+                    $token = $this->getTokenAndRefreshToken($request->email, $request->password, 'user', 'users');
 
                     if (!$token) {
                         return response()->json(['success' => false, 'message' => 'Invalid token.'], 422);

@@ -528,9 +528,9 @@ class SwapController extends Controller
 
             return response()->json(['success' => false, 'message' => 'You are not authorized to update this swap'], 401);
 
-        } catch (\Exception $e) {
+        } catch (\Error $th) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'Failed to update swap', 'errors' => $e->getMessage()], 500);
+            throw $th;
         }
     }
 
