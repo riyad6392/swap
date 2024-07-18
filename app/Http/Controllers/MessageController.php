@@ -311,8 +311,7 @@ class MessageController extends Controller
         $conversation = ConversationResources::collection(
             $conversation->paginate($conversationListRequest->pagination ?? self::PER_PAGE)
         )->resource;
-
-        return response()->json(['success' => true, 'data' => $conversation]);
+        return apiResponseWithSuccess('Conversations Retrieved Succesfully', $conversation);
     }
 
     public function messageList(MessageListRequest $messageListRequest, $id)

@@ -258,7 +258,6 @@ class SwapController extends Controller
                     'status'            => $swapRequest->status,
                 ]
             );
-            dd("ok");
             $prepareData = SwapRequestService::prepareDetailsData(
                 $SwapExchangeDetailsRequest,
                 $swap,
@@ -523,7 +522,7 @@ class SwapController extends Controller
 
                 DB::commit();
 
-                return response()->json(['success' => true, 'data' => $swap], 201);
+                return response()->json(['success' => true, 'data' => $swap->load('exchangeDetails','requestDetail')], 201);
             }
 
             return response()->json(['success' => false, 'message' => 'You are not authorized to update this swap'], 401);
