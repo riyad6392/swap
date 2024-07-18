@@ -94,6 +94,7 @@ class PlanSubscriptionController extends Controller
      */
     public function subscribe(StorePlanSubscriptionRequest $planSubscriptionRequest)
     {
+        
         try {
             DB::beginTransaction();
 

@@ -13,6 +13,7 @@ use App\Services\StripePaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpFoundation\Response;
 
 class PlanController extends Controller
 {
@@ -67,19 +68,17 @@ class PlanController extends Controller
      */
     public function index(Request $request): \Illuminate\Http\JsonResponse
     {
-        $plans = Plan::query();
-
-        $plans = $plans->where('is_active', 1)
-            ->with('planDetails');
+        $plans = Plan::where('is_active', 1)->with('planDetails');
 
         if ($request->get('get_all')) {
-            return response()->json(['success' => true, 'data' => $plans->get()]);
+            $plans = $plans->get();
+        } else {
+            $plans = $plans->paginate($request->pagination ?? self::PER_PAGE);
         }
 
-        $plans = $plans->paginate($request->pagination ?? self::PER_PAGE);
-
-        return response()->json(['success' => true, 'data' => $plans]);
+        return apiResponseWithSuccess('Plans retrieved successfully', $plans);
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -219,15 +218,13 @@ class PlanController extends Controller
      */
     public function store(StorePlanRequest $planRequest, StorePlanDetailsRequest $planDetailsRequest)
     {
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
-
-//            dd(Plan::where('is_active', 1)->count());
             if (Plan::where('is_active', 1)->count() >= 2) {
-                return response()->json(['success' => false, 'message' => 'you can not active more then 2 plan at a time'], 422);
+                return apiResponseWithError('You can not active more than 2 plans at a time', Response::HTTP_UNPROCESSABLE_ENTITY);
             }
 
-            $plan = Plan::create($planRequest->only([
+            $planData = $planRequest->only([
                 'name',
                 'description',
                 'short_description',
@@ -237,12 +234,12 @@ class PlanController extends Controller
                 'interval_duration',
                 'is_active',
                 'plan_type'
-            ]));
+            ]);
 
-            $planDetailArray = [];
-            foreach ($planDetailsRequest->plan_details as $planDetail) {
+            $plan = Plan::create($planData);
 
-                $planDetailArray[] = [
+            $planDetailArray = collect($planDetailsRequest->plan_details)->map(function ($planDetail) use ($plan) {
+                return [
                     'created_by' => auth()->id(),
                     'updated_by' => auth()->id(),
                     'plan_id' => $plan->id,
@@ -250,7 +247,7 @@ class PlanController extends Controller
                     'features_count' => $planDetail['features_count'],
                     'value' => $planDetail['value'],
                 ];
-            }
+            })->toArray();
 
             $plan->planDetails()->insert($planDetailArray);
 
@@ -260,13 +257,11 @@ class PlanController extends Controller
 
             DB::commit();
 
-            return response()->json(['success' => true, 'message' => 'Plan created successfully!'], 200);
-        } catch (\Exception $e) {
+            return apiResponseWithSuccess('Plan created successfully!', $plan, Response::HTTP_CREATED);
+        } catch (\Error $th) {
             DB::rollBack();
-
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            throw $th;
         }
-
     }
 
     /**
@@ -303,19 +298,8 @@ class PlanController extends Controller
      */
     public function show(string $id)
     {
-        try {
-            $plan = Plan::find($id);
-            if ($plan) {
-
-                $plan->load('planDetails');
-                return response()->json(['success' => true, 'data' => $plan], 200);
-            }
-
-            return response()->json(['success' => false, 'message' => 'Plan not exist'], 422);
-
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Failed to retrieve plan'], 500);
-        }
+        $plan = Plan::with('planDetails')->findOrFail($id);
+        return apiResponseWithSuccess('Plan retrieved successfully', $plan);
     }
 
     /**
@@ -427,30 +411,23 @@ class PlanController extends Controller
     {
         $plan = Plan::find($id);
 
-        if (empty($plan)) {
-            return response()->json(['success' => false, 'message' => 'Plan does not exist'], 500);
+        if (!$plan) {
+            return apiResponseWithError('Plan does not exist', Response::HTTP_NOT_FOUND);
         }
 
         if (Plan::where('is_active', 1)->count() >= 2) {
-            return response()->json(['success' => false, 'message' => 'you can not active more then 2 plan at a time'], 422);
+            return apiResponseWithError('You can not active more than 2 plans at a time', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
-
             $plan->update($updatePlanRequest->only([
-                'name',
-                'description',
-                'short_description',
-                'is_active',
-                'plan_type'
+                'name', 'description', 'short_description', 'is_active', 'plan_type'
             ]));
 
             if (count($updatePlanDetailsRequest->plan_details)) {
-                $planDetailArray = [];
-                foreach ($updatePlanDetailsRequest->plan_details as $planDetail) {
-
-                    $planDetailArray[] = [
+                $planDetailArray = collect($updatePlanDetailsRequest->plan_details)->map(function ($planDetail) use ($plan) {
+                    return [
                         'created_by' => auth()->id(),
                         'updated_by' => auth()->id(),
                         'plan_id' => $plan->id,
@@ -460,23 +437,22 @@ class PlanController extends Controller
                         'created_at' => date('Y-m-d H:i:s'),
                         'updated_at' => date('Y-m-d H:i:s'),
                     ];
-                }
+                })->toArray();
+
                 $plan->planDetails()->insert($planDetailArray);
             }
 
             if ($updatePlanDetailsRequest->delete_feature_id) {
                 PlanDetails::where('plan_id', $plan->id)
-                    ->whereIn('id', $updatePlanDetailsRequest->delete_feature_id)->delete();
+                    ->whereIn('id', $updatePlanDetailsRequest->delete_feature_id)
+                    ->delete();
             }
 
-//            $response = StripePaymentFacade::updatePrice($plan);
-//            // $plan->update(['stripe_price_id' => $response->id]);
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Plan updated successfully!'], 200);
-
-        } catch (\Exception $e) {
+            return apiResponseWithSuccess('Plan updated successfully!', $plan);
+        } catch (\Error $th) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            throw $th;
         }
     }
 
@@ -514,15 +490,9 @@ class PlanController extends Controller
      */
     public function destroy(string $id)
     {
-        $plan = Plan::find($id);
-        if ($plan) {
-            $plan->planDetails()->delete();
-            $plan->delete();
-            return response()->json(['success' => true, 'message' => 'Plan and related data deleted successfully'], 200);
-        }
-        return response()->json(['success' => false, 'message' => 'Plan not exist'], 422);
-
+        $plan = Plan::findOrFail($id);
+        $plan->planDetails()->delete();
+        $plan->delete();
+        return apiResponseWithSuccess('Plan and related data deleted successfully');
     }
-
-
 }

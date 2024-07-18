@@ -27,7 +27,7 @@ class StripePaymentService
         return $this->stripe->customers->update(
             $data['stripe_customer_id'],
             ['name' => $data['name'],
-             "email" => $data['email'],
+             "email" => "myemail@mydomain11111.com",
             ]
         );
     }

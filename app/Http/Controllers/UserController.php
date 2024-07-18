@@ -879,7 +879,7 @@ class UserController extends Controller
 
             $user = $user->load('image');
 
-            StripePaymentFacade::updateCustomer($user);
+            StripePaymentFacade::updateCustomer($user, $userRequest);
 
             DB::commit();
             return response()->json(['success' => true, 'data' => $user]);
