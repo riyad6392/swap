@@ -8,6 +8,7 @@ use App\Models\Swap;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
 
 class NotificationController extends Controller
 {
@@ -83,15 +84,11 @@ class NotificationController extends Controller
             $notificationList = $notificationQuery->paginate(10);
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => str_replace(':model', 'Notifications', config('constants.data_delete')),
-            'data' => [
-                'notifications' => $notificationList,
-                'unreadNotifications' => $unreadNotificationsCount,
-                'readNotifications' => $readNotificationsCount
-            ]
-        ], 200);
+        return apiResponseWithSuccess('Notifications Retrieved Successfully', [
+            'notifications' => $notificationList,
+            'unreadNotifications' => $unreadNotificationsCount,
+            'readNotifications' => $readNotificationsCount
+        ]);
     }
 
     /**
@@ -137,15 +134,11 @@ class NotificationController extends Controller
 
     public function show($id): \Illuminate\Http\JsonResponse
     {
-        $notification = Notification::find($id);
-
-        if (!$notification) {
-            return response()->json(['success' => false, 'message' => str_replace(':model', 'Notification', config('constants.not_found'))], 404);
-        }
+        $notification = Notification::findOrFail($id);
 
         $notification->update(['read_at' => now()]);
 
-        return response()->json(['success' => true, 'message' => str_replace(':model', 'Notification', config('constants.data_retrieve')), 'data' => $notification], 200);
+        return apiResponseWithSuccess('Notification updated successfully', $notification);
     }
 
     /**
@@ -202,7 +195,7 @@ class NotificationController extends Controller
 
         $notification->update(['read_at' => now()]);
 
-        return response()->json(['success' => true, 'message' => str_replace(':model', 'Notifications', config('constants.data_update'))], 200);
+        return apiResponseWithSuccess('Notification marked as read');
     }
 
     /**
@@ -259,7 +252,7 @@ class NotificationController extends Controller
 
         $notification->update(['read_at' => null]);
 
-        return response()->json(['success' => true, 'message' => str_replace(':model', 'Notifications', config('constants.data_update'))], 200);
+        return apiResponseWithSuccess('Notification marked as read');
     }
 
     public function deleteNotification(Request $request, String $id): \Illuminate\Http\JsonResponse
@@ -269,22 +262,18 @@ class NotificationController extends Controller
             $user = auth()->user();
             $notification = $user->notifications()->where('notifications.id', $id)->first();
 
-            if ($notification) {
-                $user->notifications()->detach($notification->id);
-                $notification->delete();
-            } else{
-                return response()->json(['success' => false, 'message' => str_replace(':model', 'Notification', config('constants.unauthorize'))], 403);
+            if (!$notification) {
+                return apiResponseWithError('Notification not found', Response::HTTP_NOT_FOUND);
             }
 
+            $user->notifications()->detach($notification->id);
+            $notification->delete();
+
             DB::commit();
-            return response()->json(['success' => true, 'message' => str_replace(':model', 'Notification', config('constants.data_delete'))], 200);
+            return apiResponseWithSuccess('Notification deleted successfully');
         } catch (\Error $th) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => config('constants.throwable error')]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['success' => false, 'message' => config('constants.exception_occured')]);
+            throw $th;
         }
-
     }
 }
