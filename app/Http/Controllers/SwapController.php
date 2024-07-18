@@ -86,7 +86,7 @@ class SwapController extends Controller
         $swaps->where(function ($query) {
             $userId = auth()->id();
             $query->where('requested_user_id', $userId)
-                ->orWhere('exchanged_user_id', $userId);
+                  ->orWhere('exchanged_user_id', $userId);
         }
         );
 
@@ -95,33 +95,33 @@ class SwapController extends Controller
             $swaps->where(function ($query) use ($searchTerm) {
                 $query->whereHas('user', function ($query) use ($searchTerm) {
                     $query->where('first_name', 'like', $searchTerm)
-                        ->orWhere('last_name', 'like', $searchTerm);
+                          ->orWhere('last_name', 'like', $searchTerm);
                 }
                 )
-                    ->orWhereHas('exchangeDetails', function ($query) use ($searchTerm) {
-                        $query->whereHas('product', function ($query) use ($searchTerm) {
-                            $query->where('name', 'like', $searchTerm)
-                                ->orWhere('description', 'like', $searchTerm);
-                        }
-                        );
-                    }
-                    )
-                    ->orWhereHas('requestDetail', function ($query) use ($searchTerm) {
-                        $query->whereHas('product', function ($query) use ($searchTerm) {
-                            $query->where('name', 'like', $searchTerm)
-                                ->orWhere('description', 'like', $searchTerm);
-                        }
-                        );
-                    }
-                    )
-                    ->orWhereHas('initiateDetails', function ($query) use ($searchTerm) {
-                        $query->whereHas('product', function ($query) use ($searchTerm) {
-                            $query->where('name', 'like', $searchTerm)
-                                ->orWhere('description', 'like', $searchTerm);
-                        }
-                        );
-                    }
-                    );
+                      ->orWhereHas('exchangeDetails', function ($query) use ($searchTerm) {
+                          $query->whereHas('product', function ($query) use ($searchTerm) {
+                              $query->where('name', 'like', $searchTerm)
+                                    ->orWhere('description', 'like', $searchTerm);
+                          }
+                          );
+                      }
+                      )
+                      ->orWhereHas('requestDetail', function ($query) use ($searchTerm) {
+                          $query->whereHas('product', function ($query) use ($searchTerm) {
+                              $query->where('name', 'like', $searchTerm)
+                                    ->orWhere('description', 'like', $searchTerm);
+                          }
+                          );
+                      }
+                      )
+                      ->orWhereHas('initiateDetails', function ($query) use ($searchTerm) {
+                          $query->whereHas('product', function ($query) use ($searchTerm) {
+                              $query->where('name', 'like', $searchTerm)
+                                    ->orWhere('description', 'like', $searchTerm);
+                          }
+                          );
+                      }
+                      );
             }
             );
         }
@@ -337,12 +337,12 @@ class SwapController extends Controller
     public function show($id)
     {
         $swap = Swap::with('exchangeDetails', 'requestDetail', 'initiateDetails')->where('uid', $id)
-            ->orWhere('id', $id)
-            ->first();
+                    ->orWhere('id', $id)
+                    ->first();
 
         if ($swap->requested_user_id == auth()->id() || $swap->exchanged_user_id == auth()->id()) {
 
-            return response()->json(['success' => true, 'data' => $swap]);
+            return response()->json(['success' => true, 'data' => $swap->load('exchangeDetails', 'requestDetail')], 200);
         }
         return response()->json(['success' => false, 'message' => 'You are not authorized to view this swap'], 401);
 
@@ -470,8 +470,8 @@ class SwapController extends Controller
     {
 
         $swap = Swap::where('uid', $id)
-            ->orWhere('id', $id)
-            ->first();
+                    ->orWhere('id', $id)
+                    ->first();
 
         if (!$swap) {
             return response()->json(['success' => false, 'message' => 'Swap not found'], 404);
@@ -485,7 +485,10 @@ class SwapController extends Controller
                 $defineType = $swapExchangeDetailsRequest->define_type;
 
                 if (is_null($swapExchangeDetailsRequest->$defineType)) {
-                    return response()->json(['success' => false, 'message' => str_replace('_', ' ', $defineType) . ' is empty']);
+                    return response()->json([
+                            'success' => false,
+                            'message' => str_replace('_', ' ', $defineType) . ' is empty']
+                    );
                 }
 
                 $prepareData = SwapRequestService::prepareDetailsData(
@@ -522,7 +525,7 @@ class SwapController extends Controller
 
                 DB::commit();
 
-                return response()->json(['success' => true, 'data' => $swap->load('exchangeDetails','requestDetail')], 201);
+                return response()->json(['success' => true, 'data' => $swap->load('exchangeDetails', 'requestDetail')], 201);
             }
 
             return response()->json(['success' => false, 'message' => 'You are not authorized to update this swap'], 401);
@@ -611,7 +614,7 @@ class SwapController extends Controller
     {
         $swap = Swap::where(function ($query) use ($uid) {
             $query->where('exchanged_user_id', auth()->id())
-                ->orWhere('requested_user_id', auth()->id());
+                  ->orWhere('requested_user_id', auth()->id());
         }
         )->where('uid', $uid)->first();
 
@@ -679,7 +682,7 @@ class SwapController extends Controller
     {
         $swap = Swap::where(function ($query) use ($uid) {
             $query->where('exchanged_user_id', auth()->id())
-                ->orWhere('requested_user_id', auth()->id());
+                  ->orWhere('requested_user_id', auth()->id());
         }
         )->where('uid', $uid)->first();
 
@@ -715,7 +718,7 @@ class SwapController extends Controller
     {
         $swap = Swap::where(function ($query) use ($uid) {
             $query->where('exchanged_user_id', auth()->id())
-                ->orWhere('requested_user_id', auth()->id());
+                  ->orWhere('requested_user_id', auth()->id());
         }
         )->where('uid', $uid)->first();
 

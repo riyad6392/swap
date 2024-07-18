@@ -20,6 +20,7 @@ class ProductVariationResource extends JsonResource
             'quantity' => $this->quantity,
             'discount_end_date' => $this->discount_end_date,
 //            'product' => $this->product,
+            'unit_price' => $this->unit_price,
             'size' => new SizeResource($this->whenLoaded('size')),
             'color' => new ColorResource($this->whenLoaded('color')),
             'images' => ImageResource::collection($this->images),
